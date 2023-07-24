@@ -1,0 +1,29 @@
+2023-07-11 08:45:20,546 INFO    MainThread:969981 [wandb_setup.py:_flush():76] Current SDK version is 0.15.3
+2023-07-11 08:45:20,547 INFO    MainThread:969981 [wandb_setup.py:_flush():76] Configure stats pid to 969981
+2023-07-11 08:45:20,547 INFO    MainThread:969981 [wandb_setup.py:_flush():76] Loading settings from /remote-home/songtianwei/.config/wandb/settings
+2023-07-11 08:45:20,547 INFO    MainThread:969981 [wandb_setup.py:_flush():76] Loading settings from /remote-home/songtianwei/research/diffusion_model_my/sh/text-to-image/train_finetuned/wandb/settings
+2023-07-11 08:45:20,547 INFO    MainThread:969981 [wandb_setup.py:_flush():76] Loading settings from environment variables: {}
+2023-07-11 08:45:20,547 INFO    MainThread:969981 [wandb_setup.py:_flush():76] Applying setup settings: {'_disable_service': False}
+2023-07-11 08:45:20,547 INFO    MainThread:969981 [wandb_setup.py:_flush():76] Inferring run settings from compute environment: {'program_relpath': 'train1.py', 'program': 'train1.py'}
+2023-07-11 08:45:20,547 INFO    MainThread:969981 [wandb_init.py:_log_setup():507] Logging user logs to /remote-home/songtianwei/research/diffusion_model_my/sh/text-to-image/train_finetuned/wandb/run-20230711_084520-t53ku8ux/logs/debug.log
+2023-07-11 08:45:20,547 INFO    MainThread:969981 [wandb_init.py:_log_setup():508] Logging internal logs to /remote-home/songtianwei/research/diffusion_model_my/sh/text-to-image/train_finetuned/wandb/run-20230711_084520-t53ku8ux/logs/debug-internal.log
+2023-07-11 08:45:20,547 INFO    MainThread:969981 [wandb_init.py:init():547] calling init triggers
+2023-07-11 08:45:20,547 INFO    MainThread:969981 [wandb_init.py:init():554] wandb.init called with sweep_config: {}
+config: {}
+2023-07-11 08:45:20,547 INFO    MainThread:969981 [wandb_init.py:init():596] starting backend
+2023-07-11 08:45:20,547 INFO    MainThread:969981 [wandb_init.py:init():600] setting up manager
+2023-07-11 08:45:20,550 INFO    MainThread:969981 [backend.py:_multiprocessing_setup():106] multiprocessing start_methods=fork,spawn,forkserver, using: spawn
+2023-07-11 08:45:20,564 INFO    MainThread:969981 [wandb_init.py:init():606] backend started and connected
+2023-07-11 08:45:20,568 INFO    MainThread:969981 [wandb_init.py:init():700] updated telemetry
+2023-07-11 08:45:20,570 INFO    MainThread:969981 [wandb_init.py:init():737] communicating run to backend with 60.0 second timeout
+2023-07-11 08:45:21,842 INFO    MainThread:969981 [wandb_run.py:_on_init():2177] communicating current version
+2023-07-11 08:45:22,761 INFO    MainThread:969981 [wandb_run.py:_on_init():2186] got version response upgrade_message: "wandb version 0.15.5 is available!  To upgrade, please run:\n $ pip install wandb --upgrade"
+
+2023-07-11 08:45:22,761 INFO    MainThread:969981 [wandb_init.py:init():787] starting run threads in backend
+2023-07-11 08:45:30,566 INFO    MainThread:969981 [wandb_run.py:_console_start():2158] atexit reg
+2023-07-11 08:45:30,566 INFO    MainThread:969981 [wandb_run.py:_redirect():2013] redirect: SettingsConsole.WRAP_RAW
+2023-07-11 08:45:30,567 INFO    MainThread:969981 [wandb_run.py:_redirect():2078] Wrapping output streams.
+2023-07-11 08:45:30,567 INFO    MainThread:969981 [wandb_run.py:_redirect():2103] Redirects installed.
+2023-07-11 08:45:30,568 INFO    MainThread:969981 [wandb_init.py:init():829] run started, returning control to user process
+2023-07-11 08:45:30,570 INFO    MainThread:969981 [wandb_run.py:_config_callback():1286] config_cb None None {'input_pertubation': 0, 'pretrained_model_name_or_path': 'CompVis/stable-diffusion-v1-4', 'revision': None, 'dataset_name': 'ydshieh/coco_dataset_script', 'dataset_config_name': '2017', 'data_dir': '/remote-home/songtianwei/research/diffusion_model_my/data', 'train_data_dir': None, 'image_column': 'image_path', 'caption_column': 'caption', 'max_train_samples': None, 'output_dir': 'my_train_results/ydshieh/coco_dataset_script/2023-07-11', 'cache_dir': None, 'seed': None, 'resolution': 224, 'center_crop': True, 'random_flip': True, 'train_batch_size': 6, 'num_train_epochs': 1, 'max_train_steps': 15000, 'gradient_accumulation_steps': 1, 'gradient_checkpointing': True, 'learning_rate': 1e-06, 'scale_lr': False, 'lr_scheduler': 'constant', 'lr_warmup_steps': 0, 'snr_gamma': None, 'use_8bit_adam': True, 'allow_tf32': False, 'use_ema': True, 'non_ema_revision': None, 'dataloader_num_workers': 0, 'adam_beta1': 0.9, 'adam_beta2': 0.999, 'adam_weight_decay': 0.01, 'adam_epsilon': 1e-08, 'max_grad_norm': 1.0, 'push_to_hub': False, 'hub_token': None, 'hub_model_id': None, 'logging_dir': 'logs', 'mixed_precision': None, 'report_to': 'wandb', 'local_rank': -1, 'checkpointing_steps': 500, 'checkpoints_total_limit': None, 'resume_from_checkpoint': None, 'enable_xformers_memory_efficient_attention': False, 'noise_offset': 0, 'validation_epochs': 5, 'tracker_project_name': 'text2image-fine-tune'}
+2023-07-11 08:45:40,800 WARNING MsgRouterThr:969981 [router.py:message_loop():77] message_loop has been closed

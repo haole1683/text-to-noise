@@ -1,0 +1,45 @@
+07/11/2023 08:58:24 - INFO - __main__ - ***** Running training *****
+07/11/2023 08:58:24 - INFO - __main__ -   Num examples = 591753
+07/11/2023 08:58:24 - INFO - __main__ -   Num Epochs = 1
+07/11/2023 08:58:24 - INFO - __main__ -   Instantaneous batch size per device = 6
+07/11/2023 08:58:24 - INFO - __main__ -   Total train batch size (w. parallel, distributed & accumulation) = 6
+07/11/2023 08:58:24 - INFO - __main__ -   Gradient Accumulation steps = 1
+07/11/2023 08:58:24 - INFO - __main__ -   Total optimization steps = 15000
+Steps:   0%|                                                                                                                                                        | 0/15000 [00:00<?, ?it/s]/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/torchvision/transforms/functional.py:1603: UserWarning: The default value of the antialias parameter of all the resizing transforms (Resize(), RandomResizedCrop(), etc.) will change from None to True in v0.17, in order to be consistent across the PIL and Tensor backends. To suppress this warning, directly pass antialias=True (recommended, future default), antialias=None (current default, which means False for Tensors and True for PIL), or antialias=False (only works on Tensors - PIL will still use antialiasing). This also applies if you are using the inference transforms from the models weights: update the call to weights.transforms(antialias=True).
+  warnings.warn(
+Traceback (most recent call last):
+  File "train1.py", line 1084, in <module>
+    main()
+  File "train1.py", line 901, in main
+    for step, batch in enumerate(train_dataloader):
+  File "/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/accelerate/data_loader.py", line 377, in __iter__
+    current_batch = next(dataloader_iter)
+  File "/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/torch/utils/data/dataloader.py", line 633, in __next__
+    data = self._next_data()
+  File "/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/torch/utils/data/dataloader.py", line 677, in _next_data
+    data = self._dataset_fetcher.fetch(index)  # may raise StopIteration
+  File "/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/torch/utils/data/_utils/fetch.py", line 49, in fetch
+    data = self.dataset.__getitems__(possibly_batched_index)
+  File "/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/datasets/arrow_dataset.py", line 2782, in __getitems__
+    batch = self.__getitem__(keys)
+  File "/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/datasets/arrow_dataset.py", line 2778, in __getitem__
+    return self._getitem(key)
+  File "/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/datasets/arrow_dataset.py", line 2763, in _getitem
+    formatted_output = format_table(
+  File "/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/datasets/formatting/formatting.py", line 624, in format_table
+    return formatter(pa_table, query_type=query_type)
+  File "/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/datasets/formatting/formatting.py", line 400, in __call__
+    return self.format_batch(pa_table)
+  File "/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/datasets/formatting/formatting.py", line 510, in format_batch
+    return self.transform(batch)
+  File "train1.py", line 765, in preprocess_train
+    examples["pixel_values"] = [train_transforms(image) for image in images]
+  File "train1.py", line 765, in <listcomp>
+    examples["pixel_values"] = [train_transforms(image) for image in images]
+  File "/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/torchvision/transforms/transforms.py", line 95, in __call__
+    img = t(img)
+  File "/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/torchvision/transforms/transforms.py", line 137, in __call__
+    return F.to_tensor(pic)
+  File "/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/torchvision/transforms/functional.py", line 140, in to_tensor
+    raise TypeError(f"pic should be PIL Image or ndarray. Got {type(pic)}")
+TypeError: pic should be PIL Image or ndarray. Got <class 'torch.Tensor'>

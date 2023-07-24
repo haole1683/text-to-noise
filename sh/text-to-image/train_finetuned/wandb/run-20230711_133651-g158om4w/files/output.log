@@ -1,0 +1,118 @@
+07/11/2023 13:37:00 - INFO - __main__ - ***** Running training *****
+07/11/2023 13:37:00 - INFO - __main__ -   Num examples = 483213
+07/11/2023 13:37:00 - INFO - __main__ -   Num Epochs = 1
+07/11/2023 13:37:00 - INFO - __main__ -   Instantaneous batch size per device = 6
+07/11/2023 13:37:00 - INFO - __main__ -   Total train batch size (w. parallel, distributed & accumulation) = 6
+07/11/2023 13:37:00 - INFO - __main__ -   Gradient Accumulation steps = 1
+07/11/2023 13:37:00 - INFO - __main__ -   Total optimization steps = 15000
+
+Steps:   0%|                                                                                                                          | 0/15000 [00:00<?, ?it/s]Forward upsample size to force interpolation output size.
+Steps:   0%|                                                                                      | 1/15000 [00:22<93:34:28, 22.46s/it, lr=1e-6, step_loss=4.06]Forward upsample size to force interpolation output size.
+Steps:   0%|                                                                                      | 2/15000 [00:23<40:53:25,  9.82s/it, lr=1e-6, step_loss=4.29]Forward upsample size to force interpolation output size.
+Steps:   0%|                                                                                      | 3/15000 [00:24<23:57:34,  5.75s/it, lr=1e-6, step_loss=4.11]Forward upsample size to force interpolation output size.
+Steps:   0%|                                                                                       | 4/15000 [00:25<15:58:01,  3.83s/it, lr=1e-6, step_loss=4.3]Forward upsample size to force interpolation output size.
+Steps:   0%|                                                                                      | 5/15000 [00:26<11:30:27,  2.76s/it, lr=1e-6, step_loss=3.98]Forward upsample size to force interpolation output size.
+Steps:   0%|                                                                                       | 6/15000 [00:26<8:48:39,  2.12s/it, lr=1e-6, step_loss=4.07]Forward upsample size to force interpolation output size.
+Steps:   0%|                                                                                       | 7/15000 [00:27<7:07:07,  1.71s/it, lr=1e-6, step_loss=4.24]Forward upsample size to force interpolation output size.
+Steps:   0%|                                                                                       | 8/15000 [00:28<5:59:34,  1.44s/it, lr=1e-6, step_loss=4.24]Forward upsample size to force interpolation output size.
+Steps:   0%|                                                                                       | 9/15000 [00:29<5:14:34,  1.26s/it, lr=1e-6, step_loss=4.17]Forward upsample size to force interpolation output size.
+Steps:   0%|                                                                                       | 10/15000 [00:30<4:43:51,  1.14s/it, lr=1e-6, step_loss=4.2]Forward upsample size to force interpolation output size.
+Steps:   0%|                                                                                      | 11/15000 [00:31<4:22:40,  1.05s/it, lr=1e-6, step_loss=4.45]Forward upsample size to force interpolation output size.
+Steps:   0%|                                                                                       | 12/15000 [00:32<4:09:38,  1.00it/s, lr=1e-6, step_loss=4.4]Forward upsample size to force interpolation output size.
+Steps:   0%|                                                                                      | 13/15000 [00:33<4:02:00,  1.03it/s, lr=1e-6, step_loss=4.46]Forward upsample size to force interpolation output size.
+Steps:   0%|                                                                                      | 14/15000 [00:33<3:55:02,  1.06it/s, lr=1e-6, step_loss=4.23]Forward upsample size to force interpolation output size.
+Steps:   0%|                                                                                      | 15/15000 [00:34<3:49:56,  1.09it/s, lr=1e-6, step_loss=4.36]Forward upsample size to force interpolation output size.
+Steps:   0%|                                                                                      | 16/15000 [00:35<3:45:57,  1.11it/s, lr=1e-6, step_loss=3.95]Forward upsample size to force interpolation output size.
+Steps:   0%|                                                                                       | 17/15000 [00:36<3:44:00,  1.11it/s, lr=1e-6, step_loss=3.9]Forward upsample size to force interpolation output size.
+Steps:   0%|                                                                                      | 18/15000 [00:37<3:41:28,  1.13it/s, lr=1e-6, step_loss=4.01]Forward upsample size to force interpolation output size.
+Steps:   0%|                                                                                      | 19/15000 [00:38<3:37:20,  1.15it/s, lr=1e-6, step_loss=4.42]Forward upsample size to force interpolation output size.
+Steps:   0%|                                                                                      | 20/15000 [00:39<3:35:14,  1.16it/s, lr=1e-6, step_loss=4.59]Forward upsample size to force interpolation output size.
+Steps:   0%|                                                                                      | 21/15000 [00:39<3:33:02,  1.17it/s, lr=1e-6, step_loss=4.31]Forward upsample size to force interpolation output size.
+Steps:   0%|▏                                                                                     | 22/15000 [00:40<3:31:08,  1.18it/s, lr=1e-6, step_loss=4.46]Forward upsample size to force interpolation output size.
+Steps:   0%|▏                                                                                     | 23/15000 [00:41<3:31:05,  1.18it/s, lr=1e-6, step_loss=4.09]Forward upsample size to force interpolation output size.
+Steps:   0%|▏                                                                                      | 24/15000 [00:42<3:31:42,  1.18it/s, lr=1e-6, step_loss=4.2]Forward upsample size to force interpolation output size.
+Steps:   0%|▏                                                                                     | 25/15000 [00:43<3:31:19,  1.18it/s, lr=1e-6, step_loss=4.44]Forward upsample size to force interpolation output size.
+Steps:   0%|▏                                                                                     | 26/15000 [00:44<3:31:05,  1.18it/s, lr=1e-6, step_loss=4.13]Forward upsample size to force interpolation output size.
+Steps:   0%|▏                                                                                     | 27/15000 [00:45<3:31:34,  1.18it/s, lr=1e-6, step_loss=4.16]Forward upsample size to force interpolation output size.
+Steps:   0%|▏                                                                                      | 28/15000 [00:45<3:30:52,  1.18it/s, lr=1e-6, step_loss=4.3]Forward upsample size to force interpolation output size.
+Steps:   0%|▏                                                                                     | 29/15000 [00:46<3:30:54,  1.18it/s, lr=1e-6, step_loss=4.38]Forward upsample size to force interpolation output size.
+Steps:   0%|▏                                                                                      | 30/15000 [00:47<3:30:46,  1.18it/s, lr=1e-6, step_loss=4.6]Forward upsample size to force interpolation output size.
+Steps:   0%|▏                                                                                     | 31/15000 [00:48<3:30:01,  1.19it/s, lr=1e-6, step_loss=4.12]Forward upsample size to force interpolation output size.
+Steps:   0%|▏                                                                                     | 32/15000 [00:49<3:29:57,  1.19it/s, lr=1e-6, step_loss=4.28]Forward upsample size to force interpolation output size.
+Steps:   0%|▏                                                                                      | 33/15000 [00:50<3:29:57,  1.19it/s, lr=1e-6, step_loss=4.1]Forward upsample size to force interpolation output size.
+Steps:   0%|▏                                                                                     | 34/15000 [00:50<3:29:58,  1.19it/s, lr=1e-6, step_loss=4.29]Forward upsample size to force interpolation output size.
+Steps:   0%|▏                                                                                     | 35/15000 [00:51<3:46:12,  1.10it/s, lr=1e-6, step_loss=4.04]Forward upsample size to force interpolation output size.
+Steps:   0%|▏                                                                                     | 36/15000 [00:52<3:41:34,  1.13it/s, lr=1e-6, step_loss=4.26]Forward upsample size to force interpolation output size.
+Steps:   0%|▏                                                                                     | 37/15000 [00:53<3:38:00,  1.14it/s, lr=1e-6, step_loss=4.39]Forward upsample size to force interpolation output size.
+Steps:   0%|▏                                                                                     | 38/15000 [00:54<3:35:37,  1.16it/s, lr=1e-6, step_loss=4.32]Forward upsample size to force interpolation output size.
+Steps:   0%|▏                                                                                     | 39/15000 [00:55<3:34:16,  1.16it/s, lr=1e-6, step_loss=4.03]Forward upsample size to force interpolation output size.
+Steps:   0%|▏                                                                                     | 40/15000 [00:56<3:32:58,  1.17it/s, lr=1e-6, step_loss=3.81]Forward upsample size to force interpolation output size.
+Steps:   0%|▏                                                                                     | 41/15000 [00:57<3:32:27,  1.17it/s, lr=1e-6, step_loss=4.35]Forward upsample size to force interpolation output size.
+Steps:   0%|▏                                                                                     | 42/15000 [00:57<3:31:50,  1.18it/s, lr=1e-6, step_loss=4.29]Forward upsample size to force interpolation output size.
+Steps:   0%|▏                                                                                     | 43/15000 [00:58<3:31:12,  1.18it/s, lr=1e-6, step_loss=4.07]Forward upsample size to force interpolation output size.
+Steps:   0%|▎                                                                                     | 44/15000 [00:59<3:30:28,  1.18it/s, lr=1e-6, step_loss=3.99]Forward upsample size to force interpolation output size.
+Steps:   0%|▎                                                                                     | 45/15000 [01:00<3:31:05,  1.18it/s, lr=1e-6, step_loss=4.36]Forward upsample size to force interpolation output size.
+Steps:   0%|▎                                                                                     | 46/15000 [01:01<3:30:36,  1.18it/s, lr=1e-6, step_loss=4.07]Forward upsample size to force interpolation output size.
+Steps:   0%|▎                                                                                     | 47/15000 [01:02<3:30:43,  1.18it/s, lr=1e-6, step_loss=4.29]Forward upsample size to force interpolation output size.
+Steps:   0%|▎                                                                                     | 48/15000 [01:02<3:30:33,  1.18it/s, lr=1e-6, step_loss=4.25]Forward upsample size to force interpolation output size.
+Steps:   0%|▎                                                                                     | 49/15000 [01:03<3:30:46,  1.18it/s, lr=1e-6, step_loss=4.08]Forward upsample size to force interpolation output size.
+Steps:   0%|▎                                                                                     | 50/15000 [01:04<3:30:38,  1.18it/s, lr=1e-6, step_loss=4.26]Forward upsample size to force interpolation output size.
+Steps:   0%|▎                                                                                     | 51/15000 [01:05<3:30:38,  1.18it/s, lr=1e-6, step_loss=4.25]Forward upsample size to force interpolation output size.
+Steps:   0%|▎                                                                                     | 52/15000 [01:06<3:30:51,  1.18it/s, lr=1e-6, step_loss=4.09]Forward upsample size to force interpolation output size.
+Steps:   0%|▎                                                                                     | 53/15000 [01:07<3:29:34,  1.19it/s, lr=1e-6, step_loss=4.39]Forward upsample size to force interpolation output size.
+Steps:   0%|▎                                                                                     | 54/15000 [01:07<3:27:54,  1.20it/s, lr=1e-6, step_loss=4.47]Forward upsample size to force interpolation output size.
+Steps:   0%|▎                                                                                     | 55/15000 [01:08<3:28:49,  1.19it/s, lr=1e-6, step_loss=4.19]Forward upsample size to force interpolation output size.
+Steps:   0%|▎                                                                                     | 56/15000 [01:09<3:29:08,  1.19it/s, lr=1e-6, step_loss=4.29]Forward upsample size to force interpolation output size.
+Steps:   0%|▎                                                                                     | 57/15000 [01:10<3:29:12,  1.19it/s, lr=1e-6, step_loss=4.17]Forward upsample size to force interpolation output size.
+Steps:   0%|▎                                                                                     | 58/15000 [01:11<3:29:39,  1.19it/s, lr=1e-6, step_loss=4.47]Forward upsample size to force interpolation output size.
+Steps:   0%|▎                                                                                     | 59/15000 [01:12<3:29:09,  1.19it/s, lr=1e-6, step_loss=4.24]Forward upsample size to force interpolation output size.
+Steps:   0%|▎                                                                                     | 60/15000 [01:13<3:29:24,  1.19it/s, lr=1e-6, step_loss=3.98]Forward upsample size to force interpolation output size.
+Steps:   0%|▎                                                                                     | 61/15000 [01:13<3:31:22,  1.18it/s, lr=1e-6, step_loss=4.04]Forward upsample size to force interpolation output size.
+Steps:   0%|▎                                                                                     | 62/15000 [01:14<3:30:38,  1.18it/s, lr=1e-6, step_loss=4.23]Forward upsample size to force interpolation output size.
+Steps:   0%|▎                                                                                     | 63/15000 [01:15<3:31:39,  1.18it/s, lr=1e-6, step_loss=3.86]Forward upsample size to force interpolation output size.
+Steps:   0%|▎                                                                                     | 64/15000 [01:16<3:29:51,  1.19it/s, lr=1e-6, step_loss=4.27]Forward upsample size to force interpolation output size.
+Steps:   0%|▍                                                                                      | 65/15000 [01:17<3:29:16,  1.19it/s, lr=1e-6, step_loss=4.4]Forward upsample size to force interpolation output size.
+Steps:   0%|▍                                                                                     | 66/15000 [01:18<3:29:13,  1.19it/s, lr=1e-6, step_loss=4.09]Forward upsample size to force interpolation output size.
+Steps:   0%|▍                                                                                     | 67/15000 [01:18<3:28:30,  1.19it/s, lr=1e-6, step_loss=4.28]Forward upsample size to force interpolation output size.
+Steps:   0%|▍                                                                                     | 68/15000 [01:19<3:28:58,  1.19it/s, lr=1e-6, step_loss=4.24]Forward upsample size to force interpolation output size.
+Steps:   0%|▍                                                                                     | 69/15000 [01:20<3:28:46,  1.19it/s, lr=1e-6, step_loss=3.98]Forward upsample size to force interpolation output size.
+Steps:   0%|▍                                                                                     | 70/15000 [01:21<3:28:10,  1.20it/s, lr=1e-6, step_loss=4.25]Forward upsample size to force interpolation output size.
+Steps:   0%|▍                                                                                     | 71/15000 [01:22<3:28:30,  1.19it/s, lr=1e-6, step_loss=4.38]Forward upsample size to force interpolation output size.
+Steps:   0%|▍                                                                                     | 72/15000 [01:23<3:28:10,  1.20it/s, lr=1e-6, step_loss=3.62]Forward upsample size to force interpolation output size.
+Steps:   0%|▍                                                                                     | 73/15000 [01:23<3:28:05,  1.20it/s, lr=1e-6, step_loss=4.07]Forward upsample size to force interpolation output size.
+Steps:   0%|▍                                                                                     | 74/15000 [01:24<3:27:28,  1.20it/s, lr=1e-6, step_loss=4.18]Forward upsample size to force interpolation output size.
+Steps:   0%|▍                                                                                     | 75/15000 [01:25<3:26:30,  1.20it/s, lr=1e-6, step_loss=4.01]Forward upsample size to force interpolation output size.
+Steps:   1%|▍                                                                                     | 76/15000 [01:26<3:27:02,  1.20it/s, lr=1e-6, step_loss=4.06]Forward upsample size to force interpolation output size.
+Steps:   1%|▍                                                                                     | 77/15000 [01:27<3:27:45,  1.20it/s, lr=1e-6, step_loss=4.52]Forward upsample size to force interpolation output size.
+Steps:   1%|▍                                                                                     | 78/15000 [01:28<3:27:26,  1.20it/s, lr=1e-6, step_loss=4.31]Forward upsample size to force interpolation output size.
+Steps:   1%|▍                                                                                     | 79/15000 [01:28<3:27:57,  1.20it/s, lr=1e-6, step_loss=4.34]Forward upsample size to force interpolation output size.
+Steps:   1%|▍                                                                                     | 80/15000 [01:29<3:27:15,  1.20it/s, lr=1e-6, step_loss=4.49]Forward upsample size to force interpolation output size.
+Steps:   1%|▍                                                                                     | 81/15000 [01:30<3:30:06,  1.18it/s, lr=1e-6, step_loss=4.08]Forward upsample size to force interpolation output size.
+Steps:   1%|▍                                                                                     | 82/15000 [01:31<3:28:40,  1.19it/s, lr=1e-6, step_loss=4.16]Forward upsample size to force interpolation output size.
+Steps:   1%|▍                                                                                     | 83/15000 [01:32<3:29:38,  1.19it/s, lr=1e-6, step_loss=4.28]Forward upsample size to force interpolation output size.
+Steps:   1%|▍                                                                                     | 84/15000 [01:33<3:29:27,  1.19it/s, lr=1e-6, step_loss=4.24]Forward upsample size to force interpolation output size.
+Steps:   1%|▍                                                                                     | 85/15000 [01:33<3:28:44,  1.19it/s, lr=1e-6, step_loss=4.17]Forward upsample size to force interpolation output size.
+Steps:   1%|▍                                                                                     | 86/15000 [01:34<3:29:00,  1.19it/s, lr=1e-6, step_loss=4.38]Forward upsample size to force interpolation output size.
+Steps:   1%|▍                                                                                     | 87/15000 [01:35<3:28:51,  1.19it/s, lr=1e-6, step_loss=4.35]Forward upsample size to force interpolation output size.
+Steps:   1%|▌                                                                                     | 88/15000 [01:36<3:28:29,  1.19it/s, lr=1e-6, step_loss=4.29]Forward upsample size to force interpolation output size.
+Steps:   1%|▌                                                                                     | 89/15000 [01:37<3:28:17,  1.19it/s, lr=1e-6, step_loss=4.38]Forward upsample size to force interpolation output size.
+Steps:   1%|▌                                                                                     | 90/15000 [01:38<3:28:07,  1.19it/s, lr=1e-6, step_loss=4.33]Forward upsample size to force interpolation output size.
+Steps:   1%|▌                                                                                     | 91/15000 [01:39<3:27:46,  1.20it/s, lr=1e-6, step_loss=4.27]Forward upsample size to force interpolation output size.
+Steps:   1%|▌                                                                                     | 92/15000 [01:39<3:28:03,  1.19it/s, lr=1e-6, step_loss=4.24]Forward upsample size to force interpolation output size.
+Steps:   1%|▌                                                                                     | 93/15000 [01:40<3:28:38,  1.19it/s, lr=1e-6, step_loss=3.94]Forward upsample size to force interpolation output size.
+Steps:   1%|▌                                                                                     | 94/15000 [01:41<3:29:22,  1.19it/s, lr=1e-6, step_loss=4.35]Forward upsample size to force interpolation output size.
+Steps:   1%|▌                                                                                        | 95/15000 [01:42<3:28:43,  1.19it/s, lr=1e-6, step_loss=4]Forward upsample size to force interpolation output size.
+Steps:   1%|▌                                                                                      | 96/15000 [01:43<3:28:47,  1.19it/s, lr=1e-6, step_loss=4.6]Forward upsample size to force interpolation output size.
+Steps:   1%|▌                                                                                     | 97/15000 [01:44<3:28:23,  1.19it/s, lr=1e-6, step_loss=4.34]Forward upsample size to force interpolation output size.
+Traceback (most recent call last):
+  File "train1.py", line 1103, in <module>
+    main()
+  File "train1.py", line 1027, in main
+    accelerator.backward(loss)
+  File "/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/accelerate/accelerator.py", line 1844, in backward
+    self.scaler.scale(loss).backward(**kwargs)
+  File "/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/torch/_tensor.py", line 487, in backward
+    torch.autograd.backward(
+  File "/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/torch/autograd/__init__.py", line 200, in backward
+    Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+KeyboardInterrupt

@@ -1,0 +1,12 @@
+{
+      "version": "0.2.0",
+      "configurations": [
+            {
+                  "name": "Python: Remote Attach",
+                  "type": "python",
+                  "request": "attach",
+                  "port": 5678,       //远程服务器开放的端口
+                  "host": "127.0.0.1",  //远程服务器的ip地址
+            }
+      ]
+}

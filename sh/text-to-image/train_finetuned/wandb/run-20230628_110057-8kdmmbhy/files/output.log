@@ -1,0 +1,275 @@
+/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/torchvision/transforms/functional.py:1603: UserWarning: The default value of the antialias parameter of all the resizing transforms (Resize(), RandomResizedCrop(), etc.) will change from None to True in v0.17, in order to be consistent across the PIL and Tensor backends. To suppress this warning, directly pass antialias=True (recommended, future default), antialias=None (current default, which means False for Tensors and True for PIL), or antialias=False (only works on Tensors - PIL will still use antialiasing). This also applies if you are using the inference transforms from the models weights: update the call to weights.transforms(antialias=True).
+  warnings.warn(
+/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/torch/nn/modules/module.py:1501: UserWarning: operator() profile_node %612 : int = prim::profile_ivalue(%dtype)
+ does not have profile information (Triggered internally at ../third_party/nvfuser/csrc/graph_fuser.cpp:104.)
+  return forward_call(*args, **kwargs)
+/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/torchvision/transforms/functional.py:1603: UserWarning: The default value of the antialias parameter of all the resizing transforms (Resize(), RandomResizedCrop(), etc.) will change from None to True in v0.17, in order to be consistent across the PIL and Tensor backends. To suppress this warning, directly pass antialias=True (recommended, future default), antialias=None (current default, which means False for Tensors and True for PIL), or antialias=False (only works on Tensors - PIL will still use antialiasing). This also applies if you are using the inference transforms from the models weights: update the call to weights.transforms(antialias=True).
+  warnings.warn(
+/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/torchvision/transforms/functional.py:1603: UserWarning: The default value of the antialias parameter of all the resizing transforms (Resize(), RandomResizedCrop(), etc.) will change from None to True in v0.17, in order to be consistent across the PIL and Tensor backends. To suppress this warning, directly pass antialias=True (recommended, future default), antialias=None (current default, which means False for Tensors and True for PIL), or antialias=False (only works on Tensors - PIL will still use antialiasing). This also applies if you are using the inference transforms from the models weights: update the call to weights.transforms(antialias=True).
+  warnings.warn(
+/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/torchvision/transforms/functional.py:1603: UserWarning: The default value of the antialias parameter of all the resizing transforms (Resize(), RandomResizedCrop(), etc.) will change from None to True in v0.17, in order to be consistent across the PIL and Tensor backends. To suppress this warning, directly pass antialias=True (recommended, future default), antialias=None (current default, which means False for Tensors and True for PIL), or antialias=False (only works on Tensors - PIL will still use antialiasing). This also applies if you are using the inference transforms from the models weights: update the call to weights.transforms(antialias=True).
+  warnings.warn(
+/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/torchvision/transforms/functional.py:1603: UserWarning: The default value of the antialias parameter of all the resizing transforms (Resize(), RandomResizedCrop(), etc.) will change from None to True in v0.17, in order to be consistent across the PIL and Tensor backends. To suppress this warning, directly pass antialias=True (recommended, future default), antialias=None (current default, which means False for Tensors and True for PIL), or antialias=False (only works on Tensors - PIL will still use antialiasing). This also applies if you are using the inference transforms from the models weights: update the call to weights.transforms(antialias=True).
+  warnings.warn(
+/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/torchvision/transforms/functional.py:1603: UserWarning: The default value of the antialias parameter of all the resizing transforms (Resize(), RandomResizedCrop(), etc.) will change from None to True in v0.17, in order to be consistent across the PIL and Tensor backends. To suppress this warning, directly pass antialias=True (recommended, future default), antialias=None (current default, which means False for Tensors and True for PIL), or antialias=False (only works on Tensors - PIL will still use antialiasing). This also applies if you are using the inference transforms from the models weights: update the call to weights.transforms(antialias=True).
+  warnings.warn(
+/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/torchvision/transforms/functional.py:1603: UserWarning: The default value of the antialias parameter of all the resizing transforms (Resize(), RandomResizedCrop(), etc.) will change from None to True in v0.17, in order to be consistent across the PIL and Tensor backends. To suppress this warning, directly pass antialias=True (recommended, future default), antialias=None (current default, which means False for Tensors and True for PIL), or antialias=False (only works on Tensors - PIL will still use antialiasing). This also applies if you are using the inference transforms from the models weights: update the call to weights.transforms(antialias=True).
+  warnings.warn(
+/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/torchvision/transforms/functional.py:1603: UserWarning: The default value of the antialias parameter of all the resizing transforms (Resize(), RandomResizedCrop(), etc.) will change from None to True in v0.17, in order to be consistent across the PIL and Tensor backends. To suppress this warning, directly pass antialias=True (recommended, future default), antialias=None (current default, which means False for Tensors and True for PIL), or antialias=False (only works on Tensors - PIL will still use antialiasing). This also applies if you are using the inference transforms from the models weights: update the call to weights.transforms(antialias=True).
+  warnings.warn(
+/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/torchvision/transforms/functional.py:1603: UserWarning: The default value of the antialias parameter of all the resizing transforms (Resize(), RandomResizedCrop(), etc.) will change from None to True in v0.17, in order to be consistent across the PIL and Tensor backends. To suppress this warning, directly pass antialias=True (recommended, future default), antialias=None (current default, which means False for Tensors and True for PIL), or antialias=False (only works on Tensors - PIL will still use antialiasing). This also applies if you are using the inference transforms from the models weights: update the call to weights.transforms(antialias=True).
+  warnings.warn(
+/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/torchvision/transforms/functional.py:1603: UserWarning: The default value of the antialias parameter of all the resizing transforms (Resize(), RandomResizedCrop(), etc.) will change from None to True in v0.17, in order to be consistent across the PIL and Tensor backends. To suppress this warning, directly pass antialias=True (recommended, future default), antialias=None (current default, which means False for Tensors and True for PIL), or antialias=False (only works on Tensors - PIL will still use antialiasing). This also applies if you are using the inference transforms from the models weights: update the call to weights.transforms(antialias=True).
+  warnings.warn(
+/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/torchvision/transforms/functional.py:1603: UserWarning: The default value of the antialias parameter of all the resizing transforms (Resize(), RandomResizedCrop(), etc.) will change from None to True in v0.17, in order to be consistent across the PIL and Tensor backends. To suppress this warning, directly pass antialias=True (recommended, future default), antialias=None (current default, which means False for Tensors and True for PIL), or antialias=False (only works on Tensors - PIL will still use antialiasing). This also applies if you are using the inference transforms from the models weights: update the call to weights.transforms(antialias=True).
+  warnings.warn(
+/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/torchvision/transforms/functional.py:1603: UserWarning: The default value of the antialias parameter of all the resizing transforms (Resize(), RandomResizedCrop(), etc.) will change from None to True in v0.17, in order to be consistent across the PIL and Tensor backends. To suppress this warning, directly pass antialias=True (recommended, future default), antialias=None (current default, which means False for Tensors and True for PIL), or antialias=False (only works on Tensors - PIL will still use antialiasing). This also applies if you are using the inference transforms from the models weights: update the call to weights.transforms(antialias=True).
+  warnings.warn(
+/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/torchvision/transforms/functional.py:1603: UserWarning: The default value of the antialias parameter of all the resizing transforms (Resize(), RandomResizedCrop(), etc.) will change from None to True in v0.17, in order to be consistent across the PIL and Tensor backends. To suppress this warning, directly pass antialias=True (recommended, future default), antialias=None (current default, which means False for Tensors and True for PIL), or antialias=False (only works on Tensors - PIL will still use antialiasing). This also applies if you are using the inference transforms from the models weights: update the call to weights.transforms(antialias=True).
+  warnings.warn(
+/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/torchvision/transforms/functional.py:1603: UserWarning: The default value of the antialias parameter of all the resizing transforms (Resize(), RandomResizedCrop(), etc.) will change from None to True in v0.17, in order to be consistent across the PIL and Tensor backends. To suppress this warning, directly pass antialias=True (recommended, future default), antialias=None (current default, which means False for Tensors and True for PIL), or antialias=False (only works on Tensors - PIL will still use antialiasing). This also applies if you are using the inference transforms from the models weights: update the call to weights.transforms(antialias=True).
+  warnings.warn(
+/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/torchvision/transforms/functional.py:1603: UserWarning: The default value of the antialias parameter of all the resizing transforms (Resize(), RandomResizedCrop(), etc.) will change from None to True in v0.17, in order to be consistent across the PIL and Tensor backends. To suppress this warning, directly pass antialias=True (recommended, future default), antialias=None (current default, which means False for Tensors and True for PIL), or antialias=False (only works on Tensors - PIL will still use antialiasing). This also applies if you are using the inference transforms from the models weights: update the call to weights.transforms(antialias=True).
+  warnings.warn(
+/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/torchvision/transforms/functional.py:1603: UserWarning: The default value of the antialias parameter of all the resizing transforms (Resize(), RandomResizedCrop(), etc.) will change from None to True in v0.17, in order to be consistent across the PIL and Tensor backends. To suppress this warning, directly pass antialias=True (recommended, future default), antialias=None (current default, which means False for Tensors and True for PIL), or antialias=False (only works on Tensors - PIL will still use antialiasing). This also applies if you are using the inference transforms from the models weights: update the call to weights.transforms(antialias=True).
+  warnings.warn(
+/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/torchvision/transforms/functional.py:1603: UserWarning: The default value of the antialias parameter of all the resizing transforms (Resize(), RandomResizedCrop(), etc.) will change from None to True in v0.17, in order to be consistent across the PIL and Tensor backends. To suppress this warning, directly pass antialias=True (recommended, future default), antialias=None (current default, which means False for Tensors and True for PIL), or antialias=False (only works on Tensors - PIL will still use antialiasing). This also applies if you are using the inference transforms from the models weights: update the call to weights.transforms(antialias=True).
+  warnings.warn(
+/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/torchvision/transforms/functional.py:1603: UserWarning: The default value of the antialias parameter of all the resizing transforms (Resize(), RandomResizedCrop(), etc.) will change from None to True in v0.17, in order to be consistent across the PIL and Tensor backends. To suppress this warning, directly pass antialias=True (recommended, future default), antialias=None (current default, which means False for Tensors and True for PIL), or antialias=False (only works on Tensors - PIL will still use antialiasing). This also applies if you are using the inference transforms from the models weights: update the call to weights.transforms(antialias=True).
+  warnings.warn(
+/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/torchvision/transforms/functional.py:1603: UserWarning: The default value of the antialias parameter of all the resizing transforms (Resize(), RandomResizedCrop(), etc.) will change from None to True in v0.17, in order to be consistent across the PIL and Tensor backends. To suppress this warning, directly pass antialias=True (recommended, future default), antialias=None (current default, which means False for Tensors and True for PIL), or antialias=False (only works on Tensors - PIL will still use antialiasing). This also applies if you are using the inference transforms from the models weights: update the call to weights.transforms(antialias=True).
+  warnings.warn(
+/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/torchvision/transforms/functional.py:1603: UserWarning: The default value of the antialias parameter of all the resizing transforms (Resize(), RandomResizedCrop(), etc.) will change from None to True in v0.17, in order to be consistent across the PIL and Tensor backends. To suppress this warning, directly pass antialias=True (recommended, future default), antialias=None (current default, which means False for Tensors and True for PIL), or antialias=False (only works on Tensors - PIL will still use antialiasing). This also applies if you are using the inference transforms from the models weights: update the call to weights.transforms(antialias=True).
+  warnings.warn(
+/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/torchvision/transforms/functional.py:1603: UserWarning: The default value of the antialias parameter of all the resizing transforms (Resize(), RandomResizedCrop(), etc.) will change from None to True in v0.17, in order to be consistent across the PIL and Tensor backends. To suppress this warning, directly pass antialias=True (recommended, future default), antialias=None (current default, which means False for Tensors and True for PIL), or antialias=False (only works on Tensors - PIL will still use antialiasing). This also applies if you are using the inference transforms from the models weights: update the call to weights.transforms(antialias=True).
+  warnings.warn(
+/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/torchvision/transforms/functional.py:1603: UserWarning: The default value of the antialias parameter of all the resizing transforms (Resize(), RandomResizedCrop(), etc.) will change from None to True in v0.17, in order to be consistent across the PIL and Tensor backends. To suppress this warning, directly pass antialias=True (recommended, future default), antialias=None (current default, which means False for Tensors and True for PIL), or antialias=False (only works on Tensors - PIL will still use antialiasing). This also applies if you are using the inference transforms from the models weights: update the call to weights.transforms(antialias=True).
+  warnings.warn(
+/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/torchvision/transforms/functional.py:1603: UserWarning: The default value of the antialias parameter of all the resizing transforms (Resize(), RandomResizedCrop(), etc.) will change from None to True in v0.17, in order to be consistent across the PIL and Tensor backends. To suppress this warning, directly pass antialias=True (recommended, future default), antialias=None (current default, which means False for Tensors and True for PIL), or antialias=False (only works on Tensors - PIL will still use antialiasing). This also applies if you are using the inference transforms from the models weights: update the call to weights.transforms(antialias=True).
+  warnings.warn(
+/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/torchvision/transforms/functional.py:1603: UserWarning: The default value of the antialias parameter of all the resizing transforms (Resize(), RandomResizedCrop(), etc.) will change from None to True in v0.17, in order to be consistent across the PIL and Tensor backends. To suppress this warning, directly pass antialias=True (recommended, future default), antialias=None (current default, which means False for Tensors and True for PIL), or antialias=False (only works on Tensors - PIL will still use antialiasing). This also applies if you are using the inference transforms from the models weights: update the call to weights.transforms(antialias=True).
+  warnings.warn(
+/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/torchvision/transforms/functional.py:1603: UserWarning: The default value of the antialias parameter of all the resizing transforms (Resize(), RandomResizedCrop(), etc.) will change from None to True in v0.17, in order to be consistent across the PIL and Tensor backends. To suppress this warning, directly pass antialias=True (recommended, future default), antialias=None (current default, which means False for Tensors and True for PIL), or antialias=False (only works on Tensors - PIL will still use antialiasing). This also applies if you are using the inference transforms from the models weights: update the call to weights.transforms(antialias=True).
+  warnings.warn(
+/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/torchvision/transforms/functional.py:1603: UserWarning: The default value of the antialias parameter of all the resizing transforms (Resize(), RandomResizedCrop(), etc.) will change from None to True in v0.17, in order to be consistent across the PIL and Tensor backends. To suppress this warning, directly pass antialias=True (recommended, future default), antialias=None (current default, which means False for Tensors and True for PIL), or antialias=False (only works on Tensors - PIL will still use antialiasing). This also applies if you are using the inference transforms from the models weights: update the call to weights.transforms(antialias=True).
+  warnings.warn(
+/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/torchvision/transforms/functional.py:1603: UserWarning: The default value of the antialias parameter of all the resizing transforms (Resize(), RandomResizedCrop(), etc.) will change from None to True in v0.17, in order to be consistent across the PIL and Tensor backends. To suppress this warning, directly pass antialias=True (recommended, future default), antialias=None (current default, which means False for Tensors and True for PIL), or antialias=False (only works on Tensors - PIL will still use antialiasing). This also applies if you are using the inference transforms from the models weights: update the call to weights.transforms(antialias=True).
+  warnings.warn(
+/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/torchvision/transforms/functional.py:1603: UserWarning: The default value of the antialias parameter of all the resizing transforms (Resize(), RandomResizedCrop(), etc.) will change from None to True in v0.17, in order to be consistent across the PIL and Tensor backends. To suppress this warning, directly pass antialias=True (recommended, future default), antialias=None (current default, which means False for Tensors and True for PIL), or antialias=False (only works on Tensors - PIL will still use antialiasing). This also applies if you are using the inference transforms from the models weights: update the call to weights.transforms(antialias=True).
+  warnings.warn(
+/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/torchvision/transforms/functional.py:1603: UserWarning: The default value of the antialias parameter of all the resizing transforms (Resize(), RandomResizedCrop(), etc.) will change from None to True in v0.17, in order to be consistent across the PIL and Tensor backends. To suppress this warning, directly pass antialias=True (recommended, future default), antialias=None (current default, which means False for Tensors and True for PIL), or antialias=False (only works on Tensors - PIL will still use antialiasing). This also applies if you are using the inference transforms from the models weights: update the call to weights.transforms(antialias=True).
+  warnings.warn(
+/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/torchvision/transforms/functional.py:1603: UserWarning: The default value of the antialias parameter of all the resizing transforms (Resize(), RandomResizedCrop(), etc.) will change from None to True in v0.17, in order to be consistent across the PIL and Tensor backends. To suppress this warning, directly pass antialias=True (recommended, future default), antialias=None (current default, which means False for Tensors and True for PIL), or antialias=False (only works on Tensors - PIL will still use antialiasing). This also applies if you are using the inference transforms from the models weights: update the call to weights.transforms(antialias=True).
+  warnings.warn(
+[INFO|training_args.py:1283] 2023-06-28 11:04:54,239 >> Found safetensors installation, but --save_safetensors=False. Safetensors should be a preferred weights saving format due to security and performance reasons. If your model cannot be saved by safetensors please feel free to open an issue at https://github.com/huggingface/safetensors!
+[INFO|training_args.py:1691] 2023-06-28 11:04:54,240 >> PyTorch: setting up devices
+[INFO|training_args.py:1423] 2023-06-28 11:04:54,241 >> The default value for the training argument `--report_to` will change in v5 (from all installed integrations to none). In v5, you will need to use `--report_to all` to get the same behavior as now. You should start updating your code and make this info disappear :-).
+1
+06/28/2023 11:05:30 - WARNING - __main__ - Process rank: 0, device: cuda:0, n_gpu: 1distributed training: True, 16-bits training: False
+06/28/2023 11:05:30 - INFO - __main__ - Training/evaluation parameters TrainingArguments(
+_n_gpu=1,
+adafactor=False,
+adam_beta1=0.9,
+adam_beta2=0.999,
+adam_epsilon=1e-08,
+auto_find_batch_size=False,
+bf16=False,
+bf16_full_eval=False,
+data_seed=None,
+dataloader_drop_last=False,
+dataloader_num_workers=0,
+dataloader_pin_memory=True,
+ddp_backend=None,
+ddp_broadcast_buffers=None,
+ddp_bucket_cap_mb=None,
+ddp_find_unused_parameters=None,
+ddp_timeout=1800,
+debug=[],
+deepspeed=None,
+disable_tqdm=False,
+do_eval=True,
+do_predict=False,
+do_train=True,
+eval_accumulation_steps=None,
+eval_delay=0,
+eval_steps=None,
+evaluation_strategy=no,
+fp16=False,
+fp16_backend=auto,
+fp16_full_eval=False,
+fp16_opt_level=O1,
+fsdp=[],
+fsdp_config={'fsdp_min_num_params': 0, 'xla': False, 'xla_fsdp_grad_ckpt': False},
+fsdp_min_num_params=0,
+fsdp_transformer_layer_cls_to_wrap=None,
+full_determinism=False,
+gradient_accumulation_steps=1,
+gradient_checkpointing=False,
+greater_is_better=None,
+group_by_length=False,
+half_precision_backend=auto,
+hub_model_id=None,
+hub_private_repo=False,
+hub_strategy=every_save,
+hub_token=<HUB_TOKEN>,
+ignore_data_skip=False,
+include_inputs_for_metrics=False,
+jit_mode_eval=False,
+label_names=None,
+label_smoothing_factor=0.0,
+learning_rate=5e-05,
+length_column_name=length,
+load_best_model_at_end=False,
+local_rank=0,
+log_level=passive,
+log_level_replica=warning,
+log_on_each_node=True,
+logging_dir=./clip-roberta-finetuned/runs/Jun28_11-04-54_2cad93842dee,
+logging_first_step=False,
+logging_nan_inf_filter=True,
+logging_steps=500,
+logging_strategy=steps,
+lr_scheduler_type=linear,
+max_grad_norm=1.0,
+max_steps=-1,
+metric_for_best_model=None,
+mp_parameters=,
+no_cuda=False,
+num_train_epochs=3.0,
+optim=adamw_hf,
+optim_args=None,
+output_dir=./clip-roberta-finetuned,
+overwrite_output_dir=True,
+past_index=-1,
+per_device_eval_batch_size=64,
+per_device_train_batch_size=128,
+prediction_loss_only=False,
+push_to_hub=False,
+push_to_hub_model_id=None,
+push_to_hub_organization=None,
+push_to_hub_token=<PUSH_TO_HUB_TOKEN>,
+ray_scope=last,
+remove_unused_columns=False,
+report_to=['tensorboard', 'wandb'],
+resume_from_checkpoint=None,
+run_name=./clip-roberta-finetuned,
+save_on_each_node=False,
+save_safetensors=False,
+save_steps=500,
+save_strategy=steps,
+save_total_limit=None,
+seed=42,
+sharded_ddp=[],
+skip_memory_metrics=True,
+tf32=None,
+torch_compile=False,
+torch_compile_backend=None,
+torch_compile_mode=None,
+torchdynamo=None,
+tpu_metrics_debug=False,
+tpu_num_cores=None,
+use_ipex=False,
+use_legacy_prediction_loop=False,
+use_mps_device=False,
+warmup_ratio=0.0,
+warmup_steps=0,
+weight_decay=0.1,
+xpu_backend=None,
+)
+06/28/2023 11:08:20 - WARNING - datasets.arrow_dataset - Loading cached processed dataset at /remote-home/songtianwei/.cache/huggingface/datasets/ydshieh___coco_dataset_script/2017-6f3462d26b47c55a/0.0.0/e033205c0266a54c10be132f9264f2a39dcf893e798f6756d224b1ff5078998f/cache-7161399a40ae038a.arrow
+06/28/2023 11:08:24 - WARNING - datasets.arrow_dataset - Loading cached processed dataset at /remote-home/songtianwei/.cache/huggingface/datasets/ydshieh___coco_dataset_script/2017-6f3462d26b47c55a/0.0.0/e033205c0266a54c10be132f9264f2a39dcf893e798f6756d224b1ff5078998f/cache-df5777364e1d24b5.arrow
+06/28/2023 11:08:24 - WARNING - datasets.arrow_dataset - Loading cached processed dataset at /remote-home/songtianwei/.cache/huggingface/datasets/ydshieh___coco_dataset_script/2017-6f3462d26b47c55a/0.0.0/e033205c0266a54c10be132f9264f2a39dcf893e798f6756d224b1ff5078998f/cache-e3030a1d42b02e86.arrow
+06/28/2023 11:08:44 - WARNING - datasets.builder - Found cached dataset coco_dataset_script (/remote-home/songtianwei/.cache/huggingface/datasets/ydshieh___coco_dataset_script/2017-6f3462d26b47c55a/0.0.0/e033205c0266a54c10be132f9264f2a39dcf893e798f6756d224b1ff5078998f)
+06/28/2023 11:14:30 - WARNING - datasets.arrow_dataset - Loading cached processed dataset at /remote-home/songtianwei/.cache/huggingface/datasets/ydshieh___coco_dataset_script/2017-6f3462d26b47c55a/0.0.0/e033205c0266a54c10be132f9264f2a39dcf893e798f6756d224b1ff5078998f/cache-7161399a40ae038a.arrow
+{'image_id': 175948, 'caption_id': 1327, 'caption': 'A tiny bathroom with only a toilet and a shelf.', 'height': 640, 'width': 426, 'file_name': '000000175948.jpg', 'coco_url': 'http://images.cocodataset.org/train2017/000000175948.jpg', 'image_path': '/remote-home/songtianwei/.cache/huggingface/datasets/downloads/extracted/2eaa9620da3c5978de7bf66708380d3175d70ab7bb370443574b53d85fe1ebf0/train2017/000000175948.jpg'}
+06/28/2023 11:15:27 - WARNING - datasets.arrow_dataset - Loading cached processed dataset at /remote-home/songtianwei/.cache/huggingface/datasets/ydshieh___coco_dataset_script/2017-6f3462d26b47c55a/0.0.0/e033205c0266a54c10be132f9264f2a39dcf893e798f6756d224b1ff5078998f/cache-66752e9e614bac1a.arrow
+{'image_path': '/remote-home/songtianwei/.cache/huggingface/datasets/downloads/extracted/2eaa9620da3c5978de7bf66708380d3175d70ab7bb370443574b53d85fe1ebf0/train2017/000000175948.jpg', 'input_ids': [0, 250, 5262, 8080, 19, 129, 10, 11471, 8, 10, 15263, 4, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 'attention_mask': [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}
+06/28/2023 11:26:26 - WARNING - datasets.arrow_dataset - Loading cached processed dataset at /remote-home/songtianwei/.cache/huggingface/datasets/ydshieh___coco_dataset_script/2017-6f3462d26b47c55a/0.0.0/e033205c0266a54c10be132f9264f2a39dcf893e798f6756d224b1ff5078998f/cache-7161399a40ae038a.arrow
+{'image_id': 175948, 'caption_id': 1327, 'caption': 'A tiny bathroom with only a toilet and a shelf.', 'height': 640, 'width': 426, 'file_name': '000000175948.jpg', 'coco_url': 'http://images.cocodataset.org/train2017/000000175948.jpg', 'image_path': '/remote-home/songtianwei/.cache/huggingface/datasets/downloads/extracted/2eaa9620da3c5978de7bf66708380d3175d70ab7bb370443574b53d85fe1ebf0/train2017/000000175948.jpg'}
+{'input_ids': [0, 250, 5262, 8080, 19, 129, 10, 11471, 8, 10, 15263, 4, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 'attention_mask': [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}
+06/28/2023 11:26:57 - WARNING - datasets.arrow_dataset - Loading cached processed dataset at /remote-home/songtianwei/.cache/huggingface/datasets/ydshieh___coco_dataset_script/2017-6f3462d26b47c55a/0.0.0/e033205c0266a54c10be132f9264f2a39dcf893e798f6756d224b1ff5078998f/cache-7161399a40ae038a.arrow
+{'image_id': 175948, 'caption_id': 1327, 'caption': 'A tiny bathroom with only a toilet and a shelf.', 'height': 640, 'width': 426, 'file_name': '000000175948.jpg', 'coco_url': 'http://images.cocodataset.org/train2017/000000175948.jpg', 'image_path': '/remote-home/songtianwei/.cache/huggingface/datasets/downloads/extracted/2eaa9620da3c5978de7bf66708380d3175d70ab7bb370443574b53d85fe1ebf0/train2017/000000175948.jpg'}
+{'caption': 'A tiny bathroom with only a toilet and a shelf.', 'image_path': '/remote-home/songtianwei/.cache/huggingface/datasets/downloads/extracted/2eaa9620da3c5978de7bf66708380d3175d70ab7bb370443574b53d85fe1ebf0/train2017/000000175948.jpg', 'input_ids': [0, 250, 5262, 8080, 19, 129, 10, 11471, 8, 10, 15263, 4, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 'attention_mask': [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}
+/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/torchvision/transforms/functional.py:1603: UserWarning: The default value of the antialias parameter of all the resizing transforms (Resize(), RandomResizedCrop(), etc.) will change from None to True in v0.17, in order to be consistent across the PIL and Tensor backends. To suppress this warning, directly pass antialias=True (recommended, future default), antialias=None (current default, which means False for Tensors and True for PIL), or antialias=False (only works on Tensors - PIL will still use antialiasing). This also applies if you are using the inference transforms from the models weights: update the call to weights.transforms(antialias=True).
+  warnings.warn(
+{'caption': 'A tiny bathroom with only a toilet and a shelf.', 'image_path': '/remote-home/songtianwei/.cache/huggingface/datasets/downloads/extracted/2eaa9620da3c5978de7bf66708380d3175d70ab7bb370443574b53d85fe1ebf0/train2017/000000175948.jpg', 'input_ids': [0, 250, 5262, 8080, 19, 129, 10, 11471, 8, 10, 15263, 4, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 'attention_mask': [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 'pixel_values': tensor([[[ 0.7041,  0.7187,  0.6749,  ...,  1.9157,  1.9157,  1.9157],
+         [ 0.7041,  0.7187,  0.6895,  ...,  1.9157,  1.9011,  1.9157],
+         [ 0.6749,  0.7041,  0.6749,  ...,  1.9011,  1.9011,  1.9157],
+         ...,
+         [ 0.6603,  0.6895,  0.9814,  ..., -0.6536,  0.1931,  0.2369],
+         [ 0.6603,  0.6457,  0.8501,  ..., -0.1280,  0.2077,  0.3245],
+         [ 0.6311,  0.6311,  0.7625,  ...,  0.2077,  0.2515,  0.3537]],
+        [[ 0.6792,  0.6942,  0.6642,  ...,  2.0749,  2.0749,  2.0749],
+         [ 0.6792,  0.6942,  0.6792,  ...,  2.0749,  2.0599,  2.0749],
+         [ 0.6491,  0.6792,  0.6642,  ...,  2.0599,  2.0599,  2.0749],
+         ...,
+         [ 0.5741,  0.6491,  0.9943,  ..., -0.4764,  0.3490,  0.3790],
+         [ 0.5891,  0.5891,  0.8593,  ...,  0.0638,  0.3040,  0.4540],
+         [ 0.5441,  0.5741,  0.7542,  ...,  0.3340,  0.3340,  0.4390]],
+        [[ 0.2404,  0.2831,  0.2546,  ...,  2.0748,  2.0748,  2.0606],
+         [ 0.2404,  0.2831,  0.2688,  ...,  2.0748,  2.0606,  2.0606],
+         [ 0.2120,  0.2688,  0.2546,  ...,  2.0606,  2.0606,  2.0606],
+         ...,
+         [ 0.3115,  0.3968,  0.7097,  ..., -1.0678, -0.3426, -0.3995],
+         [ 0.2973,  0.3115,  0.5959,  ..., -0.7123, -0.4564, -0.2431],
+         [ 0.2120,  0.2831,  0.4821,  ..., -0.4564, -0.4564, -0.1293]]])}
+06/28/2023 11:34:25 - WARNING - datasets.arrow_dataset - Loading cached processed dataset at /remote-home/songtianwei/.cache/huggingface/datasets/ydshieh___coco_dataset_script/2017-6f3462d26b47c55a/0.0.0/e033205c0266a54c10be132f9264f2a39dcf893e798f6756d224b1ff5078998f/cache-7161399a40ae038a.arrow
+{'image_id': 175948, 'caption_id': 1327, 'caption': 'A tiny bathroom with only a toilet and a shelf.', 'height': 640, 'width': 426, 'file_name': '000000175948.jpg', 'coco_url': 'http://images.cocodataset.org/train2017/000000175948.jpg', 'image_path': '/remote-home/songtianwei/.cache/huggingface/datasets/downloads/extracted/2eaa9620da3c5978de7bf66708380d3175d70ab7bb370443574b53d85fe1ebf0/train2017/000000175948.jpg'}
+06/28/2023 11:34:26 - WARNING - datasets.arrow_dataset - Loading cached processed dataset at /remote-home/songtianwei/.cache/huggingface/datasets/ydshieh___coco_dataset_script/2017-6f3462d26b47c55a/0.0.0/e033205c0266a54c10be132f9264f2a39dcf893e798f6756d224b1ff5078998f/cache-c2c5c7cf8e6a4468.arrow
+{'caption': 'A tiny bathroom with only a toilet and a shelf.', 'image_path': '/remote-home/songtianwei/.cache/huggingface/datasets/downloads/extracted/2eaa9620da3c5978de7bf66708380d3175d70ab7bb370443574b53d85fe1ebf0/train2017/000000175948.jpg', 'input_ids': [0, 250, 5262, 8080, 19, 129, 10, 11471, 8, 10, 15263, 4, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 'attention_mask': [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}
+{'caption': 'A tiny bathroom with only a toilet and a shelf.', 'image_path': '/remote-home/songtianwei/.cache/huggingface/datasets/downloads/extracted/2eaa9620da3c5978de7bf66708380d3175d70ab7bb370443574b53d85fe1ebf0/train2017/000000175948.jpg', 'input_ids': [0, 250, 5262, 8080, 19, 129, 10, 11471, 8, 10, 15263, 4, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 'attention_mask': [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 'pixel_values': tensor([[[ 0.7041,  0.7187,  0.6749,  ...,  1.9157,  1.9157,  1.9157],
+         [ 0.7041,  0.7041,  0.6895,  ...,  1.9157,  1.9011,  1.9157],
+         [ 0.6895,  0.7041,  0.6895,  ...,  1.9157,  1.9011,  1.9157],
+         ...,
+         [ 0.6457,  0.6895,  0.9814,  ..., -0.6974,  0.1931,  0.2369],
+         [ 0.6603,  0.6457,  0.8647,  ..., -0.2302,  0.2369,  0.3099],
+         [ 0.6311,  0.6311,  0.7771,  ...,  0.1201,  0.2661,  0.3537]],
+        [[ 0.6792,  0.6942,  0.6642,  ...,  2.0749,  2.0749,  2.0749],
+         [ 0.6792,  0.6792,  0.6792,  ...,  2.0749,  2.0599,  2.0749],
+         [ 0.6642,  0.6792,  0.6642,  ...,  2.0749,  2.0599,  2.0749],
+         ...,
+         [ 0.5741,  0.6642,  1.0093,  ..., -0.5215,  0.3640,  0.3640],
+         [ 0.5741,  0.6041,  0.8743,  ..., -0.0712,  0.3490,  0.4240],
+         [ 0.5441,  0.5741,  0.7542,  ...,  0.2439,  0.3490,  0.4390]],
+        [[ 0.2404,  0.2688,  0.2546,  ...,  2.0748,  2.0748,  2.0606],
+         [ 0.2404,  0.2688,  0.2688,  ...,  2.0748,  2.0606,  2.0606],
+         [ 0.2404,  0.2688,  0.2688,  ...,  2.0748,  2.0606,  2.0606],
+         ...,
+         [ 0.2973,  0.3968,  0.7381,  ..., -1.0536, -0.4422, -0.3853],
+         [ 0.2973,  0.3257,  0.5959,  ..., -0.7550, -0.4137, -0.2857],
+         [ 0.2120,  0.2688,  0.4964,  ..., -0.4990, -0.3711, -0.1720]]])}
+06/28/2023 11:38:38 - WARNING - datasets.arrow_dataset - Loading cached processed dataset at /remote-home/songtianwei/.cache/huggingface/datasets/ydshieh___coco_dataset_script/2017-6f3462d26b47c55a/0.0.0/e033205c0266a54c10be132f9264f2a39dcf893e798f6756d224b1ff5078998f/cache-7161399a40ae038a.arrow
+{'image_id': 175948, 'caption_id': 1327, 'caption': 'A tiny bathroom with only a toilet and a shelf.', 'height': 640, 'width': 426, 'file_name': '000000175948.jpg', 'coco_url': 'http://images.cocodataset.org/train2017/000000175948.jpg', 'image_path': '/remote-home/songtianwei/.cache/huggingface/datasets/downloads/extracted/2eaa9620da3c5978de7bf66708380d3175d70ab7bb370443574b53d85fe1ebf0/train2017/000000175948.jpg'}
+06/28/2023 11:38:39 - WARNING - datasets.arrow_dataset - Loading cached processed dataset at /remote-home/songtianwei/.cache/huggingface/datasets/ydshieh___coco_dataset_script/2017-6f3462d26b47c55a/0.0.0/e033205c0266a54c10be132f9264f2a39dcf893e798f6756d224b1ff5078998f/cache-c2c5c7cf8e6a4468.arrow
+{'caption': 'A tiny bathroom with only a toilet and a shelf.', 'image_path': '/remote-home/songtianwei/.cache/huggingface/datasets/downloads/extracted/2eaa9620da3c5978de7bf66708380d3175d70ab7bb370443574b53d85fe1ebf0/train2017/000000175948.jpg', 'input_ids': [0, 250, 5262, 8080, 19, 129, 10, 11471, 8, 10, 15263, 4, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 'attention_mask': [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}
+{'caption': 'A tiny bathroom with only a toilet and a shelf.', 'image_path': '/remote-home/songtianwei/.cache/huggingface/datasets/downloads/extracted/2eaa9620da3c5978de7bf66708380d3175d70ab7bb370443574b53d85fe1ebf0/train2017/000000175948.jpg', 'input_ids': [0, 250, 5262, 8080, 19, 129, 10, 11471, 8, 10, 15263, 4, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], 'attention_mask': [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 'pixel_values': tensor([[[ 0.7041,  0.7187,  0.6749,  ...,  1.9157,  1.9157,  1.9157],
+         [ 0.7041,  0.7041,  0.6895,  ...,  1.9157,  1.9011,  1.9157],
+         [ 0.6895,  0.7041,  0.6895,  ...,  1.9157,  1.9011,  1.9157],
+         ...,
+         [ 0.6457,  0.6895,  0.9814,  ..., -0.6974,  0.1931,  0.2369],
+         [ 0.6603,  0.6457,  0.8647,  ..., -0.2302,  0.2369,  0.3099],
+         [ 0.6311,  0.6311,  0.7771,  ...,  0.1201,  0.2661,  0.3537]],
+        [[ 0.6792,  0.6942,  0.6642,  ...,  2.0749,  2.0749,  2.0749],
+         [ 0.6792,  0.6792,  0.6792,  ...,  2.0749,  2.0599,  2.0749],
+         [ 0.6642,  0.6792,  0.6642,  ...,  2.0749,  2.0599,  2.0749],
+         ...,
+         [ 0.5741,  0.6642,  1.0093,  ..., -0.5215,  0.3640,  0.3640],
+         [ 0.5741,  0.6041,  0.8743,  ..., -0.0712,  0.3490,  0.4240],
+         [ 0.5441,  0.5741,  0.7542,  ...,  0.2439,  0.3490,  0.4390]],
+        [[ 0.2404,  0.2688,  0.2546,  ...,  2.0748,  2.0748,  2.0606],
+         [ 0.2404,  0.2688,  0.2688,  ...,  2.0748,  2.0606,  2.0606],
+         [ 0.2404,  0.2688,  0.2688,  ...,  2.0748,  2.0606,  2.0606],
+         ...,
+         [ 0.2973,  0.3968,  0.7381,  ..., -1.0536, -0.4422, -0.3853],
+         [ 0.2973,  0.3257,  0.5959,  ..., -0.7550, -0.4137, -0.2857],
+         [ 0.2120,  0.2688,  0.4964,  ..., -0.4990, -0.3711, -0.1720]]])}
+huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling parallelism to avoid deadlocks...
+To disable this warning, you can either:
+	- Avoid using `tokenizers` before the fork if possible
+	- Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
+/remote-home/songtianwei/research/diffusion_model_my/sh/text-to-image/train_finetuned
+huggingface/tokenizers: The current process just got forked, after parallelism has already been used. Disabling parallelism to avoid deadlocks...
+To disable this warning, you can either:
+	- Avoid using `tokenizers` before the fork if possible
+	- Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
+/remote-home/songtianwei/research/diffusion_model_my/sh/text-to-image/train_finetuned

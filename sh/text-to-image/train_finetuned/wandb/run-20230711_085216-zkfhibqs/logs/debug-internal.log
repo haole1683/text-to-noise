@@ -1,0 +1,184 @@
+2023-07-11 08:52:16,728 INFO    StreamThr :971212 [internal.py:wandb_internal():86] W&B internal server running at pid: 971212, started at: 2023-07-11 08:52:16.722996
+2023-07-11 08:52:16,744 DEBUG   HandlerThread:971212 [handler.py:handle_request():144] handle_request: status
+2023-07-11 08:52:16,756 INFO    WriterThread:971212 [datastore.py:open_for_write():85] open: /remote-home/songtianwei/research/diffusion_model_my/sh/text-to-image/train_finetuned/wandb/run-20230711_085216-zkfhibqs/run-zkfhibqs.wandb
+2023-07-11 08:52:16,757 DEBUG   SenderThread:971212 [sender.py:send():375] send: header
+2023-07-11 08:52:16,757 DEBUG   SenderThread:971212 [sender.py:send():375] send: run
+2023-07-11 08:52:18,037 DEBUG   HandlerThread:971212 [handler.py:handle_request():144] handle_request: check_version
+2023-07-11 08:52:18,052 INFO    SenderThread:971212 [dir_watcher.py:__init__():219] watching files in: /remote-home/songtianwei/research/diffusion_model_my/sh/text-to-image/train_finetuned/wandb/run-20230711_085216-zkfhibqs/files
+2023-07-11 08:52:18,052 INFO    SenderThread:971212 [sender.py:_start_run_threads():1124] run started: zkfhibqs with start time 1689036736.718125
+2023-07-11 08:52:18,052 DEBUG   SenderThread:971212 [sender.py:send_request():402] send_request: summary_record
+2023-07-11 08:52:18,053 INFO    SenderThread:971212 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-07-11 08:52:18,053 DEBUG   SenderThread:971212 [sender.py:send_request():402] send_request: check_version
+2023-07-11 08:52:18,956 DEBUG   HandlerThread:971212 [handler.py:handle_request():144] handle_request: run_start
+2023-07-11 08:52:18,965 DEBUG   HandlerThread:971212 [system_info.py:__init__():31] System info init
+2023-07-11 08:52:18,966 DEBUG   HandlerThread:971212 [system_info.py:__init__():46] System info init done
+2023-07-11 08:52:18,966 INFO    HandlerThread:971212 [system_monitor.py:start():181] Starting system monitor
+2023-07-11 08:52:18,966 INFO    SystemMonitor:971212 [system_monitor.py:_start():145] Starting system asset monitoring threads
+2023-07-11 08:52:18,966 INFO    SystemMonitor:971212 [interfaces.py:start():190] Started cpu monitoring
+2023-07-11 08:52:18,968 INFO    HandlerThread:971212 [system_monitor.py:probe():201] Collecting system info
+2023-07-11 08:52:18,970 INFO    SystemMonitor:971212 [interfaces.py:start():190] Started disk monitoring
+2023-07-11 08:52:18,975 INFO    SystemMonitor:971212 [interfaces.py:start():190] Started gpu monitoring
+2023-07-11 08:52:18,979 INFO    SystemMonitor:971212 [interfaces.py:start():190] Started memory monitoring
+2023-07-11 08:52:18,981 INFO    SystemMonitor:971212 [interfaces.py:start():190] Started network monitoring
+2023-07-11 08:52:18,998 DEBUG   HandlerThread:971212 [system_info.py:probe():195] Probing system
+2023-07-11 08:52:19,020 DEBUG   HandlerThread:971212 [git.py:repo():40] git repository is invalid
+2023-07-11 08:52:19,020 DEBUG   HandlerThread:971212 [system_info.py:probe():240] Probing system done
+2023-07-11 08:52:19,020 DEBUG   HandlerThread:971212 [system_monitor.py:probe():210] {'os': 'Linux-5.4.0-139-generic-x86_64-with-glibc2.17', 'python': '3.8.16', 'heartbeatAt': '2023-07-11T00:52:18.998960', 'startedAt': '2023-07-11T00:52:16.699858', 'docker': None, 'cuda': None, 'args': ('--pretrained_model_name_or_path=CompVis/stable-diffusion-v1-4', '--dataset_name=ydshieh/coco_dataset_script', '--data_dir=/remote-home/songtianwei/research/diffusion_model_my/data', '--use_8bit_adam', '--use_ema', '--resolution=224', '--center_crop', '--random_flip', '--train_batch_size=6', '--gradient_checkpointing', '--max_train_steps=15000', '--gradient_accumulation_steps=1', '--learning_rate=1e-06', '--max_grad_norm=1', '--lr_scheduler=constant', '--lr_warmup_steps=0', '--output_dir=my_train_results/ydshieh/coco_dataset_script/2023-07-11', '--report_to=wandb', '--dataset_config_name=2017', '--image_column', 'image_path', '--caption_column', 'caption'), 'state': 'running', 'program': 'train1.py', 'codePath': 'train1.py', 'host': '2cad93842dee', 'username': 'songtianwei', 'executable': '/remote-home/songtianwei/conda/envs/pytorch2/bin/python', 'cpu_count': 32, 'cpu_count_logical': 32, 'cpu_freq': {'current': 3.5678124999999996, 'min': 1200.0, 'max': 3900.0}, 'cpu_freq_per_core': [{'current': 3.579, 'min': 1200.0, 'max': 3900.0}, {'current': 3.599, 'min': 1200.0, 'max': 3900.0}, {'current': 3.436, 'min': 1200.0, 'max': 3900.0}, {'current': 3.585, 'min': 1200.0, 'max': 3900.0}, {'current': 3.596, 'min': 1200.0, 'max': 3900.0}, {'current': 3.571, 'min': 1200.0, 'max': 3900.0}, {'current': 3.584, 'min': 1200.0, 'max': 3900.0}, {'current': 3.599, 'min': 1200.0, 'max': 3900.0}, {'current': 3.331, 'min': 1200.0, 'max': 3900.0}, {'current': 3.6, 'min': 1200.0, 'max': 3900.0}, {'current': 3.553, 'min': 1200.0, 'max': 3900.0}, {'current': 3.523, 'min': 1200.0, 'max': 3900.0}, {'current': 3.583, 'min': 1200.0, 'max': 3900.0}, {'current': 3.6, 'min': 1200.0, 'max': 3900.0}, {'current': 3.57, 'min': 1200.0, 'max': 3900.0}, {'current': 3.326, 'min': 1200.0, 'max': 3900.0}, {'current': 3.6, 'min': 1200.0, 'max': 3900.0}, {'current': 3.585, 'min': 1200.0, 'max': 3900.0}, {'current': 3.599, 'min': 1200.0, 'max': 3900.0}, {'current': 3.599, 'min': 1200.0, 'max': 3900.0}, {'current': 3.599, 'min': 1200.0, 'max': 3900.0}, {'current': 3.599, 'min': 1200.0, 'max': 3900.0}, {'current': 3.6, 'min': 1200.0, 'max': 3900.0}, {'current': 3.6, 'min': 1200.0, 'max': 3900.0}, {'current': 3.599, 'min': 1200.0, 'max': 3900.0}, {'current': 3.6, 'min': 1200.0, 'max': 3900.0}, {'current': 3.585, 'min': 1200.0, 'max': 3900.0}, {'current': 3.586, 'min': 1200.0, 'max': 3900.0}, {'current': 3.6, 'min': 1200.0, 'max': 3900.0}, {'current': 3.6, 'min': 1200.0, 'max': 3900.0}, {'current': 3.585, 'min': 1200.0, 'max': 3900.0}, {'current': 3.599, 'min': 1200.0, 'max': 3900.0}], 'disk': {'total': 1759.3514213562012, 'used': 65.55378341674805}, 'gpu': 'NVIDIA GeForce RTX 3090', 'gpu_count': 1, 'gpu_devices': [{'name': 'NVIDIA GeForce RTX 3090', 'memory_total': 25769803776}], 'memory': {'total': 503.5597839355469}}
+2023-07-11 08:52:19,021 INFO    HandlerThread:971212 [system_monitor.py:probe():211] Finished collecting system info
+2023-07-11 08:52:19,021 INFO    HandlerThread:971212 [system_monitor.py:probe():214] Publishing system info
+2023-07-11 08:52:19,021 DEBUG   HandlerThread:971212 [system_info.py:_save_pip():51] Saving list of pip packages installed into the current environment
+2023-07-11 08:52:19,026 DEBUG   HandlerThread:971212 [system_info.py:_save_pip():67] Saving pip packages done
+2023-07-11 08:52:19,027 DEBUG   HandlerThread:971212 [system_info.py:_save_conda():74] Saving list of conda packages installed into the current environment
+2023-07-11 08:52:19,053 INFO    Thread-12 :971212 [dir_watcher.py:_on_file_created():278] file/dir created: /remote-home/songtianwei/research/diffusion_model_my/sh/text-to-image/train_finetuned/wandb/run-20230711_085216-zkfhibqs/files/requirements.txt
+2023-07-11 08:52:19,054 INFO    Thread-12 :971212 [dir_watcher.py:_on_file_created():278] file/dir created: /remote-home/songtianwei/research/diffusion_model_my/sh/text-to-image/train_finetuned/wandb/run-20230711_085216-zkfhibqs/files/wandb-summary.json
+2023-07-11 08:52:19,054 INFO    Thread-12 :971212 [dir_watcher.py:_on_file_created():278] file/dir created: /remote-home/songtianwei/research/diffusion_model_my/sh/text-to-image/train_finetuned/wandb/run-20230711_085216-zkfhibqs/files/conda-environment.yaml
+2023-07-11 08:52:26,658 DEBUG   HandlerThread:971212 [system_info.py:_save_conda():86] Saving conda packages done
+2023-07-11 08:52:26,661 INFO    HandlerThread:971212 [system_monitor.py:probe():216] Finished publishing system info
+2023-07-11 08:52:26,719 DEBUG   HandlerThread:971212 [handler.py:handle_request():144] handle_request: status_report
+2023-07-11 08:52:26,719 DEBUG   HandlerThread:971212 [handler.py:handle_request():144] handle_request: keepalive
+2023-07-11 08:52:26,721 DEBUG   SenderThread:971212 [sender.py:send():375] send: files
+2023-07-11 08:52:26,721 INFO    SenderThread:971212 [sender.py:_save_file():1378] saving file wandb-metadata.json with policy now
+2023-07-11 08:52:26,737 DEBUG   HandlerThread:971212 [handler.py:handle_request():144] handle_request: stop_status
+2023-07-11 08:52:26,738 DEBUG   SenderThread:971212 [sender.py:send_request():402] send_request: stop_status
+2023-07-11 08:52:27,070 INFO    Thread-12 :971212 [dir_watcher.py:_on_file_modified():295] file/dir modified: /remote-home/songtianwei/research/diffusion_model_my/sh/text-to-image/train_finetuned/wandb/run-20230711_085216-zkfhibqs/files/conda-environment.yaml
+2023-07-11 08:52:27,071 INFO    Thread-12 :971212 [dir_watcher.py:_on_file_created():278] file/dir created: /remote-home/songtianwei/research/diffusion_model_my/sh/text-to-image/train_finetuned/wandb/run-20230711_085216-zkfhibqs/files/wandb-metadata.json
+2023-07-11 08:52:27,566 DEBUG   SenderThread:971212 [sender.py:send():375] send: telemetry
+2023-07-11 08:52:27,567 DEBUG   HandlerThread:971212 [handler.py:handle_request():144] handle_request: status_report
+2023-07-11 08:52:27,567 DEBUG   SenderThread:971212 [sender.py:send():375] send: config
+2023-07-11 08:52:27,573 DEBUG   SenderThread:971212 [sender.py:send():375] send: exit
+2023-07-11 08:52:27,573 INFO    SenderThread:971212 [sender.py:send_exit():598] handling exit code: 1
+2023-07-11 08:52:27,573 INFO    SenderThread:971212 [sender.py:send_exit():600] handling runtime: 8
+2023-07-11 08:52:27,577 INFO    SenderThread:971212 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-07-11 08:52:27,578 INFO    SenderThread:971212 [sender.py:send_exit():606] send defer
+2023-07-11 08:52:27,578 DEBUG   HandlerThread:971212 [handler.py:handle_request():144] handle_request: defer
+2023-07-11 08:52:27,578 INFO    HandlerThread:971212 [handler.py:handle_request_defer():170] handle defer: 0
+2023-07-11 08:52:27,579 DEBUG   SenderThread:971212 [sender.py:send_request():402] send_request: defer
+2023-07-11 08:52:27,579 INFO    SenderThread:971212 [sender.py:send_request_defer():622] handle sender defer: 0
+2023-07-11 08:52:27,579 INFO    SenderThread:971212 [sender.py:transition_state():626] send defer: 1
+2023-07-11 08:52:27,579 DEBUG   HandlerThread:971212 [handler.py:handle_request():144] handle_request: defer
+2023-07-11 08:52:27,579 INFO    HandlerThread:971212 [handler.py:handle_request_defer():170] handle defer: 1
+2023-07-11 08:52:27,580 DEBUG   SenderThread:971212 [sender.py:send_request():402] send_request: defer
+2023-07-11 08:52:27,580 INFO    SenderThread:971212 [sender.py:send_request_defer():622] handle sender defer: 1
+2023-07-11 08:52:27,580 INFO    SenderThread:971212 [sender.py:transition_state():626] send defer: 2
+2023-07-11 08:52:27,580 DEBUG   HandlerThread:971212 [handler.py:handle_request():144] handle_request: defer
+2023-07-11 08:52:27,580 INFO    HandlerThread:971212 [handler.py:handle_request_defer():170] handle defer: 2
+2023-07-11 08:52:27,581 INFO    HandlerThread:971212 [system_monitor.py:finish():190] Stopping system monitor
+2023-07-11 08:52:27,581 DEBUG   SystemMonitor:971212 [system_monitor.py:_start():159] Starting system metrics aggregation loop
+2023-07-11 08:52:27,581 INFO    HandlerThread:971212 [interfaces.py:finish():202] Joined cpu monitor
+2023-07-11 08:52:27,582 DEBUG   SystemMonitor:971212 [system_monitor.py:_start():166] Finished system metrics aggregation loop
+2023-07-11 08:52:27,582 INFO    HandlerThread:971212 [interfaces.py:finish():202] Joined disk monitor
+2023-07-11 08:52:27,582 DEBUG   SystemMonitor:971212 [system_monitor.py:_start():170] Publishing last batch of metrics
+2023-07-11 08:52:27,599 INFO    HandlerThread:971212 [interfaces.py:finish():202] Joined gpu monitor
+2023-07-11 08:52:27,599 INFO    HandlerThread:971212 [interfaces.py:finish():202] Joined memory monitor
+2023-07-11 08:52:27,600 INFO    HandlerThread:971212 [interfaces.py:finish():202] Joined network monitor
+2023-07-11 08:52:27,601 DEBUG   SenderThread:971212 [sender.py:send_request():402] send_request: defer
+2023-07-11 08:52:27,601 INFO    SenderThread:971212 [sender.py:send_request_defer():622] handle sender defer: 2
+2023-07-11 08:52:27,601 INFO    SenderThread:971212 [sender.py:transition_state():626] send defer: 3
+2023-07-11 08:52:27,601 DEBUG   SenderThread:971212 [sender.py:send():375] send: stats
+2023-07-11 08:52:27,601 DEBUG   HandlerThread:971212 [handler.py:handle_request():144] handle_request: defer
+2023-07-11 08:52:27,602 INFO    HandlerThread:971212 [handler.py:handle_request_defer():170] handle defer: 3
+2023-07-11 08:52:27,603 DEBUG   SenderThread:971212 [sender.py:send_request():402] send_request: defer
+2023-07-11 08:52:27,603 INFO    SenderThread:971212 [sender.py:send_request_defer():622] handle sender defer: 3
+2023-07-11 08:52:27,603 INFO    SenderThread:971212 [sender.py:transition_state():626] send defer: 4
+2023-07-11 08:52:27,603 DEBUG   HandlerThread:971212 [handler.py:handle_request():144] handle_request: defer
+2023-07-11 08:52:27,603 INFO    HandlerThread:971212 [handler.py:handle_request_defer():170] handle defer: 4
+2023-07-11 08:52:27,604 DEBUG   SenderThread:971212 [sender.py:send_request():402] send_request: defer
+2023-07-11 08:52:27,604 INFO    SenderThread:971212 [sender.py:send_request_defer():622] handle sender defer: 4
+2023-07-11 08:52:27,604 INFO    SenderThread:971212 [sender.py:transition_state():626] send defer: 5
+2023-07-11 08:52:27,604 DEBUG   HandlerThread:971212 [handler.py:handle_request():144] handle_request: defer
+2023-07-11 08:52:27,604 INFO    HandlerThread:971212 [handler.py:handle_request_defer():170] handle defer: 5
+2023-07-11 08:52:27,605 DEBUG   SenderThread:971212 [sender.py:send():375] send: summary
+2023-07-11 08:52:27,605 INFO    SenderThread:971212 [sender.py:_save_file():1378] saving file wandb-summary.json with policy end
+2023-07-11 08:52:27,606 DEBUG   SenderThread:971212 [sender.py:send_request():402] send_request: defer
+2023-07-11 08:52:27,606 INFO    SenderThread:971212 [sender.py:send_request_defer():622] handle sender defer: 5
+2023-07-11 08:52:27,606 INFO    SenderThread:971212 [sender.py:transition_state():626] send defer: 6
+2023-07-11 08:52:27,606 DEBUG   HandlerThread:971212 [handler.py:handle_request():144] handle_request: defer
+2023-07-11 08:52:27,606 INFO    HandlerThread:971212 [handler.py:handle_request_defer():170] handle defer: 6
+2023-07-11 08:52:27,607 DEBUG   SenderThread:971212 [sender.py:send_request():402] send_request: defer
+2023-07-11 08:52:27,607 INFO    SenderThread:971212 [sender.py:send_request_defer():622] handle sender defer: 6
+2023-07-11 08:52:27,612 DEBUG   HandlerThread:971212 [handler.py:handle_request():144] handle_request: status_report
+2023-07-11 08:52:28,052 INFO    SenderThread:971212 [sender.py:transition_state():626] send defer: 7
+2023-07-11 08:52:28,052 DEBUG   HandlerThread:971212 [handler.py:handle_request():144] handle_request: defer
+2023-07-11 08:52:28,053 INFO    HandlerThread:971212 [handler.py:handle_request_defer():170] handle defer: 7
+2023-07-11 08:52:28,053 DEBUG   SenderThread:971212 [sender.py:send_request():402] send_request: defer
+2023-07-11 08:52:28,053 INFO    SenderThread:971212 [sender.py:send_request_defer():622] handle sender defer: 7
+2023-07-11 08:52:28,063 INFO    wandb-upload_0:971212 [upload_job.py:push():137] Uploaded file /tmp/tmp9wurv4p9wandb/hknzw1ca-wandb-metadata.json
+2023-07-11 08:52:28,071 INFO    Thread-12 :971212 [dir_watcher.py:_on_file_modified():295] file/dir modified: /remote-home/songtianwei/research/diffusion_model_my/sh/text-to-image/train_finetuned/wandb/run-20230711_085216-zkfhibqs/files/wandb-summary.json
+2023-07-11 08:52:28,087 INFO    Thread-12 :971212 [dir_watcher.py:_on_file_modified():295] file/dir modified: /remote-home/songtianwei/research/diffusion_model_my/sh/text-to-image/train_finetuned/wandb/run-20230711_085216-zkfhibqs/files/config.yaml
+2023-07-11 08:52:28,098 INFO    Thread-12 :971212 [dir_watcher.py:_on_file_created():278] file/dir created: /remote-home/songtianwei/research/diffusion_model_my/sh/text-to-image/train_finetuned/wandb/run-20230711_085216-zkfhibqs/files/output.log
+2023-07-11 08:52:28,163 DEBUG   HandlerThread:971212 [handler.py:handle_request():144] handle_request: poll_exit
+2023-07-11 08:52:30,076 INFO    Thread-12 :971212 [dir_watcher.py:_on_file_modified():295] file/dir modified: /remote-home/songtianwei/research/diffusion_model_my/sh/text-to-image/train_finetuned/wandb/run-20230711_085216-zkfhibqs/files/output.log
+2023-07-11 08:52:31,584 INFO    SenderThread:971212 [sender.py:transition_state():626] send defer: 8
+2023-07-11 08:52:31,584 DEBUG   SenderThread:971212 [sender.py:send_request():402] send_request: poll_exit
+2023-07-11 08:52:31,585 DEBUG   HandlerThread:971212 [handler.py:handle_request():144] handle_request: defer
+2023-07-11 08:52:31,585 INFO    HandlerThread:971212 [handler.py:handle_request_defer():170] handle defer: 8
+2023-07-11 08:52:31,585 DEBUG   SenderThread:971212 [sender.py:send_request():402] send_request: defer
+2023-07-11 08:52:31,585 INFO    SenderThread:971212 [sender.py:send_request_defer():622] handle sender defer: 8
+2023-07-11 08:52:31,586 INFO    SenderThread:971212 [sender.py:transition_state():626] send defer: 9
+2023-07-11 08:52:31,587 DEBUG   HandlerThread:971212 [handler.py:handle_request():144] handle_request: defer
+2023-07-11 08:52:31,587 INFO    HandlerThread:971212 [handler.py:handle_request_defer():170] handle defer: 9
+2023-07-11 08:52:31,587 DEBUG   SenderThread:971212 [sender.py:send_request():402] send_request: defer
+2023-07-11 08:52:31,587 INFO    SenderThread:971212 [sender.py:send_request_defer():622] handle sender defer: 9
+2023-07-11 08:52:31,587 INFO    SenderThread:971212 [dir_watcher.py:finish():365] shutting down directory watcher
+2023-07-11 08:52:32,078 INFO    SenderThread:971212 [dir_watcher.py:_on_file_modified():295] file/dir modified: /remote-home/songtianwei/research/diffusion_model_my/sh/text-to-image/train_finetuned/wandb/run-20230711_085216-zkfhibqs/files/output.log
+2023-07-11 08:52:32,078 INFO    SenderThread:971212 [dir_watcher.py:finish():395] scan: /remote-home/songtianwei/research/diffusion_model_my/sh/text-to-image/train_finetuned/wandb/run-20230711_085216-zkfhibqs/files
+2023-07-11 08:52:32,078 INFO    SenderThread:971212 [dir_watcher.py:finish():409] scan save: /remote-home/songtianwei/research/diffusion_model_my/sh/text-to-image/train_finetuned/wandb/run-20230711_085216-zkfhibqs/files/conda-environment.yaml conda-environment.yaml
+2023-07-11 08:52:32,079 INFO    SenderThread:971212 [dir_watcher.py:finish():409] scan save: /remote-home/songtianwei/research/diffusion_model_my/sh/text-to-image/train_finetuned/wandb/run-20230711_085216-zkfhibqs/files/wandb-metadata.json wandb-metadata.json
+2023-07-11 08:52:32,079 INFO    SenderThread:971212 [dir_watcher.py:finish():409] scan save: /remote-home/songtianwei/research/diffusion_model_my/sh/text-to-image/train_finetuned/wandb/run-20230711_085216-zkfhibqs/files/config.yaml config.yaml
+2023-07-11 08:52:32,081 INFO    SenderThread:971212 [dir_watcher.py:finish():409] scan save: /remote-home/songtianwei/research/diffusion_model_my/sh/text-to-image/train_finetuned/wandb/run-20230711_085216-zkfhibqs/files/requirements.txt requirements.txt
+2023-07-11 08:52:32,084 INFO    SenderThread:971212 [dir_watcher.py:finish():409] scan save: /remote-home/songtianwei/research/diffusion_model_my/sh/text-to-image/train_finetuned/wandb/run-20230711_085216-zkfhibqs/files/wandb-summary.json wandb-summary.json
+2023-07-11 08:52:32,087 INFO    SenderThread:971212 [dir_watcher.py:finish():409] scan save: /remote-home/songtianwei/research/diffusion_model_my/sh/text-to-image/train_finetuned/wandb/run-20230711_085216-zkfhibqs/files/output.log output.log
+2023-07-11 08:52:32,087 INFO    SenderThread:971212 [sender.py:transition_state():626] send defer: 10
+2023-07-11 08:52:32,088 DEBUG   HandlerThread:971212 [handler.py:handle_request():144] handle_request: defer
+2023-07-11 08:52:32,088 INFO    HandlerThread:971212 [handler.py:handle_request_defer():170] handle defer: 10
+2023-07-11 08:52:32,104 DEBUG   SenderThread:971212 [sender.py:send_request():402] send_request: defer
+2023-07-11 08:52:32,108 INFO    SenderThread:971212 [sender.py:send_request_defer():622] handle sender defer: 10
+2023-07-11 08:52:32,108 INFO    SenderThread:971212 [file_pusher.py:finish():167] shutting down file pusher
+2023-07-11 08:52:33,109 DEBUG   HandlerThread:971212 [handler.py:handle_request():144] handle_request: status_report
+2023-07-11 08:52:33,165 DEBUG   HandlerThread:971212 [handler.py:handle_request():144] handle_request: keepalive
+2023-07-11 08:52:37,123 INFO    wandb-upload_1:971212 [upload_job.py:push():137] Uploaded file /remote-home/songtianwei/research/diffusion_model_my/sh/text-to-image/train_finetuned/wandb/run-20230711_085216-zkfhibqs/files/config.yaml
+2023-07-11 08:52:37,581 INFO    wandb-upload_0:971212 [upload_job.py:push():137] Uploaded file /remote-home/songtianwei/research/diffusion_model_my/sh/text-to-image/train_finetuned/wandb/run-20230711_085216-zkfhibqs/files/conda-environment.yaml
+2023-07-11 08:52:38,110 DEBUG   HandlerThread:971212 [handler.py:handle_request():144] handle_request: status_report
+2023-07-11 08:52:38,166 DEBUG   HandlerThread:971212 [handler.py:handle_request():144] handle_request: keepalive
+2023-07-11 08:52:38,648 INFO    wandb-upload_2:971212 [upload_job.py:push():137] Uploaded file /remote-home/songtianwei/research/diffusion_model_my/sh/text-to-image/train_finetuned/wandb/run-20230711_085216-zkfhibqs/files/requirements.txt
+2023-07-11 08:52:40,181 INFO    wandb-upload_4:971212 [upload_job.py:push():137] Uploaded file /remote-home/songtianwei/research/diffusion_model_my/sh/text-to-image/train_finetuned/wandb/run-20230711_085216-zkfhibqs/files/output.log
+2023-07-11 08:52:40,445 INFO    wandb-upload_3:971212 [upload_job.py:push():137] Uploaded file /remote-home/songtianwei/research/diffusion_model_my/sh/text-to-image/train_finetuned/wandb/run-20230711_085216-zkfhibqs/files/wandb-summary.json
+2023-07-11 08:52:40,646 INFO    Thread-11 :971212 [sender.py:transition_state():626] send defer: 11
+2023-07-11 08:52:40,646 DEBUG   HandlerThread:971212 [handler.py:handle_request():144] handle_request: defer
+2023-07-11 08:52:40,646 INFO    HandlerThread:971212 [handler.py:handle_request_defer():170] handle defer: 11
+2023-07-11 08:52:40,647 DEBUG   SenderThread:971212 [sender.py:send_request():402] send_request: defer
+2023-07-11 08:52:40,647 INFO    SenderThread:971212 [sender.py:send_request_defer():622] handle sender defer: 11
+2023-07-11 08:52:40,647 INFO    SenderThread:971212 [file_pusher.py:join():172] waiting for file pusher
+2023-07-11 08:52:40,647 INFO    SenderThread:971212 [sender.py:transition_state():626] send defer: 12
+2023-07-11 08:52:40,647 DEBUG   HandlerThread:971212 [handler.py:handle_request():144] handle_request: defer
+2023-07-11 08:52:40,647 INFO    HandlerThread:971212 [handler.py:handle_request_defer():170] handle defer: 12
+2023-07-11 08:52:40,647 DEBUG   SenderThread:971212 [sender.py:send_request():402] send_request: defer
+2023-07-11 08:52:40,647 INFO    SenderThread:971212 [sender.py:send_request_defer():622] handle sender defer: 12
+2023-07-11 08:52:42,627 INFO    SenderThread:971212 [sender.py:transition_state():626] send defer: 13
+2023-07-11 08:52:42,627 DEBUG   HandlerThread:971212 [handler.py:handle_request():144] handle_request: defer
+2023-07-11 08:52:42,627 INFO    HandlerThread:971212 [handler.py:handle_request_defer():170] handle defer: 13
+2023-07-11 08:52:42,628 DEBUG   SenderThread:971212 [sender.py:send_request():402] send_request: defer
+2023-07-11 08:52:42,628 INFO    SenderThread:971212 [sender.py:send_request_defer():622] handle sender defer: 13
+2023-07-11 08:52:42,628 INFO    SenderThread:971212 [sender.py:transition_state():626] send defer: 14
+2023-07-11 08:52:42,628 DEBUG   HandlerThread:971212 [handler.py:handle_request():144] handle_request: defer
+2023-07-11 08:52:42,628 INFO    HandlerThread:971212 [handler.py:handle_request_defer():170] handle defer: 14
+2023-07-11 08:52:42,629 DEBUG   SenderThread:971212 [sender.py:send():375] send: final
+2023-07-11 08:52:42,629 DEBUG   SenderThread:971212 [sender.py:send():375] send: footer
+2023-07-11 08:52:42,629 DEBUG   SenderThread:971212 [sender.py:send_request():402] send_request: defer
+2023-07-11 08:52:42,629 INFO    SenderThread:971212 [sender.py:send_request_defer():622] handle sender defer: 14
+2023-07-11 08:52:42,630 DEBUG   HandlerThread:971212 [handler.py:handle_request():144] handle_request: poll_exit
+2023-07-11 08:52:42,631 DEBUG   SenderThread:971212 [sender.py:send_request():402] send_request: poll_exit
+2023-07-11 08:52:42,631 DEBUG   HandlerThread:971212 [handler.py:handle_request():144] handle_request: server_info
+2023-07-11 08:52:42,632 DEBUG   HandlerThread:971212 [handler.py:handle_request():144] handle_request: get_summary
+2023-07-11 08:52:42,632 DEBUG   HandlerThread:971212 [handler.py:handle_request():144] handle_request: sampled_history
+2023-07-11 08:52:42,632 DEBUG   SenderThread:971212 [sender.py:send_request():402] send_request: server_info
+2023-07-11 08:52:43,461 DEBUG   HandlerThread:971212 [handler.py:handle_request():144] handle_request: status_report
+2023-07-11 08:52:43,461 INFO    MainThread:971212 [wandb_run.py:_footer_history_summary_info():3469] rendering history
+2023-07-11 08:52:43,462 INFO    MainThread:971212 [wandb_run.py:_footer_history_summary_info():3501] rendering summary
+2023-07-11 08:52:43,462 INFO    MainThread:971212 [wandb_run.py:_footer_sync_info():3428] logging synced files
+2023-07-11 08:52:43,462 DEBUG   HandlerThread:971212 [handler.py:handle_request():144] handle_request: shutdown
+2023-07-11 08:52:43,462 INFO    HandlerThread:971212 [handler.py:finish():842] shutting down handler
+2023-07-11 08:52:44,461 INFO    SenderThread:971212 [sender.py:finish():1550] shutting down sender
+2023-07-11 08:52:44,461 INFO    SenderThread:971212 [file_pusher.py:finish():167] shutting down file pusher
+2023-07-11 08:52:44,461 INFO    SenderThread:971212 [file_pusher.py:join():172] waiting for file pusher
+2023-07-11 08:52:44,462 INFO    WriterThread:971212 [datastore.py:close():298] close: /remote-home/songtianwei/research/diffusion_model_my/sh/text-to-image/train_finetuned/wandb/run-20230711_085216-zkfhibqs/run-zkfhibqs.wandb
