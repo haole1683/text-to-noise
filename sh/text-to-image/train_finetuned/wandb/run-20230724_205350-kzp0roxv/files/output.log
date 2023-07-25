@@ -1,0 +1,67 @@
+07/24/2023 20:53:57 - INFO - __main__ - ***** Running training *****
+07/24/2023 20:53:57 - INFO - __main__ -   Num examples = 483213
+07/24/2023 20:53:57 - INFO - __main__ -   Num Epochs = 1
+07/24/2023 20:53:57 - INFO - __main__ -   Instantaneous batch size per device = 6
+07/24/2023 20:53:57 - INFO - __main__ -   Total train batch size (w. parallel, distributed & accumulation) = 6
+07/24/2023 20:53:57 - INFO - __main__ -   Gradient Accumulation steps = 1
+07/24/2023 20:53:57 - INFO - __main__ -   Total optimization steps = 15000
+
+Steps:   0%|                                                                                                                                                                                      | 0/15000 [00:00<?, ?it/s]Forward upsample size to force interpolation output size.
+Steps:   0%|                                                                                                                                                  | 1/15000 [00:12<50:00:42, 12.00s/it, lr=1e-6, step_loss=4.13]Forward upsample size to force interpolation output size.
+Steps:   0%|                                                                                                                                                  | 2/15000 [00:13<23:07:38,  5.55s/it, lr=1e-6, step_loss=4.45]Forward upsample size to force interpolation output size.
+Steps:   0%|                                                                                                                                                  | 3/15000 [00:13<14:13:37,  3.42s/it, lr=1e-6, step_loss=4.14]Forward upsample size to force interpolation output size.
+Steps:   0%|                                                                                                                                                  | 4/15000 [00:14<10:02:03,  2.41s/it, lr=1e-6, step_loss=4.23]Forward upsample size to force interpolation output size.
+Steps:   0%|                                                                                                                                                   | 5/15000 [00:15<7:41:20,  1.85s/it, lr=1e-6, step_loss=4.42]Forward upsample size to force interpolation output size.
+Steps:   0%|                                                                                                                                                   | 6/15000 [00:16<6:17:22,  1.51s/it, lr=1e-6, step_loss=4.36]Forward upsample size to force interpolation output size.
+Steps:   0%|                                                                                                                                                   | 7/15000 [00:17<5:25:38,  1.30s/it, lr=1e-6, step_loss=4.15]Forward upsample size to force interpolation output size.
+Steps:   0%|                                                                                                                                                   | 8/15000 [00:18<4:49:57,  1.16s/it, lr=1e-6, step_loss=4.39]Forward upsample size to force interpolation output size.
+Steps:   0%|                                                                                                                                                   | 9/15000 [00:19<4:26:50,  1.07s/it, lr=1e-6, step_loss=4.48]Forward upsample size to force interpolation output size.
+Steps:   0%|                                                                                                                                                  | 10/15000 [00:19<4:10:05,  1.00s/it, lr=1e-6, step_loss=4.47]Forward upsample size to force interpolation output size.
+Steps:   0%|                                                                                                                                                  | 11/15000 [00:20<3:58:37,  1.05it/s, lr=1e-6, step_loss=4.17]Forward upsample size to force interpolation output size.
+Steps:   0%|                                                                                                                                                  | 12/15000 [00:21<3:50:00,  1.09it/s, lr=1e-6, step_loss=4.11]Forward upsample size to force interpolation output size.
+Steps:   0%|▏                                                                                                                                                 | 13/15000 [00:22<3:44:51,  1.11it/s, lr=1e-6, step_loss=4.25]Forward upsample size to force interpolation output size.
+Steps:   0%|▏                                                                                                                                                 | 14/15000 [00:23<3:40:58,  1.13it/s, lr=1e-6, step_loss=4.66]Forward upsample size to force interpolation output size.
+Steps:   0%|▏                                                                                                                                                 | 15/15000 [00:24<3:38:33,  1.14it/s, lr=1e-6, step_loss=4.49]Forward upsample size to force interpolation output size.
+Steps:   0%|▏                                                                                                                                                 | 16/15000 [00:25<3:36:59,  1.15it/s, lr=1e-6, step_loss=4.45]Forward upsample size to force interpolation output size.
+Steps:   0%|▏                                                                                                                                                 | 17/15000 [00:25<3:37:27,  1.15it/s, lr=1e-6, step_loss=4.27]Forward upsample size to force interpolation output size.
+Steps:   0%|▏                                                                                                                                                 | 18/15000 [00:26<3:35:23,  1.16it/s, lr=1e-6, step_loss=4.32]Forward upsample size to force interpolation output size.
+Steps:   0%|▏                                                                                                                                                  | 19/15000 [00:27<3:33:49,  1.17it/s, lr=1e-6, step_loss=4.3]Forward upsample size to force interpolation output size.
+Steps:   0%|▏                                                                                                                                                 | 20/15000 [00:28<3:32:59,  1.17it/s, lr=1e-6, step_loss=4.26]Forward upsample size to force interpolation output size.
+Steps:   0%|▏                                                                                                                                                 | 21/15000 [00:29<3:32:52,  1.17it/s, lr=1e-6, step_loss=4.31]Forward upsample size to force interpolation output size.
+Steps:   0%|▏                                                                                                                                                 | 22/15000 [00:30<3:32:13,  1.18it/s, lr=1e-6, step_loss=4.65]Forward upsample size to force interpolation output size.
+Steps:   0%|▏                                                                                                                                                 | 23/15000 [00:31<3:32:30,  1.17it/s, lr=1e-6, step_loss=4.45]Traceback (most recent call last):
+  File "train1.py", line 1103, in <module>
+    main()
+  File "train1.py", line 920, in main
+    for step, batch in enumerate(train_dataloader):
+  File "/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/accelerate/data_loader.py", line 387, in __iter__
+    next_batch = next(dataloader_iter)
+  File "/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/torch/utils/data/dataloader.py", line 633, in __next__
+    data = self._next_data()
+  File "/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/torch/utils/data/dataloader.py", line 677, in _next_data
+    data = self._dataset_fetcher.fetch(index)  # may raise StopIteration
+  File "/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/torch/utils/data/_utils/fetch.py", line 49, in fetch
+    data = self.dataset.__getitems__(possibly_batched_index)
+  File "/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/datasets/arrow_dataset.py", line 2782, in __getitems__
+    batch = self.__getitem__(keys)
+  File "/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/datasets/arrow_dataset.py", line 2778, in __getitem__
+    return self._getitem(key)
+  File "/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/datasets/arrow_dataset.py", line 2763, in _getitem
+    formatted_output = format_table(
+  File "/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/datasets/formatting/formatting.py", line 624, in format_table
+    return formatter(pa_table, query_type=query_type)
+  File "/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/datasets/formatting/formatting.py", line 400, in __call__
+    return self.format_batch(pa_table)
+  File "/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/datasets/formatting/formatting.py", line 510, in format_batch
+    return self.transform(batch)
+  File "train1.py", line 771, in preprocess_train
+    examples["pixel_values"] = [train_transforms(image) for image in images]
+  File "train1.py", line 771, in <listcomp>
+    examples["pixel_values"] = [train_transforms(image) for image in images]
+  File "/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/torchvision/transforms/transforms.py", line 95, in __call__
+    img = t(img)
+  File "/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/torchvision/transforms/transforms.py", line 137, in __call__
+    return F.to_tensor(pic)
+  File "/remote-home/songtianwei/conda/envs/pytorch2/lib/python3.8/site-packages/torchvision/transforms/functional.py", line 174, in to_tensor
+    return img.to(dtype=default_float_dtype).div(255)
+KeyboardInterrupt

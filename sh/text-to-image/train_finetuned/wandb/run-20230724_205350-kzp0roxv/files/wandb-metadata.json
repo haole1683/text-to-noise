@@ -1,0 +1,229 @@
+{
+    "os": "Linux-5.4.0-139-generic-x86_64-with-glibc2.17",
+    "python": "3.8.16",
+    "heartbeatAt": "2023-07-24T12:53:52.638591",
+    "startedAt": "2023-07-24T12:53:50.015909",
+    "docker": null,
+    "cuda": null,
+    "args": [
+        "--pretrained_model_name_or_path=CompVis/stable-diffusion-v1-4",
+        "--dataset_name=ydshieh/coco_dataset_script",
+        "--data_dir=/remote-home/songtianwei/research/diffusion_model_my/data",
+        "--use_8bit_adam",
+        "--use_ema",
+        "--resolution=224",
+        "--center_crop",
+        "--random_flip",
+        "--train_batch_size=6",
+        "--gradient_checkpointing",
+        "--max_train_steps=15000",
+        "--gradient_accumulation_steps=1",
+        "--learning_rate=1e-06",
+        "--max_grad_norm=1",
+        "--lr_scheduler=constant",
+        "--lr_warmup_steps=0",
+        "--output_dir=my_train_results/ydshieh/coco_dataset_script/2023-07-24",
+        "--report_to=wandb",
+        "--dataset_config_name=2017",
+        "--image_column",
+        "image_path",
+        "--caption_column",
+        "caption"
+    ],
+    "state": "running",
+    "program": "train1.py",
+    "codePath": "sh/text-to-image/train_finetuned/train1.py",
+    "git": {
+        "remote": null,
+        "commit": "fff8192cedc172f9c73f319064724c5b64d4e123"
+    },
+    "email": "2997155472@qq.com",
+    "root": "/remote-home/songtianwei/research/diffusion_model_my",
+    "host": "00351cb6f98e",
+    "username": "songtianwei",
+    "executable": "/remote-home/songtianwei/conda/envs/pytorch2/bin/python",
+    "cpu_count": 32,
+    "cpu_count_logical": 32,
+    "cpu_freq": {
+        "current": 3.5472499999999996,
+        "min": 1200.0,
+        "max": 3900.0
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 3.6,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.599,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.6,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.6,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.503,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.6,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.599,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.576,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.599,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.6,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.6,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.6,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.599,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.599,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.54,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.535,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.599,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.59,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.6,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.249,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.581,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.484,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.312,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.494,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.502,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.6,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.32,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.599,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.586,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.6,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.572,
+            "min": 1200.0,
+            "max": 3900.0
+        },
+        {
+            "current": 3.475,
+            "min": 1200.0,
+            "max": 3900.0
+        }
+    ],
+    "disk": {
+        "total": 1759.3514213562012,
+        "used": 64.61545181274414
+    },
+    "gpu": "NVIDIA GeForce RTX 3090",
+    "gpu_count": 1,
+    "gpu_devices": [
+        {
+            "name": "NVIDIA GeForce RTX 3090",
+            "memory_total": 25769803776
+        }
+    ],
+    "memory": {
+        "total": 503.5597839355469
+    }
+}

@@ -18,7 +18,8 @@ accelerate launch --mixed_precision="fp16"  train_generator.py \
   --use_8bit_adam\
   --use_ema \
   --resolution=224 --center_crop --random_flip \
-  --train_batch_size=3 \
+  --train_batch_size=6 \
+  --eval_batch_size=6 \
   --gradient_checkpointing \
   --max_train_steps=15000 \
   --gradient_accumulation_steps=1 \
@@ -31,5 +32,6 @@ accelerate launch --mixed_precision="fp16"  train_generator.py \
   --image_column image_path \
   --caption_column caption \
   --do_eval \
+  --do_train \
   --max_train_samples 100
   # --resume_from_checkpoint 
