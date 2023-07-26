@@ -998,9 +998,8 @@ def main():
 
                     # Get the text embedding for conditioning
                     batch_token_ids = batch["input_ids"]
-                    batch_attention_mask = batch["attention_mask"]
                     
-                    encoder_hidden_states = text_encoder(batch_token_ids,batch_attention_mask)[0]  # [6,77,768]
+                    encoder_hidden_states = text_encoder(batch_token_ids)[0]  # [6,77,768]
 
                     # Predict the noise residual and compute loss
                     # noise_latents : image latent with noise   [6,3,224,224]
@@ -1133,8 +1132,8 @@ def main():
                     
                     loss = output.loss
 
-            logs = {"eval_loss": loss.detach().item(), "lr": lr_scheduler.get_last_lr()[0]}
-            progress_bar.set_postfix(**logs)
+                logs = {"eval_loss": loss.detach().item(), "lr": lr_scheduler.get_last_lr()[0]}
+                progress_bar.set_postfix(**logs)
     
     # Create the pipeline using the trained modules and save it.
     accelerator.wait_for_everyone()
