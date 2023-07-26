@@ -16,11 +16,11 @@
 # Code source : https://github.com/huggingface/diffusers/blob/v0.18.2/examples/text_to_image/train_text_to_image.py
 
 # This is for debug
-import ptvsd
-print("waiting for attaching")
-ptvsd.enable_attach(address = ('127.0.0.1', 5678))
-ptvsd.wait_for_attach()
-print("attached")
+# import ptvsd
+# print("waiting for attaching")
+# ptvsd.enable_attach(address = ('127.0.0.1', 5678))
+# ptvsd.wait_for_attach()
+# print("attached")
 
 
 import argparse
@@ -53,7 +53,7 @@ from PIL import Image
 
 
 import diffusers
-from diffusers import AutoencoderKL, DDPMScheduler, StableDiffusionPipeline, UNet2DConditionModel
+from diffusers import AutoencoderKL, DDPMScheduler, StableDiffusionPipeline, UNet2DConditionModel, UNet2DModel
 from diffusers.optimization import get_scheduler
 from diffusers.training_utils import EMAModel
 from diffusers.utils import check_min_version, deprecate, is_wandb_available
@@ -253,7 +253,7 @@ def parse_args():
     parser.add_argument(
         "--eval_batch_size", type=int, default=16, help="Batch size (per device) for the evaluation dataloader."
     )
-    parser.add_argument("--num_train_epochs", type=int, default=100)
+    parser.add_argument("--num_train_epochs", type=int, default=10)
     parser.add_argument(
         "--max_train_steps",
         type=int,
@@ -817,7 +817,6 @@ def main():
     with accelerator.main_process_first():
         if args.max_train_samples is not None:
             dataset["train"] = dataset["train"].shuffle(seed=args.seed).select(range(args.max_train_samples))
-        dataset["train"] = dataset["train"].shuffle(seed=args.seed).select(range(100))
         # filter out corrupt images 
         train_dataset = dataset["train"].filter(filter_corrupt_images, batched=True)
         # Set the training transforms
@@ -906,7 +905,7 @@ def main():
     if args.do_train:
         logger.info(f"  Training num examples = {len(train_dataset)}")
     if args.do_eval:
-        logger.info(f"  Evaluatoin num examples = {len(eval_dataset)}")
+        logger.info(f"  Evaluation num examples = {len(eval_dataset)}")
     logger.info(f"  Num Epochs = {args.num_train_epochs}")
     logger.info(f"  Instantaneous batch size per device = {args.train_batch_size}")
     logger.info(f"  Total train batch size (w. parallel, distributed & accumulation) = {total_batch_size}")
@@ -944,20 +943,6 @@ def main():
     progress_bar = tqdm(range(global_step, args.max_train_steps), disable=not accelerator.is_local_main_process)
     progress_bar.set_description("Steps")
 
-    # cosine similarity as logits (from clip)
-    def cal_sim(text_features,image_features):
-        import torch.nn as nn
-
-        image_features = image_features / image_features.norm(dim=1, keepdim=True)
-        text_features = text_features / text_features.norm(dim=1, keepdim=True)
-        
-        logit_scale = nn.Parameter(torch.ones([]) * np.log(1 / 0.07))
-        logit_scale = logit_scale.exp()
-        logits_per_image = logit_scale * image_features @ text_features.t()
-        logits_per_text = logits_per_image.t()
-        
-        return logits_per_image, logits_per_text
-
     for epoch in range(first_epoch, args.num_train_epochs):
         if args.do_train:
             logging.info("*"*50)
@@ -980,18 +965,12 @@ def main():
 
                     # latents = torch.randn_like(img_pixel_values).to(weight_dtype)  # [6,3,224,224]
                     latents = vae.encode(img_pixel_values).latent_dist.sample()
-                    latents = latents * vae.config.scaling_factor
+                    # !! cancal the line
+                    # latents = latents * vae.config.scaling_factor
 
                     # Sample noise that we'll add to the latents
                     noise = torch.randn_like(latents)  # [6,3,224,224]
 
-                    if args.noise_offset:
-                        # https://www.crosslabs.org//blog/diffusion-with-offset-noise
-                        noise += args.noise_offset * torch.randn(
-                            (latents.shape[0], latents.shape[1], 1, 1), device=latents.device
-                        )
-                    if args.input_pertubation:
-                        new_noise = noise + args.input_pertubation * torch.randn_like(noise)
                     bsz = latents.shape[0]  # 6
                     # Sample a random timestep for each image
                     timesteps = torch.randint(0, noise_scheduler.config.num_train_timesteps, (bsz,), device=latents.device)
@@ -999,28 +978,21 @@ def main():
 
                     # Add noise to the latents according to the noise magnitude at each timestep
                     # (this is the forward diffusion process)
-                    if args.input_pertubation:
-                        noisy_latents = noise_scheduler.add_noise(latents, new_noise, timesteps)
-                    else:
-                        noisy_latents = noise_scheduler.add_noise(latents, noise, timesteps)  # # [6,3,224,224]
+                    
+                    noisy_latents = noise_scheduler.add_noise(latents, noise, timesteps)  # # [6,3,224,224]
 
                     # Get the text embedding for conditioning
                     batch_token_ids = batch["input_ids"]
                     encoder_hidden_states = text_encoder(batch_token_ids)[0]  # [6,77,768]
 
-                    # Get the target for loss depending on the prediction type
-                    if noise_scheduler.config.prediction_type == "epsilon":
-                        target = noise
-                    elif noise_scheduler.config.prediction_type == "v_prediction":
-                        target = noise_scheduler.get_velocity(latents, noise, timesteps)
-                    else:
-                        raise ValueError(f"Unknown prediction type {noise_scheduler.config.prediction_type}")
-
                     # Predict the noise residual and compute loss
                     # noise_latents : image latent with noise   [6,3,224,224]
                     # timesteps : [6]
                     # encoder_hidden_state : text latent data   [6,77,768]
-                    model_pred = unet(noisy_latents, timesteps, encoder_hidden_states).sample
+                    # model_pred = unet(noisy_latents, timesteps, encoder_hidden_states).sample
+                    
+                    # here use latent directly without noise
+                    model_pred = unet(latents, timesteps, encoder_hidden_states).sample
                     
                     # START MY CODE
                     vae_decoding = vae.decode(model_pred).sample  # use vae output as noise
@@ -1035,18 +1007,17 @@ def main():
                         vae_decoding = torch.clamp(vae_decoding, -epsilon / 255, epsilon / 255)
                     image_noise = img_pixel_values + vae_decoding
                     image_noise = torch.clamp(image_noise, -1, 1)
+                      
+                    data_input = {
+                        "input_ids":batch_token_ids,
+                        "pixel_values" : image_noise
+                    }
+                    output = clip_model(**data_input, return_loss=True)
+                    logits_per_image = output.logits_per_image   # for training , image_logits is the same as logits text
+                    logits_per_text = output.logits_per_text
                     
-                    # align the image_noise embedding with the text
-                    image_features = clip_model.get_image_features(image_noise)
-                    text_features = clip_model.get_text_features(batch_token_ids)
+                    loss = output.loss
                     
-                    logits_per_image, logits_per_text = cal_sim(text_features,image_features)
-                    # softmax
-                    loss = torch.nn.functional.softmax(logits_per_image, dim=0)
-
-                    # sum the logits of the 对角线
-                    loss = torch.diag(logits_per_image).mean()
-
                     # END MY CODE
                     
                     # Gather the losses across all processes for logging (if we use distributed training).
@@ -1089,7 +1060,6 @@ def main():
             logging.info("*"*50)
             unet.eval()
             vae.decoder.eval()
-            eval_loss = 0.0
             
             for step, batch in enumerate(tqdm(eval_dataloader)):
                 with torch.no_grad():
@@ -1099,7 +1069,7 @@ def main():
                     # here you can not access the img, so set it random
                     latents = vae.encode(img_pixel_values).latent_dist.sample()
                     # latents = torch.randn_like(img_pixel_values).to(weight_dtype)
-                    latents = latents * vae.config.scaling_factor
+                    # latents = latents * vae.config.scaling_factor
 
                     # Sample noise that we'll add to the latents
                     noise = torch.randn_like(latents)
@@ -1111,29 +1081,14 @@ def main():
                     timesteps = torch.randint(0, noise_scheduler.config.num_train_timesteps, (bsz,), device=latents.device)
                     timesteps = timesteps.long()
 
-                    # Add noise to the latents according to the noise magnitude at each timestep
-                    # (this is the forward diffusion process)
-                    if args.input_pertubation:
-                        noisy_latents = noise_scheduler.add_noise(latents, new_noise, timesteps)
-                    else:
-                        noisy_latents = noise_scheduler.add_noise(latents, noise, timesteps)
-
                     # Get the text embedding for conditioning
                     batch_token_ids = batch["input_ids"]
                     encoder_hidden_states = text_encoder(batch_token_ids)[0]
 
-                    # Get the target for loss depending on the prediction type
-                    if noise_scheduler.config.prediction_type == "epsilon":
-                        target = noise
-                    elif noise_scheduler.config.prediction_type == "v_prediction":
-                        target = noise_scheduler.get_velocity(latents, noise, timesteps)
-                    else:
-                        raise ValueError(f"Unknown prediction type {noise_scheduler.config.prediction_type}")
-
                     # Predict the noise residual and compute loss
                     # noise_latents : image latent with noise 
                     # encoder_hidden_state : text latent data
-                    model_pred = unet(noisy_latents, timesteps, encoder_hidden_states).sample
+                    model_pred = unet(latents, timesteps, encoder_hidden_states).sample
                     
                     # START MY CODE
                     vae_decoding = vae.decode(model_pred).sample  # use vae output as noise
@@ -1149,16 +1104,15 @@ def main():
                     image_noise = img_pixel_values + vae_decoding
                     image_noise = torch.clamp(image_noise, -1, 1)
                     
-                    # align the image_noise embedding with the text
-                    image_features = clip_model.get_image_features(image_noise)
-                    text_features = clip_model.get_text_features(batch_token_ids)
+                    data_input = {
+                        "input_ids":batch_token_ids,
+                        "pixel_values" : image_noise
+                    }
+                    output = clip_model(**data_input, return_loss=True)
+                    logits_per_image = output.logits_per_image   # for training , image_logits is the same as logits text
+                    logits_per_text = output.logits_per_text
                     
-                    logits_per_image, logits_per_text = cal_sim(text_features,image_features)
-                    # softmax
-                    loss = torch.nn.functional.softmax(logits_per_image, dim=0)
-                    # sum the logits of the 对角线
-                    loss = torch.diag(logits_per_image).mean()
-                    # evaluation loss should be large for clip model when calculating the similarity
+                    loss = output.loss
 
             logs = {"eval_loss": loss.detach().item(), "lr": lr_scheduler.get_last_lr()[0]}
             progress_bar.set_postfix(**logs)

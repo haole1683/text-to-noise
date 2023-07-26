@@ -33,5 +33,4 @@ accelerate launch --mixed_precision="fp16"  train_generator.py \
   --caption_column caption \
   --do_eval \
   --do_train \
-  --max_train_samples 100
   # --resume_from_checkpoint 
