@@ -16,11 +16,11 @@
 # Code source : https://github.com/huggingface/diffusers/blob/v0.18.2/examples/text_to_image/train_text_to_image.py
 
 # This is for debug
-# import ptvsd
-# print("waiting for attaching")
-# ptvsd.enable_attach(address = ('127.0.0.1', 5678))
-# ptvsd.wait_for_attach()
-# print("attached")
+import ptvsd
+print("waiting for attaching")
+ptvsd.enable_attach(address = ('127.0.0.1', 5678))
+ptvsd.wait_for_attach()
+print("attached")
 
 
 import argparse
@@ -48,7 +48,7 @@ from torchvision import transforms
 from tqdm.auto import tqdm
 from transformers import CLIPTextModel, CLIPTokenizer
 from transformers.utils import ContextManagers
-from transformers import CLIPModel
+from transformers import AutoProcessor, CLIPModel
 from PIL import Image
 
 
@@ -581,6 +581,9 @@ def main():
     # START MY CODE
     clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
     clip_model.requires_grad_(False)
+    
+    processor = AutoProcessor.from_pretrained("openai/clip-vit-base-patch32")
+    image_processor = processor.image_processor
 
     # unet = UNet2DConditionModel.from_pretrained(
     #     args.pretrained_model_name_or_path, subfolder="unet", revision=args.non_ema_revision
@@ -780,9 +783,21 @@ def main():
             transforms.CenterCrop(args.resolution) if args.center_crop else transforms.RandomCrop(args.resolution),
             transforms.RandomHorizontalFlip() if args.random_flip else transforms.Lambda(lambda x: x),
             transforms.ToTensor(),
-            transforms.Normalize([0.5], [0.5]),
+            # transforms.Normalize([0.5], [0.5]),
         ]
     )
+    eval_transform = transforms.Compose(
+        [
+            transforms.Resize(args.resolution, interpolation=transforms.InterpolationMode.BILINEAR),
+            transforms.ToTensor(),  
+        ]
+    )
+        
+    image_mean = image_processor.image_mean
+    image_std = image_processor.image_std
+    # normilaze function 
+    def normalize_fn(x, mean=image_mean, std=image_std):
+        return transforms.Normalize(mean=mean, std=std)(x)
 
     def preprocess_train(examples):
         from PIL import Image
@@ -983,7 +998,9 @@ def main():
 
                     # Get the text embedding for conditioning
                     batch_token_ids = batch["input_ids"]
-                    encoder_hidden_states = text_encoder(batch_token_ids)[0]  # [6,77,768]
+                    batch_attention_mask = batch["attention_mask"]
+                    
+                    encoder_hidden_states = text_encoder(batch_token_ids,batch_attention_mask)[0]  # [6,77,768]
 
                     # Predict the noise residual and compute loss
                     # noise_latents : image latent with noise   [6,3,224,224]
@@ -1007,10 +1024,12 @@ def main():
                         vae_decoding = torch.clamp(vae_decoding, -epsilon / 255, epsilon / 255)
                     image_noise = img_pixel_values + vae_decoding
                     image_noise = torch.clamp(image_noise, -1, 1)
+                    
+                    image_noise_normailize = normalize_fn(image_noise)
                       
                     data_input = {
                         "input_ids":batch_token_ids,
-                        "pixel_values" : image_noise
+                        "pixel_values" : image_noise_normailize
                     }
                     output = clip_model(**data_input, return_loss=True)
                     logits_per_image = output.logits_per_image   # for training , image_logits is the same as logits text
