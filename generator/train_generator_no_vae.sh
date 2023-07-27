@@ -11,13 +11,13 @@ export dataset_config_name="2017"
 # the path of the pretrained model
 export output_dir="my_train_results/$dataset_name/$(date +'%Y-%m-%d')"
 
-accelerate launch --mixed_precision="fp16"  train_generator.py \
+accelerate launch --mixed_precision="fp16"  train_generator_no_vae.py \
   --pretrained_model_name_or_path=$MODEL_NAME \
   --dataset_name=$dataset_name \
   --data_dir=$data_dir \
   --use_8bit_adam\
   --resolution=224 --center_crop --random_flip \
-  --train_batch_size=6 \
+  --train_batch_size=1 \
   --eval_batch_size=6 \
   --gradient_checkpointing \
   --max_train_steps=350 \
@@ -33,5 +33,5 @@ accelerate launch --mixed_precision="fp16"  train_generator.py \
   --do_eval \
   --do_train \
   --max_train_samples=100 \
-  # --max_eval_samples=100
+  --max_eval_samples=100
   # --resume_from_checkpoint 

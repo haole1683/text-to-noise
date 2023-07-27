@@ -553,6 +553,11 @@ def main():
     )
 
     unet_config = {
+        
+        "in_channels": 3,
+        "out_channels": 3,
+        "sample_size": 224,
+        
         "act_fn": "silu",
         "attention_head_dim": 8,
         "block_out_channels": [
@@ -572,13 +577,10 @@ def main():
         "downsample_padding": 1,
         "flip_sin_to_cos": True,
         "freq_shift": 0,
-        "in_channels": 3,
         "layers_per_block": 2,
         "mid_block_scale_factor": 1,
         "norm_eps": 1e-05,
         "norm_num_groups": 32,
-        "out_channels": 3,
-        "sample_size": 224,
         "up_block_types": [
             "UpBlock2D",
             "CrossAttnUpBlock2D",
