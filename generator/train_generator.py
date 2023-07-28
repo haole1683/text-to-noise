@@ -971,7 +971,6 @@ def main():
                     image_noise = img_pixel_values + vae_decoding * torch.tensor(0.0).to(vae_decoding.device)
 
                     image_noise = torch.clamp(image_noise, -1, 1)
-                    
                     image_noise_normailize = normalize_fn(image_noise)
                       
                     data_input = {
