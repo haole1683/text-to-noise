@@ -56,7 +56,6 @@ import diffusers
 import torch.nn as nn
 from diffusers import AutoencoderKL, DDPMScheduler, StableDiffusionPipeline, UNet2DConditionModel
 from diffusers.optimization import get_scheduler
-from diffusers.training_utils import EMAModel
 from diffusers.utils import check_min_version, deprecate, is_wandb_available
 from diffusers.utils.import_utils import is_xformers_available
 
@@ -81,13 +80,74 @@ logger = get_logger(__name__, log_level="INFO")
 DATASET_NAME_MAPPING = {
     "lambdalabs/pokemon-blip-captions": ("image", "text"),
 }
-        
 
+class Generator(nn.Module):
+    def __init__(self):
+        super(Generator, self).__init__()
+        self.unet_config = {
+            "act_fn": "silu",
+            "attention_head_dim": 8,
+            "block_out_channels": [
+                320,
+                640,
+                1280,
+                1280
+            ],
+            "center_input_sample": False,
+            "cross_attention_dim": 768,
+            "down_block_types": [
+                "CrossAttnDownBlock2D",
+                "CrossAttnDownBlock2D",
+                "CrossAttnDownBlock2D",
+                "DownBlock2D"
+            ],
+            "downsample_padding": 1,
+            "flip_sin_to_cos": True,
+            "freq_shift": 0,
+            "in_channels": 4,
+            "layers_per_block": 2,
+            "mid_block_scale_factor": 1,
+            "norm_eps": 1e-05,
+            "norm_num_groups": 32,
+            "out_channels": 4,
+            "sample_size": 224,
+            "up_block_types": [
+                "UpBlock2D",
+                "CrossAttnUpBlock2D",
+                "CrossAttnUpBlock2D",
+                "CrossAttnUpBlock2D"
+            ]
+        }
+        self.unet = UNet2DConditionModel(**self.unet_config)
+        self.vae_config = {
+            'in_channels': 3,
+            'out_channels': 3,
+            'down_block_types': ['DownEncoderBlock2D', 'DownEncoderBlock2D', 'DownEncoderBlock2D', 'DownEncoderBlock2D'],
+            'up_block_types': ['UpDecoderBlock2D', 'UpDecoderBlock2D', 'UpDecoderBlock2D', 'UpDecoderBlock2D'],
+            'block_out_channels': [128, 256, 512, 512],
+            'layers_per_block': 2,
+            'act_fn': 'silu',
+            'latent_channels': 4,
+            'norm_num_groups': 32,
+            'sample_size': 512,
+            'scaling_factor': 0.18215,
+        }
+        self.vae = AutoencoderKL(**self.vae_config)
+        
+    def forward(self, img_pixel_values, encoder_hidden_states):
+        latent = self.vae.encode(img_pixel_values).latent_dist.sample()
+        timesteps = torch.randint(0, 1000, (1,),device=latent.device)
+        timesteps = timesteps.long()  #  6
+        unet_pred = self.unet(latent, timesteps, encoder_hidden_states).sample
+        vae_decoding = self.vae.decoder(unet_pred)
+        return vae_decoding
+    
+    def enable_xformers_memory_efficient_attention(self):
+        self.unet.enable_xformers_memory_efficient_attention()
+        self.vae.enable_xformers_memory_efficient_attention()
+        
 def parse_args():
     parser = argparse.ArgumentParser(description="Simple example of a training script.")
-    parser.add_argument(
-        "--input_pertubation", type=float, default=0, help="The scale of input pretubation. Recommended 0.1."
-    )
     parser.add_argument(
         "--pretrained_model_name_or_path",
         type=str,
@@ -272,17 +332,6 @@ def parse_args():
             " https://pytorch.org/docs/stable/notes/cuda.html#tensorfloat-32-tf32-on-ampere-devices"
         ),
     )
-    parser.add_argument("--use_ema", action="store_true", help="Whether to use EMA model.")
-    parser.add_argument(
-        "--non_ema_revision",
-        type=str,
-        default=None,
-        required=False,
-        help=(
-            "Revision of pretrained non-ema model identifier. Must be a branch, tag or git identifier of the local or"
-            " remote repository specified with --pretrained_model_name_or_path."
-        ),
-    )
     parser.add_argument(
         "--dataloader_num_workers",
         type=int,
@@ -401,40 +450,18 @@ def parse_args():
     if args.dataset_name is None and args.train_data_dir is None:
         raise ValueError("Need either a dataset name or a training folder.")
 
-    # default to using the same revision for the non-ema model if not specified
-    if args.non_ema_revision is None:
-        args.non_ema_revision = args.revision
-
     return args
+
 
 def main():
     args = parse_args()
 
-    if args.non_ema_revision is not None:
-        deprecate(
-            "non_ema_revision!=None",
-            "0.15.0",
-            message=(
-                "Downloading 'non_ema' weights from revision branches of the Hub is deprecated. Please make sure to"
-                " use `--variant=non_ema` instead."
-            ),
-        )
-    logging_dir = os.path.join(args.output_dir, args.logging_dir)
-
     accelerator_project_config = ProjectConfiguration(total_limit=args.checkpoints_total_limit)
-
-    if args.report_to == "tensorboard":
-        pass
-    elif args.report_to == "wandb":
-        logging_dir=None
-    else:
-        logging_dir=None
 
     accelerator = Accelerator(
         gradient_accumulation_steps=args.gradient_accumulation_steps,
         mixed_precision=args.mixed_precision,
         log_with=args.report_to,
-        # logging_dir=logging_dir,
         project_config=accelerator_project_config,
     )
 
@@ -469,7 +496,6 @@ def main():
             ).repo_id
 
     # Load scheduler, tokenizer and models.
-    noise_scheduler = DDPMScheduler.from_pretrained(args.pretrained_model_name_or_path, subfolder="scheduler")
     tokenizer = CLIPTokenizer.from_pretrained(
         args.pretrained_model_name_or_path, subfolder="tokenizer", revision=args.revision
     )
@@ -497,73 +523,29 @@ def main():
         text_encoder = CLIPTextModel.from_pretrained(
             args.pretrained_model_name_or_path, subfolder="text_encoder", revision=args.revision
         )
-    vae = AutoencoderKL.from_pretrained(
-        args.pretrained_model_name_or_path, subfolder="vae", revision=args.revision
-    )
 
-    unet_config = {
-        "act_fn": "silu",
-        "attention_head_dim": 8,
-        "block_out_channels": [
-            320,
-            640,
-            1280,
-            1280
-        ],
-        "center_input_sample": False,
-        "cross_attention_dim": 768,
-        "down_block_types": [
-            "CrossAttnDownBlock2D",
-            "CrossAttnDownBlock2D",
-            "CrossAttnDownBlock2D",
-            "DownBlock2D"
-        ],
-        "downsample_padding": 1,
-        "flip_sin_to_cos": True,
-        "freq_shift": 0,
-        "in_channels": 4,
-        "layers_per_block": 2,
-        "mid_block_scale_factor": 1,
-        "norm_eps": 1e-05,
-        "norm_num_groups": 32,
-        "out_channels": 4,
-        "sample_size": 224,
-        "up_block_types": [
-            "UpBlock2D",
-            "CrossAttnUpBlock2D",
-            "CrossAttnUpBlock2D",
-            "CrossAttnUpBlock2D"
-        ]
-    }
-
-    # START MY CODE
-    clip_model_config = CLIPModel.from_pretrained("openai/clip-vit-base-patch32").config
-    clip_model = CLIPModel(clip_model_config)
-    # set clip_model parameters random
+    generator = Generator()
     
-    clip_model.requires_grad_(False)
+    clip_pretrained = True
+    if clip_pretrained:
+        clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
+    else:
+        clip_model_config = CLIPModel.from_pretrained("openai/clip-vit-base-patch32").config
+        clip_model = CLIPModel(clip_model_config)
+    
+    clip_train = False
+    if clip_train:
+        clip_model.train()
+        clip_model.requires_grad_(True)
+    else:
+        clip_model.eval()
+        clip_model.requires_grad_(False)
     
     processor = AutoProcessor.from_pretrained("openai/clip-vit-base-patch32")
     image_processor = processor.image_processor
 
-    # unet = UNet2DConditionModel.from_pretrained(
-    #     args.pretrained_model_name_or_path, subfolder="unet", revision=args.non_ema_revision
-    # )
-    unet = UNet2DConditionModel(**unet_config)
-
     # Freeze vae and text_encoder
-    # vae.encoder.requires_grad_(False)
-    # Freeze vae directly
-    vae.requires_grad_(False)
     text_encoder.requires_grad_(False)
-    # END MY CODE
-
-    # Create EMA for the unet.
-    if args.use_ema:
-        ema_unet = UNet2DConditionModel.from_pretrained(
-            args.pretrained_model_name_or_path, subfolder="unet", revision=args.revision
-        )
-        ema_unet = EMAModel(ema_unet.parameters(), model_cls=UNet2DConditionModel, model_config=ema_unet.config)
 
     if args.enable_xformers_memory_efficient_attention:
         if is_xformers_available():
@@ -575,7 +557,7 @@ def main():
                 logger.warn(
                     "xFormers 0.0.16 cannot be used for training in some GPUs. If you observe problems during training, please update xFormers to at least 0.0.17. See https://huggingface.co/docs/diffusers/main/en/optimization/xformers for more details."
                 )
-            unet.enable_xformers_memory_efficient_attention()
+            generator.enable_xformers_memory_efficient_attention()
         else:
             raise ValueError("xformers is not available. Make sure it is installed correctly")
 
@@ -583,21 +565,13 @@ def main():
     if version.parse(accelerate.__version__) >= version.parse("0.16.0"):
         # create custom saving & loading hooks so that `accelerator.save_state(...)` serializes in a nice format
         def save_model_hook(models, weights, output_dir):
-            if args.use_ema:
-                ema_unet.save_pretrained(os.path.join(output_dir, "unet_ema"))
-
             for i, model in enumerate(models):
-                model.save_pretrained(os.path.join(output_dir, "unet"))
+                model.save(output_dir)
 
                 # make sure to pop weight so that corresponding model is not saved again
                 weights.pop()
 
         def load_model_hook(models, input_dir):
-            if args.use_ema:
-                load_model = EMAModel.from_pretrained(os.path.join(input_dir, "unet_ema"), UNet2DConditionModel)
-                ema_unet.load_state_dict(load_model.state_dict())
-                ema_unet.to(accelerator.device)
-                del load_model
 
             for i in range(len(models)):
                 # pop models so that they are not loaded again
@@ -612,9 +586,6 @@ def main():
 
         accelerator.register_save_state_pre_hook(save_model_hook)
         accelerator.register_load_state_pre_hook(load_model_hook)
-
-    if args.gradient_checkpointing:
-        unet.enable_gradient_checkpointing()
 
     # Enable TF32 for faster training on Ampere GPUs,
     # cf https://pytorch.org/docs/stable/notes/cuda.html#tensorfloat-32-tf32-on-ampere-devices
@@ -641,14 +612,22 @@ def main():
 
     optimizer = optimizer_cls([
         {
-            "params":unet.parameters(),
+            "params":generator.parameters(),
             "lr":args.learning_rate,
             "betas":(args.adam_beta1, args.adam_beta2),
             "weight_decay":args.adam_weight_decay,
             "eps":args.adam_epsilon,
         },
+        {
+            "params": clip_model.parameters(),
+            "lr": args.learning_rate,
+            "betas": (args.adam_beta1, args.adam_beta2),
+            "weight_decay": args.adam_weight_decay,
+            "eps": args.adam_epsilon,
+        }
     ])
 
+    
     # Get the datasets: you can either provide your own training and evaluation files (see below)
     # or specify a Dataset from the hub (the dataset will be downloaded automatically from the datasets Hub).
 
@@ -821,18 +800,15 @@ def main():
         num_training_steps=args.max_train_steps * args.gradient_accumulation_steps,
     )
 
-    # Prepare everything with our `accelerator`.
-    # unet, optimizer, lr_scheduler, vae = accelerator.prepare(
-    #     unet, optimizer, lr_scheduler, vae
-    # )
-    unet, optimizer, lr_scheduler = accelerator.prepare(
-        unet, optimizer, lr_scheduler
+
+    generator, optimizer, lr_scheduler = accelerator.prepare(
+        generator, optimizer, lr_scheduler
     )
+    if clip_train:
+        clip_model = accelerator.prepare(clip_model)
+        
     train_dataloader = accelerator.prepare(train_dataloader)
     eval_dataloader = accelerator.prepare(eval_dataloader)
-
-    if args.use_ema:
-        ema_unet.to(accelerator.device)
 
     # For mixed precision training we cast the text_encoder and vae weights to half-precision
     # as these models are only used for inference, keeping weights in full precision is not required.
@@ -840,7 +816,6 @@ def main():
 
     # Move text_encode and vae to gpu and cast to weight_dtype
     text_encoder.to(accelerator.device, dtype=weight_dtype)
-    vae.to(accelerator.device, dtype=weight_dtype)
     clip_model.to(accelerator.device, dtype=weight_dtype)
 
     # We need to recalculate our total training steps as the size of the training dataloader may have changed.
@@ -907,8 +882,7 @@ def main():
             logging.info("*"*50)
             logging.info("Doing Training")
             logging.info("*"*50)
-            unet.train()
-            # vae.decoder.train()
+            generator.train()
             progress_bar.set_description("Training Steps")
             train_loss = 0.0
 
@@ -919,87 +893,64 @@ def main():
                         progress_bar.update(1)
                     continue
 
-                with accelerator.accumulate(unet):
-                    # Convert images to latent space
-                    img_pixel_values = batch["pixel_values"].to(weight_dtype)  # [6,3,224,224]
+                
+                # Convert images to latent space
+                img_pixel_values = batch["pixel_values"].to(weight_dtype)  # [6,3,224,224]
 
-                    # latents = torch.randn_like(img_pixel_values).to(weight_dtype)  # [6,3,224,224]
-                    latents = vae.encode(img_pixel_values).latent_dist.sample()
-                    # !! cancal the line
-                    # latents = latents * vae.config.scaling_factor
+                # Get the text embedding for conditioning
+                batch_token_ids = batch["input_ids"]
+                encoder_hidden_states = text_encoder(batch_token_ids)[0]  # [6,77,768]
+                
+                noise = generator(img_pixel_values, encoder_hidden_states)
+                
+                # limit the norm of the noise
+                norm_type = 'l2'
+                epsilon = 16
+                if norm_type == 'l2':
+                    temp = torch.norm(noise.view(noise.shape[0], -1), dim=1).view(-1, 1, 1, 1)
+                    noise = noise * epsilon / temp
+                else:
+                    noise = torch.clamp(noise, -epsilon / 255, epsilon / 255)
+                    
+                add_noise = True
+                if add_noise:
+                    image = img_pixel_values + noise
+                else:
+                    image = img_pixel_values + noise * torch.tensor(0.0).to(noise.device)
+                    
+                image = torch.clamp(image, -1, 1)
+                
+                use_normailize = False
+                if use_normailize:
+                    image = normalize_fn(image)
+                    
+                data_input = {
+                    "input_ids":batch_token_ids,
+                    "pixel_values" : image
+                }
+                output = clip_model(**data_input, return_loss=True)
+                logits_per_image = output.logits_per_image   # for training , image_logits is the same as logits text
+                logits_per_text = output.logits_per_text
+                
+                loss = output.loss
+                
+                # END MY CODE
+                
+                # Gather the losses across all processes for logging (if we use distributed training).
+                avg_loss = accelerator.gather(loss.repeat(args.train_batch_size)).mean()
+                train_loss += avg_loss.item() / args.gradient_accumulation_steps
 
-                    # Sample noise that we'll add to the latents
-                    noise = torch.randn_like(latents)  # [6,3,224,224]
-
-                    bsz = latents.shape[0]  # 6
-                    # Sample a random timestep for each image
-                    timesteps = torch.randint(0, noise_scheduler.config.num_train_timesteps, (bsz,), device=latents.device)
-                    timesteps = timesteps.long()  #  6
-
-                    # Add noise to the latents according to the noise magnitude at each timestep
-                    # (this is the forward diffusion process)
-                    
-                    noisy_latents = noise_scheduler.add_noise(latents, noise, timesteps)  # # [6,3,224,224]
-
-                    # Get the text embedding for conditioning
-                    batch_token_ids = batch["input_ids"]
-                    
-                    encoder_hidden_states = text_encoder(batch_token_ids)[0]  # [6,77,768]
-
-                    # Predict the noise residual and compute loss
-                    # noise_latents : image latent with noise   [6,3,224,224]
-                    # timesteps : [6]
-                    # encoder_hidden_state : text latent data   [6,77,768]
-                    # model_pred = unet(noisy_latents, timesteps, encoder_hidden_states).sample
-                    
-                    # here use latent directly without noise
-                    model_pred = unet(latents, timesteps, encoder_hidden_states).sample
-                    
-                    # START MY CODE
-                    vae_decoding = vae.decode(model_pred).sample  # use vae output as noise
-                    
-                    # limit the norm of the noise
-                    norm_type = 'l2'
-                    epsilon = 16
-                    if norm_type == 'l2':
-                        temp = torch.norm(vae_decoding.view(vae_decoding.shape[0], -1), dim=1).view(-1, 1, 1, 1)
-                        vae_decoding = vae_decoding * epsilon / temp
-                    else:
-                        vae_decoding = torch.clamp(vae_decoding, -epsilon / 255, epsilon / 255)
-                    image_noise = img_pixel_values + vae_decoding * torch.tensor(0.0).to(vae_decoding.device)
-
-                    image_noise = torch.clamp(image_noise, -1, 1)
-                    # image_noise = normalize_fn(image_noise)
-                      
-                    data_input = {
-                        "input_ids":batch_token_ids,
-                        "pixel_values" : image_noise
-                    }
-                    output = clip_model(**data_input, return_loss=True)
-                    logits_per_image = output.logits_per_image   # for training , image_logits is the same as logits text
-                    logits_per_text = output.logits_per_text
-                    
-                    loss = output.loss
-                    
-                    # END MY CODE
-                    
-                    # Gather the losses across all processes for logging (if we use distributed training).
-                    avg_loss = accelerator.gather(loss.repeat(args.train_batch_size)).mean()
-                    train_loss += avg_loss.item() / args.gradient_accumulation_steps
-
-                    # Backpropagate
-                    accelerator.backward(loss)
-                    if accelerator.sync_gradients:
-                        accelerator.clip_grad_norm_(unet.parameters(), args.max_grad_norm)
-                        # accelerator.clip_grad_norm_(vae.decoder.parameters(), args.max_grad_norm)
-                    optimizer.step()
-                    lr_scheduler.step()
-                    optimizer.zero_grad()
+                # Backpropagate
+                accelerator.backward(loss)
+                # if accelerator.sync_gradients:
+                #     accelerator.clip_grad_norm_(generator.parameters(), args.max_grad_norm)
+                #     accelerator.clip_grad_norm_(clip_model.parameters(), args.max_grad_norm)
+                optimizer.step()
+                lr_scheduler.step()
+                optimizer.zero_grad()
 
                 # Checks if the accelerator has performed an optimization step behind the scenes
                 if accelerator.sync_gradients:
-                    if args.use_ema:
-                        ema_unet.step(unet.parameters())
                     progress_bar.update(1)
                     global_step += 1
                     accelerator.log({"train_loss": train_loss}, step=global_step)
@@ -1032,66 +983,51 @@ def main():
             logging.info("Doing Evaluation")
             logging.info("*"*50)
             progress_bar.set_description("Evaluation Steps")
-            unet.eval()
-            # vae.decoder.eval()
+            generator.eval()
             
             eval_losses = []
             for step, batch in enumerate(tqdm(eval_dataloader)):
                 with torch.no_grad():
                     # Convert images to latent space
-                    img_pixel_values = batch["pixel_values"].to(weight_dtype)
-
-                    # here you can not access the img, so set it random
-                    latents = vae.encode(img_pixel_values).latent_dist.sample()
-                    # latents = torch.randn_like(img_pixel_values).to(weight_dtype)
-                    # latents = latents * vae.config.scaling_factor
-
-                    # Sample noise that we'll add to the latents
-                    noise = torch.randn_like(latents)
-
-                    if args.input_pertubation:
-                        new_noise = noise + args.input_pertubation * torch.randn_like(noise)
-                    bsz = latents.shape[0]
-                    # Sample a random timestep for each image
-                    timesteps = torch.randint(0, noise_scheduler.config.num_train_timesteps, (bsz,), device=latents.device)
-                    timesteps = timesteps.long()
+                    img_pixel_values = batch["pixel_values"].to(weight_dtype)  # [6,3,224,224]
 
                     # Get the text embedding for conditioning
                     batch_token_ids = batch["input_ids"]
-                    encoder_hidden_states = text_encoder(batch_token_ids)[0]
-
-                    # Predict the noise residual and compute loss
-                    # noise_latents : image latent with noise 
-                    # encoder_hidden_state : text latent data
-                    model_pred = unet(latents, timesteps, encoder_hidden_states).sample
+                    encoder_hidden_states = text_encoder(batch_token_ids)[0]  # [6,77,768]
                     
-                    # START MY CODE
-                    vae_decoding = vae.decode(model_pred).sample  # use vae output as noise
+                    noise = generator(img_pixel_values, encoder_hidden_states)
                     
                     # limit the norm of the noise
                     norm_type = 'l2'
                     epsilon = 16
                     if norm_type == 'l2':
-                        temp = torch.norm(vae_decoding.view(vae_decoding.shape[0], -1), dim=1).view(-1, 1, 1, 1)
-                        vae_decoding = vae_decoding * epsilon / temp
+                        temp = torch.norm(noise.view(noise.shape[0], -1), dim=1).view(-1, 1, 1, 1)
+                        noise = noise * epsilon / temp
                     else:
-                        vae_decoding = torch.clamp(vae_decoding, -epsilon / 255, epsilon / 255)
-                    image_noise = img_pixel_values + vae_decoding
-                    image_noise = torch.clamp(image_noise, -1, 1)
-                    
-                    image_noise_normailize = normalize_fn(image_noise)
+                        noise = torch.clamp(noise, -epsilon / 255, epsilon / 255)
+                        
+                    add_noise = True
+                    if add_noise:
+                        image = img_pixel_values + noise
+                    else:
+                        image = img_pixel_values + noise * torch.tensor(0.0).to(noise.device)
+                        
+                    image = torch.clamp(image, -1, 1)
+                    use_normailize = False
+                    if use_normailize:
+                        image = normalize_fn(image)
                       
                     data_input = {
                         "input_ids":batch_token_ids,
-                        "pixel_values" : image_noise_normailize
+                        "pixel_values" : image
                     }
                     output = clip_model(**data_input, return_loss=True)
-    
                     logits_per_image = output.logits_per_image   # for training , image_logits is the same as logits text
                     logits_per_text = output.logits_per_text
                     
                     loss = output.loss
                     
+                    # END MY CODE
                 eval_losses.append(loss.detach().item())
                 logs = {"step" : step, "eval_loss": loss.detach().item(), "lr": lr_scheduler.get_last_lr()[0]}
                 progress_bar.set_postfix(**logs)
@@ -1102,32 +1038,6 @@ def main():
                         "eval_avg_loss": eval_mean_loss,
                         }
             wandb.log(eval_record)  
-            
-    
-    # Create the pipeline using the trained modules and save it.
-    accelerator.wait_for_everyone()
-    if accelerator.is_main_process:
-        unet = accelerator.unwrap_model(unet)
-        if args.use_ema:
-            ema_unet.copy_to(unet.parameters())
-
-        pipeline = StableDiffusionPipeline.from_pretrained(
-            args.pretrained_model_name_or_path,
-            text_encoder=text_encoder,
-            vae=vae,
-            unet=unet,
-            revision=args.revision,
-        )
-        pipeline.save_pretrained(args.output_dir)
-
-        if args.push_to_hub:
-            upload_folder(
-                repo_id=repo_id,
-                folder_path=args.output_dir,
-                commit_message="End of training",
-                ignore_patterns=["step_*", "epoch_*"],
-            )
-
     accelerator.end_training()
 
 
