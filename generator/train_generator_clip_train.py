@@ -82,57 +82,6 @@ DATASET_NAME_MAPPING = {
 }
 
 
-def log_validation(vae, text_encoder, tokenizer, unet, args, accelerator, weight_dtype, epoch):
-    logger.info("Running validation... ")
-
-    pipeline = StableDiffusionPipeline.from_pretrained(
-        args.pretrained_model_name_or_path,
-        vae=accelerator.unwrap_model(vae),
-        text_encoder=accelerator.unwrap_model(text_encoder),
-        tokenizer=tokenizer,
-        unet=accelerator.unwrap_model(unet),
-        safety_checker=None,
-        revision=args.revision,
-        torch_dtype=weight_dtype,
-    )
-    pipeline = pipeline.to(accelerator.device)
-    pipeline.set_progress_bar_config(disable=True)
-
-    if args.enable_xformers_memory_efficient_attention:
-        pipeline.enable_xformers_memory_efficient_attention()
-
-    if args.seed is None:
-        generator = None
-    else:
-        generator = torch.Generator(device=accelerator.device).manual_seed(args.seed)
-
-    images = []
-    for i in range(len(args.validation_prompts)):
-        with torch.autocast("cuda"):
-            image = pipeline(args.validation_prompts[i], num_inference_steps=20, generator=generator).images[0]
-
-        images.append(image)
-
-    for tracker in accelerator.trackers:
-        if tracker.name == "tensorboard":
-            np_images = np.stack([np.asarray(img) for img in images])
-            tracker.writer.add_images("validation", np_images, epoch, dataformats="NHWC")
-        elif tracker.name == "wandb":
-            tracker.log(
-                {
-                    "validation": [
-                        wandb.Image(image, caption=f"{i}: {args.validation_prompts[i]}")
-                        for i, image in enumerate(images)
-                    ]
-                }
-            )
-        else:
-            logger.warn(f"image logging not implemented for {tracker.name}")
-
-    del pipeline
-    torch.cuda.empty_cache()
-
-
 def parse_args():
     parser = argparse.ArgumentParser(description="Simple example of a training script.")
     parser.add_argument(
@@ -553,11 +502,6 @@ def main():
     )
 
     unet_config = {
-        
-        "in_channels": 3,
-        "out_channels": 3,
-        "sample_size": 224,
-        
         "act_fn": "silu",
         "attention_head_dim": 8,
         "block_out_channels": [
@@ -577,10 +521,13 @@ def main():
         "downsample_padding": 1,
         "flip_sin_to_cos": True,
         "freq_shift": 0,
+        "in_channels": 4,
         "layers_per_block": 2,
         "mid_block_scale_factor": 1,
         "norm_eps": 1e-05,
         "norm_num_groups": 32,
+        "out_channels": 4,
+        "sample_size": 224,
         "up_block_types": [
             "UpBlock2D",
             "CrossAttnUpBlock2D",
@@ -591,8 +538,6 @@ def main():
 
     # START MY CODE
     clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
-    clip_model.requires_grad_(False)
-    
     processor = AutoProcessor.from_pretrained("openai/clip-vit-base-patch32")
     image_processor = processor.image_processor
 
@@ -697,7 +642,15 @@ def main():
             "weight_decay":args.adam_weight_decay,
             "eps":args.adam_epsilon,
         },
-        # {"params":vae.decoder.parameters()},
+    ])
+    optimizer_clip = optimizer_cls([
+        {
+            "params":clip_model.parameters(),
+            "lr":args.learning_rate,
+            "betas":(args.adam_beta1, args.adam_beta2),
+            "weight_decay":args.adam_weight_decay,
+            "eps":args.adam_epsilon,
+        },
     ])
 
     # Get the datasets: you can either provide your own training and evaluation files (see below)
@@ -873,6 +826,12 @@ def main():
         num_warmup_steps=args.lr_warmup_steps * args.gradient_accumulation_steps,
         num_training_steps=args.max_train_steps * args.gradient_accumulation_steps,
     )
+    lr_scheduler_clip = get_scheduler(
+        args.lr_scheduler,
+        optimizer=optimizer_clip,
+        num_warmup_steps=args.lr_warmup_steps * args.gradient_accumulation_steps,
+        num_training_steps=args.max_train_steps * args.gradient_accumulation_steps,
+    )
 
     # Prepare everything with our `accelerator`.
     # unet, optimizer, lr_scheduler, vae = accelerator.prepare(
@@ -881,6 +840,8 @@ def main():
     unet, optimizer, lr_scheduler = accelerator.prepare(
         unet, optimizer, lr_scheduler
     )
+    clip_model, optimizer_clip,lr_scheduler_clip = accelerator.prepare(clip_model, optimizer_clip, lr_scheduler_clip)
+    
     train_dataloader = accelerator.prepare(train_dataloader)
     eval_dataloader = accelerator.prepare(eval_dataloader)
 
@@ -894,7 +855,6 @@ def main():
     # Move text_encode and vae to gpu and cast to weight_dtype
     text_encoder.to(accelerator.device, dtype=weight_dtype)
     vae.to(accelerator.device, dtype=weight_dtype)
-    clip_model.to(accelerator.device, dtype=weight_dtype)
 
     # We need to recalculate our total training steps as the size of the training dataloader may have changed.
     num_update_steps_per_epoch = math.ceil(len(train_dataloader) / args.gradient_accumulation_steps)
@@ -989,22 +949,11 @@ def main():
                     timesteps = torch.randint(0, noise_scheduler.config.num_train_timesteps, (bsz,), device=latents.device)
                     timesteps = timesteps.long()  #  6
 
-                    # Add noise to the latents according to the noise magnitude at each timestep
-                    # (this is the forward diffusion process)
-                    
-                    noisy_latents = noise_scheduler.add_noise(latents, noise, timesteps)  # # [6,3,224,224]
-
                     # Get the text embedding for conditioning
                     batch_token_ids = batch["input_ids"]
                     
                     encoder_hidden_states = text_encoder(batch_token_ids)[0]  # [6,77,768]
 
-                    # Predict the noise residual and compute loss
-                    # noise_latents : image latent with noise   [6,3,224,224]
-                    # timesteps : [6]
-                    # encoder_hidden_state : text latent data   [6,77,768]
-                    # model_pred = unet(noisy_latents, timesteps, encoder_hidden_states).sample
-                    
                     # here use latent directly without noise
                     model_pred = unet(latents, timesteps, encoder_hidden_states).sample
                     
@@ -1019,7 +968,8 @@ def main():
                         vae_decoding = vae_decoding * epsilon / temp
                     else:
                         vae_decoding = torch.clamp(vae_decoding, -epsilon / 255, epsilon / 255)
-                    image_noise = img_pixel_values + vae_decoding
+                    image_noise = img_pixel_values + vae_decoding 
+                    # image_noise = img_pixel_values 
                     image_noise = torch.clamp(image_noise, -1, 1)
                     
                     image_noise_normailize = normalize_fn(image_noise)
@@ -1044,10 +994,14 @@ def main():
                     accelerator.backward(loss)
                     if accelerator.sync_gradients:
                         accelerator.clip_grad_norm_(unet.parameters(), args.max_grad_norm)
-                        # accelerator.clip_grad_norm_(vae.decoder.parameters(), args.max_grad_norm)
+                        # accelerator.clip_grad_norm_(clip_model.parameters(), args.max_grad_norm)
                     optimizer.step()
                     lr_scheduler.step()
                     optimizer.zero_grad()
+                    
+                    optimizer_clip.step()
+                    lr_scheduler_clip.step()
+                    optimizer_clip.zero_grad()
 
                 # Checks if the accelerator has performed an optimization step behind the scenes
                 if accelerator.sync_gradients:
@@ -1086,7 +1040,7 @@ def main():
             logging.info("*"*50)
             progress_bar.set_description("Evaluation Steps")
             unet.eval()
-            # vae.decoder.eval()
+            clip_model.eval()
             
             eval_losses = []
             for step, batch in enumerate(tqdm(eval_dataloader)):
@@ -1096,14 +1050,10 @@ def main():
 
                     # here you can not access the img, so set it random
                     latents = vae.encode(img_pixel_values).latent_dist.sample()
-                    # latents = torch.randn_like(img_pixel_values).to(weight_dtype)
-                    # latents = latents * vae.config.scaling_factor
 
                     # Sample noise that we'll add to the latents
                     noise = torch.randn_like(latents)
 
-                    if args.input_pertubation:
-                        new_noise = noise + args.input_pertubation * torch.randn_like(noise)
                     bsz = latents.shape[0]
                     # Sample a random timestep for each image
                     timesteps = torch.randint(0, noise_scheduler.config.num_train_timesteps, (bsz,), device=latents.device)
