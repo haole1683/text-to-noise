@@ -526,14 +526,14 @@ def main():
 
     generator = Generator()
     
-    clip_pretrained = True
+    clip_pretrained = False
     if clip_pretrained:
         clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
     else:
         clip_model_config = CLIPModel.from_pretrained("openai/clip-vit-base-patch32").config
         clip_model = CLIPModel(clip_model_config)
     
-    clip_train = False
+    clip_train = True
     if clip_train:
         clip_model.train()
         clip_model.requires_grad_(True)
@@ -566,8 +566,9 @@ def main():
         # create custom saving & loading hooks so that `accelerator.save_state(...)` serializes in a nice format
         def save_model_hook(models, weights, output_dir):
             for i, model in enumerate(models):
-                model.save(output_dir)
-
+                # model.save(output_dir)
+                # Save model here
+                
                 # make sure to pop weight so that corresponding model is not saved again
                 weights.pop()
 
@@ -912,7 +913,7 @@ def main():
                 else:
                     noise = torch.clamp(noise, -epsilon / 255, epsilon / 255)
                     
-                add_noise = True
+                add_noise = False
                 if add_noise:
                     image = img_pixel_values + noise
                 else:
