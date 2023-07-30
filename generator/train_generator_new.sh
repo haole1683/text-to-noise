@@ -9,7 +9,7 @@ export data_dir="/remote-home/songtianwei/research/diffusion_model_my/data"
 export dataset_config_name="2017"
 
 # the path of the pretrained model
-export output_dir="my_train_results/$dataset_name/$(date +'%Y-%m-%d')/$('%H-%M-%S')"
+export output_dir="my_train_results/$dataset_name/$(date '+%Y-%m-%d_%H:%M:%S')/"
 
 accelerate launch --mixed_precision="fp16"  train_generator_new.py \
   --pretrained_model_name_or_path=$MODEL_NAME \
@@ -35,8 +35,9 @@ accelerate launch --mixed_precision="fp16"  train_generator_new.py \
   --do_train \
   --do_eval \
   --generator_train \
-  --clip_train \
   --max_train_samples=10000 \
   --max_eval_samples=1000 \
   # --clip_pretrained \
+  # --generator_train \
+  # --clip_train \
   # --resume_from_checkpoint 

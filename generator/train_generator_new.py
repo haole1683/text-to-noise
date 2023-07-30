@@ -834,10 +834,8 @@ def main():
 
     optimizer = accelerator.prepare(optimizer)
     lr_scheduler = accelerator.prepare(lr_scheduler)
-    if generator_train:
-        generator = accelerator.prepare(generator)
-    if clip_train:
-        clip_model = accelerator.prepare(clip_model)
+    generator = accelerator.prepare(generator)
+    clip_model = accelerator.prepare(clip_model)
         
     train_dataloader = accelerator.prepare(train_dataloader)
     eval_dataloader = accelerator.prepare(eval_dataloader)
@@ -926,6 +924,7 @@ def main():
             progress_bar.set_description("Training Steps")
             train_loss = 0.0
 
+            
             for step, batch in enumerate(train_dataloader):
                 # Skip steps until we reach the resumed step
                 if args.resume_from_checkpoint and epoch == first_epoch and step < resume_step:
