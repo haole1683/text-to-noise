@@ -54,9 +54,9 @@ from PIL import Image
 
 import diffusers
 import torch.nn as nn
-from diffusers import AutoencoderKL, DDPMScheduler, StableDiffusionPipeline, UNet2DConditionModel
+from diffusers import AutoencoderKL, UNet2DConditionModel
 from diffusers.optimization import get_scheduler
-from diffusers.utils import check_min_version, deprecate, is_wandb_available
+from diffusers.utils import check_min_version, is_wandb_available
 from diffusers.utils.import_utils import is_xformers_available
 
 # fix the bug - assert "source" in options and options["source"] is not None
@@ -69,8 +69,8 @@ if is_wandb_available():
     import wandb
 
 # https://blog.csdn.net/qq_34097715/article/details/109646082
-from PIL import ImageFile
-ImageFile.LOAD_TRUNCATED_IMAGES = True
+# from PIL import ImageFile
+# ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 # Will error if the minimal version of diffusers is not installed. Remove at your own risks.
 check_min_version("0.17.0.dev0")
@@ -436,6 +436,21 @@ def parse_args():
         help="whether do train"
     )
     parser.add_argument(
+        "--generator_train",
+        action="store_true",
+        help="whether do generator train"
+    )
+    parser.add_argument(
+        "--clip_train",
+        action="store_true",
+        help="whether do clip train"
+    )
+    parser.add_argument(
+        "--clip_pretrained",
+        action="store_true",
+        help="whether use clip pretrained"
+    )
+    parser.add_argument(
         "--do_eval",
         action="store_true",
         help="whether do evalution"
@@ -490,11 +505,6 @@ def main():
         if args.output_dir is not None:
             os.makedirs(args.output_dir, exist_ok=True)
 
-        if args.push_to_hub:
-            repo_id = create_repo(
-                repo_id=args.hub_model_id or Path(args.output_dir).name, exist_ok=True, token=args.hub_token
-            ).repo_id
-
     # Load scheduler, tokenizer and models.
     tokenizer = CLIPTokenizer.from_pretrained(
         args.pretrained_model_name_or_path, subfolder="tokenizer", revision=args.revision
@@ -525,15 +535,25 @@ def main():
         )
 
     generator = Generator()
+    generator_train = args.generator_train
+    logger.info(f"generator_train: {generator_train}")
+    if generator_train:
+        generator.train()
+        generator.requires_grad_(True)
+    else:
+        generator.eval()
+        generator.requires_grad_(False)
     
-    clip_pretrained = False
+    clip_pretrained = args.clip_pretrained
+    logger.info(f"clip_pretrained: {clip_pretrained}")
     if clip_pretrained:
         clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
     else:
         clip_model_config = CLIPModel.from_pretrained("openai/clip-vit-base-patch32").config
         clip_model = CLIPModel(clip_model_config)
     
-    clip_train = True
+    clip_train = args.clip_train
+    logger.info(f"clip_train: {clip_train}")
     if clip_train:
         clip_model.train()
         clip_model.requires_grad_(True)
@@ -544,7 +564,7 @@ def main():
     processor = AutoProcessor.from_pretrained("openai/clip-vit-base-patch32")
     image_processor = processor.image_processor
 
-    # Freeze vae and text_encoder
+    # text_encoder
     text_encoder.requires_grad_(False)
 
     if args.enable_xformers_memory_efficient_attention:
@@ -611,23 +631,31 @@ def main():
     else:
         optimizer_cls = torch.optim.AdamW
 
-    optimizer = optimizer_cls([
-        {
-            "params":generator.parameters(),
-            "lr":args.learning_rate,
-            "betas":(args.adam_beta1, args.adam_beta2),
-            "weight_decay":args.adam_weight_decay,
-            "eps":args.adam_epsilon,
-        },
-        {
-            "params": clip_model.parameters(),
-            "lr": args.learning_rate,
-            "betas": (args.adam_beta1, args.adam_beta2),
-            "weight_decay": args.adam_weight_decay,
-            "eps": args.adam_epsilon,
-        }
-    ])
-
+    optimizer_parameter_obj = []
+    if generator_train:
+        optimizer_parameter_obj.append(
+            {
+                "params":generator.parameters(),
+                "lr":args.learning_rate,
+                "betas":(args.adam_beta1, args.adam_beta2),
+                "weight_decay":args.adam_weight_decay,
+                "eps":args.adam_epsilon,
+            }, 
+        )
+    if clip_train:
+        optimizer_parameter_obj.append(
+             {
+                "params": clip_model.parameters(),
+                "lr": args.learning_rate,
+                "betas": (args.adam_beta1, args.adam_beta2),
+                "weight_decay": args.adam_weight_decay,
+                "eps": args.adam_epsilon,
+            }
+        )
+    if not generator_train and not clip_train:
+        raise ValueError("At least one of generator_train and clip_train should be True")
+    
+    optimizer = optimizer_cls(optimizer_parameter_obj)
     
     # Get the datasets: you can either provide your own training and evaluation files (see below)
     # or specify a Dataset from the hub (the dataset will be downloaded automatically from the datasets Hub).
@@ -752,7 +780,8 @@ def main():
 
     with accelerator.main_process_first():
         if args.max_train_samples is not None:
-            dataset["train"] = dataset["train"].shuffle(seed=args.seed).select(range(args.max_train_samples))
+            # dataset["train"] = dataset["train"].shuffle(seed=args.seed).select(range(args.max_train_samples))
+            dataset["train"] = dataset["train"].select(range(args.max_train_samples))
         # filter out corrupt images 
         train_dataset = dataset["train"].filter(filter_corrupt_images, batched=True)
         # Set the training transforms
@@ -771,10 +800,11 @@ def main():
     # train dataloader
     train_dataloader = torch.utils.data.DataLoader(
         train_dataset,
-        shuffle=True,
+        shuffle=False,  # here change to False to check the order of the images
         collate_fn=collate_fn,
         batch_size=args.train_batch_size,
         num_workers=args.dataloader_num_workers,
+        drop_last=True,
     )
     
     # evaluation dataloader
@@ -784,6 +814,7 @@ def main():
         collate_fn=collate_fn,
         batch_size=args.eval_batch_size,
         num_workers=args.dataloader_num_workers,
+        drop_last=True,
     )
     
    
@@ -801,10 +832,10 @@ def main():
         num_training_steps=args.max_train_steps * args.gradient_accumulation_steps,
     )
 
-
-    generator, optimizer, lr_scheduler = accelerator.prepare(
-        generator, optimizer, lr_scheduler
-    )
+    optimizer = accelerator.prepare(optimizer)
+    lr_scheduler = accelerator.prepare(lr_scheduler)
+    if generator_train:
+        generator = accelerator.prepare(generator)
     if clip_train:
         clip_model = accelerator.prepare(clip_model)
         
@@ -817,7 +848,6 @@ def main():
 
     # Move text_encode and vae to gpu and cast to weight_dtype
     text_encoder.to(accelerator.device, dtype=weight_dtype)
-    clip_model.to(accelerator.device, dtype=weight_dtype)
 
     # We need to recalculate our total training steps as the size of the training dataloader may have changed.
     num_update_steps_per_epoch = math.ceil(len(train_dataloader) / args.gradient_accumulation_steps)
@@ -883,7 +913,16 @@ def main():
             logging.info("*"*50)
             logging.info("Doing Training")
             logging.info("*"*50)
-            generator.train()
+            if generator_train:
+                generator.train()
+            else:
+                generator.eval()
+                
+            if clip_train:
+                clip_model.train()
+            else:
+                clip_model.eval()
+                
             progress_bar.set_description("Training Steps")
             train_loss = 0.0
 
@@ -894,31 +933,32 @@ def main():
                         progress_bar.update(1)
                     continue
 
-                
                 # Convert images to latent space
                 img_pixel_values = batch["pixel_values"].to(weight_dtype)  # [6,3,224,224]
-
+                
                 # Get the text embedding for conditioning
                 batch_token_ids = batch["input_ids"]
-                encoder_hidden_states = text_encoder(batch_token_ids)[0]  # [6,77,768]
                 
-                noise = generator(img_pixel_values, encoder_hidden_states)
-                
-                # limit the norm of the noise
-                norm_type = 'l2'
-                epsilon = 16
-                if norm_type == 'l2':
-                    temp = torch.norm(noise.view(noise.shape[0], -1), dim=1).view(-1, 1, 1, 1)
-                    noise = noise * epsilon / temp
-                else:
-                    noise = torch.clamp(noise, -epsilon / 255, epsilon / 255)
+                if generator_train:
+                    encoder_hidden_states = text_encoder(batch_token_ids)[0]  # [6,77,768]                
+                    noise = generator.forward(img_pixel_values, encoder_hidden_states)
                     
-                add_noise = False
-                if add_noise:
-                    image = img_pixel_values + noise
+                    # limit the norm of the noise
+                    norm_type = 'l2'
+                    epsilon = 16
+                    if norm_type == 'l2':
+                        temp = torch.norm(noise.view(noise.shape[0], -1), dim=1).view(-1, 1, 1, 1)
+                        noise = noise * epsilon / temp
+                    else:
+                        noise = torch.clamp(noise, -epsilon / 255, epsilon / 255)
+                        
+                    add_noise = False
+                    if add_noise:
+                        image = img_pixel_values + noise
+                    else:
+                        image = img_pixel_values + noise * torch.tensor(0.0).to(noise.device)
                 else:
-                    image = img_pixel_values + noise * torch.tensor(0.0).to(noise.device)
-                    
+                    image = img_pixel_values 
                 image = torch.clamp(image, -1, 1)
                 
                 use_normailize = False
@@ -943,9 +983,11 @@ def main():
 
                 # Backpropagate
                 accelerator.backward(loss)
-                # if accelerator.sync_gradients:
-                #     accelerator.clip_grad_norm_(generator.parameters(), args.max_grad_norm)
-                #     accelerator.clip_grad_norm_(clip_model.parameters(), args.max_grad_norm)
+                if accelerator.sync_gradients:
+                    if generator_train:
+                        accelerator.clip_grad_norm_(generator.parameters(), args.max_grad_norm)
+                    elif clip_train:
+                        accelerator.clip_grad_norm_(clip_model.parameters(), args.max_grad_norm)
                 optimizer.step()
                 lr_scheduler.step()
                 optimizer.zero_grad()
@@ -984,7 +1026,9 @@ def main():
             logging.info("Doing Evaluation")
             logging.info("*"*50)
             progress_bar.set_description("Evaluation Steps")
+            
             generator.eval()
+            clip_model.eval()
             
             eval_losses = []
             for step, batch in enumerate(tqdm(eval_dataloader)):
@@ -994,26 +1038,28 @@ def main():
 
                     # Get the text embedding for conditioning
                     batch_token_ids = batch["input_ids"]
-                    encoder_hidden_states = text_encoder(batch_token_ids)[0]  # [6,77,768]
-                    
-                    noise = generator(img_pixel_values, encoder_hidden_states)
-                    
-                    # limit the norm of the noise
-                    norm_type = 'l2'
-                    epsilon = 16
-                    if norm_type == 'l2':
-                        temp = torch.norm(noise.view(noise.shape[0], -1), dim=1).view(-1, 1, 1, 1)
-                        noise = noise * epsilon / temp
-                    else:
-                        noise = torch.clamp(noise, -epsilon / 255, epsilon / 255)
+                    if generator_train:
+                        encoder_hidden_states = text_encoder(batch_token_ids)[0]  # [6,77,768]                
+                        noise = generator.forward(img_pixel_values, encoder_hidden_states)
                         
-                    add_noise = True
-                    if add_noise:
-                        image = img_pixel_values + noise
+                        # limit the norm of the noise
+                        norm_type = 'l2'
+                        epsilon = 16
+                        if norm_type == 'l2':
+                            temp = torch.norm(noise.view(noise.shape[0], -1), dim=1).view(-1, 1, 1, 1)
+                            noise = noise * epsilon / temp
+                        else:
+                            noise = torch.clamp(noise, -epsilon / 255, epsilon / 255)
+                            
+                        add_noise = False
+                        if add_noise:
+                            image = img_pixel_values + noise
+                        else:
+                            image = img_pixel_values + noise * torch.tensor(0.0).to(noise.device)
                     else:
-                        image = img_pixel_values + noise * torch.tensor(0.0).to(noise.device)
-                        
+                        image = img_pixel_values 
                     image = torch.clamp(image, -1, 1)
+                    
                     use_normailize = False
                     if use_normailize:
                         image = normalize_fn(image)
@@ -1030,7 +1076,7 @@ def main():
                     
                     # END MY CODE
                 eval_losses.append(loss.detach().item())
-                logs = {"step" : step, "eval_loss": loss.detach().item(), "lr": lr_scheduler.get_last_lr()[0]}
+                logs = {"step" : step,  "lr": lr_scheduler.get_last_lr()[0],"eval_loss": loss.detach().item(),}
                 progress_bar.set_postfix(**logs)
             eval_mean_loss = np.mean(eval_losses)
             eval_record = {

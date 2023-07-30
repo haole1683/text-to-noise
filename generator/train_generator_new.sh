@@ -15,12 +15,14 @@ accelerate launch --mixed_precision="fp16"  train_generator_new.py \
   --pretrained_model_name_or_path=$MODEL_NAME \
   --dataset_name=$dataset_name \
   --data_dir=$data_dir \
-  --use_8bit_adam\
-  --resolution=224 --center_crop --random_flip \
-  --train_batch_size=6 \
-  --eval_batch_size=6 \
+  --use_8bit_adam \
+  --resolution=224 \
+  --center_crop \
+  --random_flip \
+  --train_batch_size=4 \
+  --eval_batch_size=4 \
   --gradient_checkpointing \
-  --max_train_steps=350 \
+  --max_train_steps=15000 \
   --gradient_accumulation_steps=1 \
   --learning_rate=1e-5 \
   --max_grad_norm=1 \
@@ -30,8 +32,11 @@ accelerate launch --mixed_precision="fp16"  train_generator_new.py \
   --dataset_config_name=$dataset_config_name \
   --image_column image_path \
   --caption_column caption \
-  --do_eval \
   --do_train \
-  --max_train_samples=1000 \
-  --max_eval_samples=100
+  --do_eval \
+  --generator_train \
+  --clip_train \
+  --max_train_samples=10000 \
+  --max_eval_samples=1000 \
+  # --clip_pretrained \
   # --resume_from_checkpoint 
