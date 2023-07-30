@@ -924,7 +924,10 @@ def main():
             progress_bar.set_description("Training Steps")
             train_loss = 0.0
 
-            
+            generator_step_M = 1
+            clip_step_N = 1
+            train_target_list = ["generator"]*generator_step_M + ["clip"]*clip_step_N
+            cur_index = 0
             for step, batch in enumerate(train_dataloader):
                 # Skip steps until we reach the resumed step
                 if args.resume_from_checkpoint and epoch == first_epoch and step < resume_step:
@@ -932,9 +935,14 @@ def main():
                         progress_bar.update(1)
                     continue
 
+                # which to train
+                train_target = train_target_list[cur_index]
+                cur_index = (cur_index + 1) % len(train_target_list)
+                if train_target == "generator":
+                    pass
+
                 # Convert images to latent space
                 img_pixel_values = batch["pixel_values"].to(weight_dtype)  # [6,3,224,224]
-                
                 # Get the text embedding for conditioning
                 batch_token_ids = batch["input_ids"]
                 
@@ -989,6 +997,10 @@ def main():
                         accelerator.clip_grad_norm_(clip_model.parameters(), args.max_grad_norm)
                 optimizer.step()
                 lr_scheduler.step()
+                
+                # Don't forget zero the gradients of the model after the optimizer step!!!
+                generator.zero_grad()
+                clip_model.zero_grad()
                 optimizer.zero_grad()
 
                 # Checks if the accelerator has performed an optimization step behind the scenes

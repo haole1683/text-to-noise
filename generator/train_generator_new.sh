@@ -19,8 +19,8 @@ accelerate launch --mixed_precision="fp16"  train_generator_new.py \
   --resolution=224 \
   --center_crop \
   --random_flip \
-  --train_batch_size=4 \
-  --eval_batch_size=4 \
+  --train_batch_size=8 \
+  --eval_batch_size=8 \
   --gradient_checkpointing \
   --max_train_steps=15000 \
   --gradient_accumulation_steps=1 \
@@ -34,9 +34,9 @@ accelerate launch --mixed_precision="fp16"  train_generator_new.py \
   --caption_column caption \
   --do_train \
   --do_eval \
-  --generator_train \
-  --max_train_samples=10000 \
-  --max_eval_samples=1000 \
+  --clip_train \
+  --max_train_samples=50000 \
+  --max_eval_samples=10000 \
   # --clip_pretrained \
   # --generator_train \
   # --clip_train \
