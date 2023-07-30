@@ -37,7 +37,7 @@ accelerate launch --mixed_precision="fp16"  train_generator_new.py \
   --clip_train \
   --max_train_samples=50000 \
   --max_eval_samples=10000 \
-  # --clip_pretrained \
+  --clip_pretrained \
   # --generator_train \
   # --clip_train \
   # --resume_from_checkpoint 
