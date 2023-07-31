@@ -10,7 +10,7 @@ export MAX_TRAIN_SAMPLES=1000
 export CURRENT_TIME=$(date +'%Y-%m-%d_%H-%M-%S')
 export OUTPUT_DIR="./my_train_results/$DATASET_SHORT_NAME/$DATASET_NOISE_TYPE/$MAX_TRAIN_SAMPLES/$CURRENT_TIME"
 
-python run_clip.py \
+python run_clip_my.py \
     --output_dir $OUTPUT_DIR \
     --model_name_or_path ../clip-roberta \
     --data_dir /remote-home/songtianwei/research/diffusion_model_my/data \

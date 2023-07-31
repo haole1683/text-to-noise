@@ -37,7 +37,7 @@ for DATASET_NAME in "${DATASET_NAMES_CHOICEs[@]}"
                 echo "Learning_Rate: $Learning_Rate"
 
                 # Start your task using the current noise type and train samples count
-                python run_clip.py \
+                python run_clip_my.py \
                     --output_dir $OUTPUT_DIR \
                     --model_name_or_path ../clip-roberta \
                     --data_dir /remote-home/songtianwei/research/diffusion_model_my/data \

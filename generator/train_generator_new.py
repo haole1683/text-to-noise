@@ -534,6 +534,10 @@ def main():
             args.pretrained_model_name_or_path, subfolder="text_encoder", revision=args.revision
         )
 
+    def _freeze_params(module):
+        for param in module.parameters():
+            param.requires_grad = False
+    
     generator = Generator()
     generator_train = args.generator_train
     logger.info(f"generator_train: {generator_train}")
@@ -545,6 +549,7 @@ def main():
     else:
         generator.eval()
         generator.requires_grad_(False)
+        # _freeze_params(generator)
     
     clip_pretrained = args.clip_pretrained
     logger.info(f"clip_pretrained: {clip_pretrained}")
@@ -553,6 +558,8 @@ def main():
     else:
         clip_model_config = CLIPModel.from_pretrained("openai/clip-vit-base-patch32").config
         clip_model = CLIPModel(clip_model_config)
+        
+        
     
     clip_train = args.clip_train
     logger.info(f"clip_train: {clip_train}")
@@ -562,6 +569,7 @@ def main():
     else:
         clip_model.eval()
         clip_model.requires_grad_(False)
+        # _freeze_params(clip_model)
     
     processor = AutoProcessor.from_pretrained("openai/clip-vit-base-patch32")
     image_processor = processor.image_processor
@@ -761,6 +769,7 @@ def main():
             images = [image.convert("RGB") for image in examples[image_column]]
         examples["pixel_values"] = [train_transforms(image) for image in images]
         examples["input_ids"] = tokenize_captions(examples)
+        examples["attention_mask"] = examples["input_ids"] != tokenizer.pad_token_id
         return examples
 
     def filter_corrupt_images(examples):
@@ -778,7 +787,12 @@ def main():
         pixel_values = torch.stack([example["pixel_values"] for example in examples])
         pixel_values = pixel_values.to(memory_format=torch.contiguous_format).float()
         input_ids = torch.stack([example["input_ids"] for example in examples])
-        return {"pixel_values": pixel_values, "input_ids": input_ids}
+        attention_mask = torch.stack([example["attention_mask"] for example in examples])
+        return {
+            "pixel_values": pixel_values,
+            "input_ids": input_ids,
+            "attention_mask": attention_mask,
+        }
 
     with accelerator.main_process_first():
         if args.max_train_samples is not None:
@@ -977,13 +991,14 @@ def main():
                     image = img_pixel_values 
                 image = torch.clamp(image, -1, 1)
                 
-                use_normailize = False
+                use_normailize = True
                 if use_normailize:
                     image = normalize_fn(image)
                     
                 data_input = {
                     "input_ids":batch_token_ids,
                     "pixel_values" : image,
+                    "attention_mask":batch["attention_mask"],
                 }
                 output = clip_model(**data_input, return_loss=True)
                 logits_per_image = output.logits_per_image   # for training , image_logits is the same as logits text
@@ -1000,11 +1015,11 @@ def main():
                 # Backpropagate
                 accelerator.backward(loss)
   
-                if accelerator.sync_gradients:
-                    if generator_train:
-                        accelerator.clip_grad_norm_(generator.parameters(), args.max_grad_norm)
-                    elif clip_train:
-                        accelerator.clip_grad_norm_(clip_model.parameters(), args.max_grad_norm)
+                # if accelerator.sync_gradients:
+                #     if generator_train:
+                #         accelerator.clip_grad_norm_(generator.parameters(), args.max_grad_norm)
+                #     elif clip_train:
+                #         accelerator.clip_grad_norm_(clip_model.parameters(), args.max_grad_norm)
                 
                 # Update optimizer
                 optimizer.step()
@@ -1024,6 +1039,10 @@ def main():
                             accelerator.save_state(save_path)
                             logger.info(f"Saved state to {save_path}")
 
+                # model_info = {
+                #     "clip_model.vision_model.encoder.layers[0].mlp.fc1.bias.grad":clip_model.vision_model.encoder.layers[0].mlp.fc1.bias.grad
+                # }
+                
                 record = {
                         "epoch": epoch,
                         "step": step,

@@ -21,12 +21,12 @@ accelerate launch --mixed_precision="no"  train_generator_new.py \
   --resolution=224 \
   --center_crop \
   --random_flip \
-  --train_batch_size=8 \
-  --eval_batch_size=8 \
+  --train_batch_size=64 \
+  --eval_batch_size=64 \
   --gradient_checkpointing \
   --max_train_steps=15000 \
   --gradient_accumulation_steps=1 \
-  --learning_rate=5e-5 \
+  --learning_rate=5 \
   --max_grad_norm=1 \
   --lr_scheduler="linear" \
   --lr_warmup_steps=0 \
@@ -37,6 +37,7 @@ accelerate launch --mixed_precision="no"  train_generator_new.py \
   --caption_column caption \
   --do_train \
   --do_eval \
+  --clip_pretrained \
   --clip_train \
   --max_train_samples=50000 \
   --max_eval_samples=10000 \

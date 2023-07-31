@@ -28,6 +28,8 @@ ptvsd.enable_attach(address = ('127.0.0.1', 5678))
 ptvsd.wait_for_attach()
 print("attached")
 
+
+
 import logging
 import os
 import sys
@@ -38,7 +40,7 @@ import torch
 from datasets import load_dataset
 from PIL import Image
 from torchvision.io import ImageReadMode, read_image
-from torchvision.transforms import CenterCrop, ConvertImageDtype, Normalize, Resize
+from torchvision.transforms import CenterCrop, ConvertImageDtype, Normalize, Resize, ToTensor
 from torchvision.transforms.functional import InterpolationMode
 
 import transformers
@@ -59,7 +61,7 @@ from transformers.utils.versions import require_version
 logger = logging.getLogger(__name__)
 
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
-check_min_version("4.32.0.dev0")
+check_min_version("4.31.0.dev0")
 
 require_version("datasets>=1.8.0", "To fix: pip install -r examples/pytorch/contrastive-image-text/requirements.txt")
 
@@ -174,6 +176,17 @@ class DataTrainingArguments:
         default=None,
         metadata={"help": "The number of processes to use for the preprocessing."},
     )
+    
+    # Noise type, default is none, other noise is "random" and "clip_min_noise"
+    dataset_noise_type: Optional[str] = field(
+        default=None,
+        metadata={"help": "The type of noise to add to the dataset."},
+    )
+    
+    dataset_normalize_flag: Optional[bool] = field(
+        default=False,
+        metadata={"help": "Whether to normalize the dataset."},
+    )
 
     def __post_init__(self):
         if self.dataset_name is None and self.train_file is None and self.validation_file is None:
@@ -197,14 +210,50 @@ dataset_name_mapping = {
 
 # We use torchvision for faster image pre-processing. The transforms are implemented as nn.Module,
 # so we jit it to be faster.
+# class Transform(torch.nn.Module):
+#     def __init__(self, image_size, mean, std):
+#         super().__init__()
+#         self.transforms = torch.nn.Sequential(
+#             Resize([image_size], interpolation=InterpolationMode.BICUBIC),
+#             CenterCrop(image_size),
+#             ConvertImageDtype(torch.float),
+#             Normalize(mean, std),
+#         )
+
+#     @torch.jit.ignore
+#     def add_noise(self, x, noise_type):
+#         if noise_type == "random":  
+#             noise = torch.randn_like(x) * 0.1 
+#         elif  noise_type == "clip_min_noise":
+#             noise = torch.clamp(x - 0.1, min=0.0, max=1.0) - x
+#         else:
+#             raise ValueError(f"Unknown noise type: {noise_type}")
+        
+#         # limit the noise to l2 norm
+#         noise = noise / torch.norm(noise, dim=-1, keepdim=True)
+#         # clip to [0, 1]
+#         x = torch.clamp(x, min=0.0, max=1.0)
+    
+#     def forward(self, x, noise_type=None) -> torch.Tensor:
+#         """`x` should be an instance of `PIL.Image.Image`"""
+#         with torch.no_grad():
+#             x = self.transforms(x)
+            
+#         if noise_type is not None:
+#             x = self.add_noise(x, noise_type)
+#         return x
+
+
 class Transform(torch.nn.Module):
-    def __init__(self, image_size, mean, std):
+    def __init__(self, image_size):
         super().__init__()
         self.transforms = torch.nn.Sequential(
             Resize([image_size], interpolation=InterpolationMode.BICUBIC,antialias=None),
             CenterCrop(image_size),
             ConvertImageDtype(torch.float),
-            Normalize(mean, std),
+            # This is convert tensor image to the given dtype and scale the values accordingly.
+            # Normalize(mean, std),
+            # ToTensor(),
         )
 
     def forward(self, x) -> torch.Tensor:
@@ -214,17 +263,21 @@ class Transform(torch.nn.Module):
         return x
 
 
-def collate_fn(examples):
-    pixel_values = torch.stack([example["pixel_values"] for example in examples])
-    input_ids = torch.tensor([example["input_ids"] for example in examples], dtype=torch.long)
-    attention_mask = torch.tensor([example["attention_mask"] for example in examples], dtype=torch.long)
-    return {
-        "pixel_values": pixel_values,
-        "input_ids": input_ids,
-        "attention_mask": attention_mask,
-        "return_loss": True,
-    }
+# def collate_fn(examples):
+#     pixel_values = torch.stack([example["pixel_values"] for example in examples])
+#     input_ids = torch.tensor([example["input_ids"] for example in examples], dtype=torch.long)
+#     attention_mask = torch.tensor([example["attention_mask"] for example in examples], dtype=torch.long)
+#     return {
+#         "pixel_values": pixel_values,
+#         "input_ids": input_ids,
+#         "attention_mask": attention_mask,
+#         "return_loss": True,
+#     }
 
+
+
+# noise_type = None
+# normalize_flag = True
 
 def main():
     # 1. Parse input arguments
@@ -264,7 +317,7 @@ def main():
     # Log on each process the small summary:
     logger.warning(
         f"Process rank: {training_args.local_rank}, device: {training_args.device}, n_gpu: {training_args.n_gpu}"
-        + f"distributed training: {training_args.parallel_mode.value == 'distributed'}, 16-bits training: {training_args.fp16}"
+        + f"distributed training: {bool(training_args.local_rank != -1)}, 16-bits training: {training_args.fp16}"
     )
     logger.info(f"Training/evaluation parameters {training_args}")
 
@@ -327,6 +380,8 @@ def main():
             model_args.tokenizer_name, cache_dir=model_args.cache_dir, use_fast=model_args.use_fast_tokenizer
         )
     elif model_args.model_name_or_path:
+        print("***"*10)
+        print(model_args.model_name_or_path)
         tokenizer = AutoTokenizer.from_pretrained(
             model_args.model_name_or_path, cache_dir=model_args.cache_dir, use_fast=model_args.use_fast_tokenizer
         )
@@ -341,14 +396,14 @@ def main():
         model_args.image_processor_name or model_args.model_name_or_path,
         cache_dir=model_args.cache_dir,
         revision=model_args.model_revision,
-        token=True if model_args.use_auth_token else None,
+        use_auth_token=True if model_args.use_auth_token else None,
     )
 
     model = AutoModel.from_pretrained(
         model_args.model_name_or_path,
         cache_dir=model_args.cache_dir,
         revision=model_args.model_revision,
-        token=True if model_args.use_auth_token else None,
+        use_auth_token=True if model_args.use_auth_token else None,
     )
     config = model.config
 
@@ -398,25 +453,17 @@ def main():
 
     # 7. Preprocessing the datasets.
     # Initialize torchvision transforms and jit it for faster processing.
+    # image_transformations = Transform(
+    #     config.vision_config.image_size, image_processor.image_mean, image_processor.image_std
+    # )
+    
     image_transformations = Transform(
-        config.vision_config.image_size, image_processor.image_mean, image_processor.image_std
+        config.vision_config.image_size
     )
-    image_transformations = torch.jit.script(image_transformations)
+    # image_transformations = torch.jit.script(image_transformations)
 
     # Preprocessing the datasets.
     # We need to tokenize input captions and transform the images.
-    def tokenize_captions(examples):
-        captions = list(examples[caption_column])
-        text_inputs = tokenizer(captions, max_length=data_args.max_seq_length, padding="max_length", truncation=True)
-        examples["input_ids"] = text_inputs.input_ids
-        examples["attention_mask"] = text_inputs.attention_mask
-        return examples
-
-    def transform_images(examples):
-        images = [read_image(image_file, mode=ImageReadMode.RGB) for image_file in examples[image_column]]
-        examples["pixel_values"] = [image_transformations(image) for image in images]
-        return examples
-
     def filter_corrupt_images(examples):
         """remove problematic images"""
         valid_images = []
@@ -427,7 +474,108 @@ def main():
             except Exception:
                 valid_images.append(False)
         return valid_images
+    
+    def tokenize_captions(examples):
+        captions = list(examples[caption_column])
+        text_inputs = tokenizer(captions, max_length=data_args.max_seq_length, padding="max_length", truncation=True)
+        examples["input_ids"] = text_inputs.input_ids
+        examples["attention_mask"] = text_inputs.attention_mask
+        return examples
+    
+    def add_noises(examples):
+        from generator.diffusion import generate_noise
+        import torch
+        device = "cuda"
+        captions = examples['caption']
+        batch_size = len(captions)
+        batch_noise = generate_noise(captions).to(device)
 
+        if not isinstance(examples['pixel_values'],torch.Tensor):
+            if isinstance(examples['pixel_values'][0],torch.Tensor):
+                pixel_values = torch.stack(examples["pixel_values"]).to(device)
+            else:
+                pixel_values = torch.tensor(examples["pixel_values"], dtype=torch.float).to(device) 
+        else:
+            pixel_values = examples["pixel_values"].to(device)
+            
+        assert(batch_noise.shape[0]==batch_size)
+        
+        batch_image_with_noise = torch.clamp(batch_noise + pixel_values,0,1)  # Add noise , clamp to 0..1
+        batch_pixel_with_noise_list = [batch_image_with_noise[i] for i in range(batch_image_with_noise.size(0))]
+        examples["pixel_values"] = batch_pixel_with_noise_list
+        return examples
+
+    def add_random_noises(examples):
+        device = "cuda"
+        import torch
+        if not isinstance(examples['pixel_values'],torch.Tensor):
+            if isinstance(examples['pixel_values'][0],torch.Tensor):
+                pixel_values = torch.stack(examples["pixel_values"]).to(device)
+            else:
+                pixel_values = torch.tensor(examples["pixel_values"], dtype=torch.float).to(device) 
+        else:
+            pixel_values = examples["pixel_values"].to(device)
+        batch_size = pixel_values.shape[0]
+        batch_shape = pixel_values.shape
+        batch_noise = torch.randn(batch_shape).to(device)
+        
+        # def random_noise(self, noise_shape=[10, 3, 32, 32]):
+        # random_noise = torch.FloatTensor(*batch_shape).uniform_(-self.epsilon, self.epsilon).to(device)
+        
+        norm_type = 'l2'
+        epsilon = 16
+        if norm_type == 'l2':
+            temp = torch.norm(batch_noise.view(batch_noise.shape[0], -1), dim=1).view(-1, 1, 1, 1)
+            batch_noise = batch_noise * epsilon / temp
+        else:
+            batch_noise = torch.clamp(batch_noise, -epsilon / 255, epsilon / 255)
+            
+        batch_image_with_noise = torch.clamp(batch_noise + pixel_values,0,1)  # Add noise , clamp to 0..1
+        batch_pixel_with_noise_list = [batch_image_with_noise[i] for i in range(batch_image_with_noise.size(0))]
+        examples["pixel_values"] = batch_pixel_with_noise_list
+        return examples
+    
+    
+    def normalize_fn(examples):
+        normalize_fun = Normalize(mean=image_processor.image_mean,std=image_processor.image_std)
+
+        device = "cuda"
+        if not isinstance(examples['pixel_values'],torch.Tensor):
+            if isinstance(examples['pixel_values'][0],torch.Tensor):
+                pixel_values = torch.stack(examples["pixel_values"]).to(device)
+            else:
+                pixel_values = torch.tensor(examples["pixel_values"], dtype=torch.float).to(device) 
+        else:
+            pixel_values = examples["pixel_values"].to(device)
+        
+        examples["pixel_values"] = [normalize_fun(image) for image in pixel_values]
+        return examples
+    
+    def transform_images(examples):
+        # 1.load image
+        images = [read_image(image_file, mode=ImageReadMode.RGB) for image_file in examples[image_column]]
+        # 2.transform image -- Resize \ CenterCrop \ ToTensorFloat
+        # print(examples)
+        examples["pixel_values"] = [image_transformations(image) for image in images]
+        # print(type(examples['pixel_values']))
+        # print(type(examples['pixel_values'][0]))
+        return examples
+
+    def collate_fn(examples):
+        if torch.is_tensor(examples[0]["pixel_values"]):
+            pixel_values = torch.stack([example["pixel_values"] for example in examples])
+        else:
+            pixel_values = torch.tensor([example["pixel_values"] for example in examples], dtype=torch.float)
+        input_ids = torch.tensor([example["input_ids"] for example in examples], dtype=torch.long)
+        attention_mask = torch.tensor([example["attention_mask"] for example in examples], dtype=torch.long)
+        return {
+            "pixel_values": pixel_values,
+            "input_ids": input_ids,
+            "attention_mask": attention_mask,
+            "return_loss": True,
+        }
+
+    
     if training_args.do_train:
         if "train" not in dataset:
             raise ValueError("--do_train requires a train dataset")
@@ -437,20 +585,75 @@ def main():
             train_dataset = train_dataset.select(range(max_train_samples))
 
         train_dataset = train_dataset.filter(
-            filter_corrupt_images, batched=True, num_proc=data_args.preprocessing_num_workers
+            filter_corrupt_images, batched=True, num_proc=data_args.preprocessing_num_workers,load_from_cache_file=not data_args.overwrite_cache
         )
         train_dataset = train_dataset.map(
             function=tokenize_captions,
             batched=True,
-            remove_columns=[col for col in column_names if col != image_column],
+            remove_columns=[col for col in column_names if col != image_column and col != caption_column],
             num_proc=data_args.preprocessing_num_workers,
             load_from_cache_file=not data_args.overwrite_cache,
             desc="Running tokenizer on train dataset",
         )
 
         # Transform images on the fly as doing it on the whole dataset takes too much time.
-        train_dataset.set_transform(transform_images)
-
+        # train_dataset.set_transform(transform_images)  WRONG!!!!!!!!!
+        train_dataset = train_dataset.map(
+            function=transform_images,
+            batched=True,
+            batch_size=64,
+            num_proc=data_args.preprocessing_num_workers,
+            load_from_cache_file=not data_args.overwrite_cache,
+            desc="Running transform on train dataset",
+        )
+        
+        # set format to torch
+        # train_dataset = train_dataset.with_format("torch")  Type not corresponding
+        
+        if data_args.dataset_noise_type is not None:
+            logging.info(f"Adding noise to the dataset with noise type: {data_args.dataset_noise_type}")
+            if data_args.dataset_noise_type == "random":
+                print("Adding random noise")
+                train_dataset = train_dataset.map(
+                    function=add_random_noises,
+                    batched=True,
+                    batch_size=64,
+                    num_proc=data_args.preprocessing_num_workers,
+                    load_from_cache_file=not data_args.overwrite_cache,
+                    desc="Running adding random noise on train dataset"
+                ) 
+            elif data_args.dataset_noise_type == "clip_min_noise":
+                # add noise    
+                print("Adding clip_min_noise")
+                train_dataset = train_dataset.map(
+                    function=add_noises,
+                    batched=True,
+                    batch_size=64,
+                    num_proc=data_args.preprocessing_num_workers,
+                    load_from_cache_file=not data_args.overwrite_cache,
+                    desc="Running adding generated noise on train dataset"
+                ) 
+            elif data_args.dataset_noise_type == "none":
+                pass
+            else:
+                raise ValueError(f"Unknown noise type: {data_args.dataset_noise_type}")
+        else:
+            logging.info(f"No noise is added to the dataset")
+            
+        if data_args.dataset_normalize_flag:
+            # normalize
+            logging.info(f"Normalizing the dataset")
+            train_dataset = train_dataset.map(
+                function=normalize_fn,
+                batched=True,
+                batch_size=64,
+                num_proc=data_args.preprocessing_num_workers,
+                load_from_cache_file=not data_args.overwrite_cache,
+                desc="Running normalize on train dataset"
+            )  
+        else:
+            logging.info(f"No normalization is added to the dataset")
+            
     if training_args.do_eval:
         if "validation" not in dataset:
             raise ValueError("--do_eval requires a train validation")
@@ -473,6 +676,14 @@ def main():
 
         # Transform images on the fly as doing it on the whole dataset takes too much time.
         eval_dataset.set_transform(transform_images)
+        # eval_dataset = eval_dataset.map(
+        #     function=transform_images,
+        #     batched=True,
+        #     batch_size=64,
+        #     num_proc=data_args.preprocessing_num_workers,
+        #     load_from_cache_file=not data_args.overwrite_cache,
+        #     desc="Running transform on eval dataset",
+        # )
 
     if training_args.do_predict:
         if "test" not in dataset:
@@ -485,14 +696,14 @@ def main():
         test_dataset = test_dataset.filter(
             filter_corrupt_images, batched=True, num_proc=data_args.preprocessing_num_workers
         )
-        test_dataset = test_dataset.map(
-            function=tokenize_captions,
-            batched=True,
-            num_proc=data_args.preprocessing_num_workers,
-            remove_columns=[col for col in column_names if col != image_column],
-            load_from_cache_file=not data_args.overwrite_cache,
-            desc="Running tokenizer on test dataset",
-        )
+        # test_dataset = test_dataset.map(
+        #     function=transform_images,
+        #     batched=True,
+        #     batch_size=64,
+        #     num_proc=data_args.preprocessing_num_workers,
+        #     load_from_cache_file=not data_args.overwrite_cache,
+        #     desc="Running transform on test dataset",
+        # )
 
         # Transform images on the fly as doing it on the whole dataset takes too much time.
         test_dataset.set_transform(transform_images)
