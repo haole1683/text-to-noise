@@ -16,11 +16,11 @@
 # Code source : https://github.com/huggingface/diffusers/blob/v0.18.2/examples/text_to_image/train_text_to_image.py
 
 # This is for debug
-import ptvsd
-print("waiting for attaching")
-ptvsd.enable_attach(address = ('127.0.0.1', 5678))
-ptvsd.wait_for_attach()
-print("attached")
+# import ptvsd
+# print("waiting for attaching")
+# ptvsd.enable_attach(address = ('127.0.0.1', 5678))
+# ptvsd.wait_for_attach()
+# print("attached")
 
 
 import argparse
@@ -936,6 +936,8 @@ def main():
                     if step % args.gradient_accumulation_steps == 0:
                         progress_bar.update(1)
                     continue
+                
+                
 
                 # which to train
                 train_target = train_target_list[cur_index]
@@ -947,6 +949,11 @@ def main():
                 img_pixel_values = batch["pixel_values"].to(weight_dtype)  # [6,3,224,224]
                 # Get the text embedding for conditioning
                 batch_token_ids = batch["input_ids"]
+                
+                # Don't forget zero the gradients of the model after the optimizer step!!!
+                generator.zero_grad()
+                clip_model.zero_grad()
+                optimizer.zero_grad()
                 
                 if generator_train:
                     encoder_hidden_states = text_encoder(batch_token_ids)[0]  # [6,77,768]                
@@ -976,7 +983,7 @@ def main():
                     
                 data_input = {
                     "input_ids":batch_token_ids,
-                    "pixel_values" : image
+                    "pixel_values" : image,
                 }
                 output = clip_model(**data_input, return_loss=True)
                 logits_per_image = output.logits_per_image   # for training , image_logits is the same as logits text
@@ -992,6 +999,7 @@ def main():
 
                 # Backpropagate
                 accelerator.backward(loss)
+                # loss.backward()
                 if accelerator.sync_gradients:
                     if generator_train:
                         accelerator.clip_grad_norm_(generator.parameters(), args.max_grad_norm)
@@ -999,11 +1007,6 @@ def main():
                         accelerator.clip_grad_norm_(clip_model.parameters(), args.max_grad_norm)
                 optimizer.step()
                 lr_scheduler.step()
-                
-                # Don't forget zero the gradients of the model after the optimizer step!!!
-                generator.zero_grad()
-                clip_model.zero_grad()
-                optimizer.zero_grad()
 
                 # Checks if the accelerator has performed an optimization step behind the scenes
                 if accelerator.sync_gradients:
