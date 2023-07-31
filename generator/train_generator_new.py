@@ -48,7 +48,7 @@ from torchvision import transforms
 from tqdm.auto import tqdm
 from transformers import CLIPTextModel, CLIPTokenizer
 from transformers.utils import ContextManagers
-from transformers import AutoProcessor, CLIPModel
+from transformers import AutoProcessor, CLIPModel, AutoModel
 from PIL import Image
 
 
@@ -554,10 +554,10 @@ def main():
     clip_pretrained = args.clip_pretrained
     logger.info(f"clip_pretrained: {clip_pretrained}")
     if clip_pretrained:
-        clip_model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
+        clip_model = AutoModel.from_pretrained("openai/clip-vit-base-patch32")
     else:
-        clip_model_config = CLIPModel.from_pretrained("openai/clip-vit-base-patch32").config
-        clip_model = CLIPModel(clip_model_config)
+        clip_model_config = AutoModel.from_pretrained("openai/clip-vit-base-patch32").config
+        clip_model = AutoModel(clip_model_config)
         
         
     

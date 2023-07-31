@@ -13,7 +13,7 @@ export output_dir="my_train_results/$dataset_name/$(date '+%Y-%m-%d_%H:%M:%S')/"
 
 # 混合精度问题，出现nan
 # reference：https://www.cnblogs.com/jimchen1218/p/14315008.html
-accelerate launch --mixed_precision="no"  train_generator_new.py \
+accelerate launch --mixed_precision="fp16"  train_generator_new.py \
   --pretrained_model_name_or_path=$MODEL_NAME \
   --dataset_name=$dataset_name \
   --data_dir=$data_dir \
@@ -26,7 +26,7 @@ accelerate launch --mixed_precision="no"  train_generator_new.py \
   --gradient_checkpointing \
   --max_train_steps=15000 \
   --gradient_accumulation_steps=1 \
-  --learning_rate=5 \
+  --learning_rate=5e-4 \
   --max_grad_norm=1 \
   --lr_scheduler="linear" \
   --lr_warmup_steps=0 \
