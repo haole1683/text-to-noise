@@ -16,11 +16,11 @@
 # Code source : https://github.com/huggingface/diffusers/blob/v0.18.2/examples/text_to_image/train_text_to_image.py
 
 # This is for debug
-import ptvsd
-print("waiting for attaching")
-ptvsd.enable_attach(address = ('127.0.0.1', 5678))
-ptvsd.wait_for_attach()
-print("attached")
+# import ptvsd
+# print("waiting for attaching")
+# ptvsd.enable_attach(address = ('127.0.0.1', 5678))
+# ptvsd.wait_for_attach()
+# print("attached")
 
 
 import argparse
