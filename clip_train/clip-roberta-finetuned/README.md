@@ -16,7 +16,7 @@ should probably proofread and complete it, then remove this comment. -->
 
 This model is a fine-tuned version of [../clip-roberta](https://huggingface.co/../clip-roberta) on the ydshieh/coco_dataset_script 2017 dataset.
 It achieves the following results on the evaluation set:
-- Loss: 3.4641
+- Loss: 1.7710
 
 ## Model description
 

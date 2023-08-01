@@ -533,10 +533,6 @@ def main():
         text_encoder = CLIPTextModel.from_pretrained(
             args.pretrained_model_name_or_path, subfolder="text_encoder", revision=args.revision
         )
-
-    def _freeze_params(module):
-        for param in module.parameters():
-            param.requires_grad = False
     
     generator = Generator()
     generator_train = args.generator_train
@@ -553,11 +549,20 @@ def main():
     
     clip_pretrained = args.clip_pretrained
     logger.info(f"clip_pretrained: {clip_pretrained}")
-    if clip_pretrained:
-        clip_model = AutoModel.from_pretrained("openai/clip-vit-base-patch32")
-    else:
-        clip_model_config = AutoModel.from_pretrained("openai/clip-vit-base-patch32").config
-        clip_model = AutoModel(clip_model_config)
+    
+    model_name_or_path = "/remote-home/songtianwei/research/diffusion_model_my/clip-roberta"
+    clip_model = AutoModel.from_pretrained(
+        model_name_or_path,
+        cache_dir=None,
+        revision="main",
+        token=None,
+    )
+    clip_model_config = clip_model.config
+    # if clip_pretrained:
+    #     clip_model = AutoModel.from_pretrained("openai/clip-vit-base-patch32")
+    # else:
+    #     clip_model_config = AutoModel.from_pretrained("openai/clip-vit-base-patch32").config
+    #     clip_model = AutoModel(clip_model_config)
         
         
     
@@ -641,31 +646,54 @@ def main():
     else:
         optimizer_cls = torch.optim.AdamW
 
-    optimizer_parameter_obj = []
-    if generator_train:
-        optimizer_parameter_obj.append(
+    optimizer_cls = torch.optim.AdamW
+    from transformers.trainer_pt_utils import get_parameter_names
+    from transformers.pytorch_utils import ALL_LAYERNORM_LAYERS
+    decay_parameters = get_parameter_names(clip_model, ALL_LAYERNORM_LAYERS)
+    decay_parameters = [name for name in decay_parameters if "bias" not in name]
+    optimizer_grouped_parameters = [
             {
-                "params":generator.parameters(),
-                "lr":args.learning_rate,
-                "betas":(args.adam_beta1, args.adam_beta2),
-                "weight_decay":args.adam_weight_decay,
-                "eps":args.adam_epsilon,
-            }, 
-        )
-    if clip_train:
-        optimizer_parameter_obj.append(
-             {
-                "params": clip_model.parameters(),
-                "lr": args.learning_rate,
-                "betas": (args.adam_beta1, args.adam_beta2),
-                "weight_decay": args.adam_weight_decay,
-                "eps": args.adam_epsilon,
-            }
-        )
-    if not generator_train and not clip_train:
-        raise ValueError("At least one of generator_train and clip_train should be True")
+                "params": [
+                    p for n, p in clip_model.named_parameters() if (n in decay_parameters and p.requires_grad)
+                ],
+                "weight_decay": 0.1,
+            },
+            {
+                "params": [
+                    p for n, p in clip_model.named_parameters() if (n not in decay_parameters and p.requires_grad)
+                ],
+                "weight_decay": 0.0,
+            },
+        ]
+    optimizer = optimizer_cls(optimizer_grouped_parameters)
     
-    optimizer = optimizer_cls(optimizer_parameter_obj)
+    clip_model, optimizer = accelerator.prepare(clip_model, optimizer)
+    
+    # optimizer_parameter_obj = []
+    # if generator_train:
+    #     optimizer_parameter_obj.append(
+    #         {
+    #             "params":generator.parameters(),
+    #             "lr":args.learning_rate,
+    #             "betas":(args.adam_beta1, args.adam_beta2),
+    #             "weight_decay":args.adam_weight_decay,
+    #             "eps":args.adam_epsilon,
+    #         }, 
+    #     )
+    # if clip_train:
+    #     optimizer_parameter_obj.append(
+    #          {
+    #             "params": clip_model.parameters(),
+    #             "lr": args.learning_rate,
+    #             "betas": (args.adam_beta1, args.adam_beta2),
+    #             "weight_decay": args.adam_weight_decay,
+    #             "eps": args.adam_epsilon,
+    #         }
+    #     )
+    # if not generator_train and not clip_train:
+    #     raise ValueError("At least one of generator_train and clip_train should be True")
+    
+    # optimizer = optimizer_cls(optimizer_parameter_obj)
     
     # Get the datasets: you can either provide your own training and evaluation files (see below)
     # or specify a Dataset from the hub (the dataset will be downloaded automatically from the datasets Hub).
@@ -738,8 +766,8 @@ def main():
     # Preprocessing the datasets.
     train_transforms = transforms.Compose(
         [
-            transforms.Resize(args.resolution, interpolation=transforms.InterpolationMode.BILINEAR),
-            transforms.CenterCrop(args.resolution) if args.center_crop else transforms.RandomCrop(args.resolution),
+            transforms.Resize(clip_model_config.vision_config.image_size, interpolation=transforms.InterpolationMode.BILINEAR),
+            transforms.CenterCrop(clip_model_config.vision_config.image_size,) if args.center_crop else transforms.RandomCrop(args.resolution),
             transforms.RandomHorizontalFlip() if args.random_flip else transforms.Lambda(lambda x: x),
             transforms.ToTensor(),
             # transforms.Normalize([0.5], [0.5]),
@@ -841,17 +869,17 @@ def main():
         args.max_train_steps = args.num_train_epochs * num_update_steps_per_epoch
         overrode_max_train_steps = True
 
-    lr_scheduler = get_scheduler(
-        args.lr_scheduler,
-        optimizer=optimizer,
-        num_warmup_steps=args.lr_warmup_steps * args.gradient_accumulation_steps,
-        num_training_steps=args.max_train_steps * args.gradient_accumulation_steps,
-    )
+    # lr_scheduler = get_scheduler(
+    #     args.lr_scheduler,
+    #     optimizer=optimizer,
+    #     num_warmup_steps=args.lr_warmup_steps * args.gradient_accumulation_steps,
+    #     num_training_steps=args.max_train_steps * args.gradient_accumulation_steps,
+    # )
 
-    optimizer = accelerator.prepare(optimizer)
-    lr_scheduler = accelerator.prepare(lr_scheduler)
+    # optimizer = accelerator.prepare(optimizer)
+    # lr_scheduler = accelerator.prepare(lr_scheduler)
     generator = accelerator.prepare(generator)
-    clip_model = accelerator.prepare(clip_model)
+    # clip_model = accelerator.prepare(clip_model)
         
     train_dataloader = accelerator.prepare(train_dataloader)
     eval_dataloader = accelerator.prepare(eval_dataloader)
@@ -1023,7 +1051,7 @@ def main():
                 
                 # Update optimizer
                 optimizer.step()
-                lr_scheduler.step()
+                # lr_scheduler.step()
 
                 # Checks if the accelerator has performed an optimization step behind the scenes
                 if accelerator.sync_gradients:
@@ -1048,7 +1076,8 @@ def main():
                         "step": step,
                         "global_step":global_step,
                         "train_loss": loss.detach().item(),
-                        "lr": lr_scheduler.get_last_lr()[0],
+                        # "lr": lr_scheduler.get_last_lr()[0],
+                        "lr": optimizer.param_groups[0]["lr"],
                         }
                 wandb.log(record)  
                 progress_bar.set_postfix(**record)
@@ -1113,8 +1142,8 @@ def main():
                     
                     # END MY CODE
                 eval_losses.append(loss.detach().item())
-                logs = {"step" : step,  "lr": lr_scheduler.get_last_lr()[0],"eval_loss": loss.detach().item(),}
-                progress_bar.set_postfix(**logs)
+                # logs = {"step" : step,  "lr": lr_scheduler.get_last_lr()[0],"eval_loss": loss.detach().item(),}
+                # progress_bar.set_postfix(**logs)
             eval_mean_loss = np.mean(eval_losses)
             eval_record = {
                         "epoch": epoch,

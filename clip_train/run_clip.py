@@ -514,6 +514,7 @@ def main():
         elif last_checkpoint is not None:
             checkpoint = last_checkpoint
         train_result = trainer.train(resume_from_checkpoint=checkpoint)
+        
         trainer.save_model()
         tokenizer.save_pretrained(training_args.output_dir)
         image_processor.save_pretrained(training_args.output_dir)
