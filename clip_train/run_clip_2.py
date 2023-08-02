@@ -466,7 +466,7 @@ def main():
     revision = None
     pretrained_model_name_or_path = "CompVis/stable-diffusion-v1-4"
     
-    use_clip_tokenizer = True
+    use_clip_tokenizer = False
     if use_clip_tokenizer:
         tokenizer = CLIPTokenizer.from_pretrained(
             pretrained_model_name_or_path, subfolder="tokenizer", revision=revision
@@ -767,15 +767,15 @@ def main():
         if args.output_dir is not None:
             os.makedirs(args.output_dir, exist_ok=True)
             
-    optimizer = accelerator.prepare(optimizer)
-    lr_scheduler = accelerator.prepare(lr_scheduler)
-    generator = accelerator.prepare(generator)
-    clip_model = accelerator.prepare(clip_model)
+    # optimizer = accelerator.prepare(optimizer)
+    # lr_scheduler = accelerator.prepare(lr_scheduler)
+    # generator = accelerator.prepare(generator)
+    # clip_model = accelerator.prepare(clip_model)
         
-    train_dataloader = accelerator.prepare(train_dataloader)
-    eval_dataloader = accelerator.prepare(eval_dataloader)
+    # train_dataloader = accelerator.prepare(train_dataloader)
+    # eval_dataloader = accelerator.prepare(eval_dataloader)
     
-    text_encoder.to(accelerator.device, dtype=weight_dtype)
+    # text_encoder.to(accelerator.device, dtype=weight_dtype)
     
     overrode_max_train_steps = False
     num_update_steps_per_epoch = math.ceil(len(train_dataloader) / training_args.gradient_accumulation_steps)
@@ -839,9 +839,20 @@ def main():
     progress_bar.set_description("Training Steps")
     
     accelerator.free_memory()
+    clip_model.zero_grad()
     optimizer = torch.optim.Adam(clip_model.parameters(), lr=1e-4)
     optimizer = accelerator.prepare(optimizer)
     
+    trainer = Trainer(
+        model=clip_model,
+        args=training_args,
+        train_dataset=train_dataset if training_args.do_train else None,
+        eval_dataset=eval_dataset if training_args.do_eval else None,
+        data_collator=collate_fn,
+    )
+    
+    
+    train_dataloader = trainer.get_train_dataloader()
     for epoch in range(first_epoch, training_args.num_train_epochs):
         if training_args.do_train:
             # logging.info("*"*50)
@@ -867,10 +878,10 @@ def main():
             for step, batch in enumerate(train_dataloader):
                 clip_model.train()
                 # Skip steps until we reach the resumed step
-                # if training_args.resume_from_checkpoint and epoch == first_epoch and step < resume_step:
-                #     if step % training_args.gradient_accumulation_steps == 0:
-                #         progress_bar.update(1)
-                #     continue
+                if training_args.resume_from_checkpoint and epoch == first_epoch and step < resume_step:
+                    if step % training_args.gradient_accumulation_steps == 0:
+                        progress_bar.update(1)
+                    continue
                 # which to train
                 # train_target = train_target_list[cur_index]
                 # cur_index = (cur_index + 1) % len(train_target_list)
@@ -930,7 +941,8 @@ def main():
                 # train_loss += avg_loss.item() / training_args.gradient_accumulation_steps
 
                 # Backpropagate
-                accelerator.backward(loss)
+                # accelerator.backward(loss)
+                loss.backward()
 
                 # if accelerator.sync_gradients:
                 #     if generator_train:
@@ -946,8 +958,8 @@ def main():
                 # optimizer.zero_grad()
 
                 # Checks if the accelerator has performed an optimization step behind the scenes
-                # if accelerator.sync_gradients:
-                #     progress_bar.update(1)
+                if accelerator.sync_gradients:
+                    progress_bar.update(1)
                 #     global_step += 1
                 #     accelerator.log({"train_loss": train_loss}, step=global_step)
                 #     train_loss = 0.0

@@ -61,7 +61,6 @@ from transformers import (
 from transformers.trainer_utils import get_last_checkpoint
 from transformers.utils import check_min_version, send_example_telemetry
 from transformers.utils.versions import require_version
-from transformers.debug_utils import DebugOption, DebugUnderflowOverflow
 from transformers.trainer_callback import (
     TrainerState,
 )
@@ -898,7 +897,7 @@ def main():
             checkpoint = training_args.resume_from_checkpoint
         elif last_checkpoint is not None:
             checkpoint = last_checkpoint
-        trainer.train(resume_from_checkpoint=checkpoint)
+        # trainer.train(resume_from_checkpoint=checkpoint)
         # # This is the replace version of _inner_training_loop
         # accelerator.free_memory()
         
