@@ -275,8 +275,6 @@ def collate_fn(examples):
         "return_loss": True,
     }
 
-
-
 class Generator(nn.Module):
     def __init__(self):
         super(Generator, self).__init__()
@@ -841,6 +839,8 @@ def main():
     progress_bar.set_description("Training Steps")
     
     accelerator.free_memory()
+    optimizer = torch.optim.Adam(clip_model.parameters(), lr=1e-4)
+    optimizer = accelerator.prepare(optimizer)
     
     for epoch in range(first_epoch, training_args.num_train_epochs):
         if training_args.do_train:
@@ -1043,3 +1043,7 @@ def main():
         #     wandb.log(eval_record)  
 
     accelerator.end_training()
+    
+
+if __name__ == "__main__":
+    main()
