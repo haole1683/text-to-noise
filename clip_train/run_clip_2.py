@@ -491,11 +491,11 @@ def main():
     clip_model_config = clip_model.config
     clip_pretrained = False
     
-    if clip_pretrained:
-        clip_model = AutoModel.from_pretrained("openai/clip-vit-base-patch32")
-    else:
-        clip_model_config = AutoModel.from_pretrained("openai/clip-vit-base-patch32").config
-        clip_model = AutoModel.from_config(clip_model_config)
+    # if clip_pretrained:
+    #     clip_model = AutoModel.from_pretrained("openai/clip-vit-base-patch32")
+    # else:
+    #     clip_model_config = AutoModel.from_pretrained("openai/clip-vit-base-patch32").config
+    #     clip_model = AutoModel.from_config(clip_model_config)
         
     
     clip_train = True
@@ -593,7 +593,7 @@ def main():
     )
     image_transformations = torch.jit.script(image_transformations)
     
-    data_args.max_seq_length = 77
+    # data_args.max_seq_length = 77
     
     # Preprocessing the datasets.
     # We need to tokenize input captions and transform the images.
@@ -750,32 +750,38 @@ def main():
                 "weight_decay": 0.0,
             },
         ]
-    optimizer = optimizer_cls(optimizer_grouped_parameters)
+    adam_kwargs = {
+        "lr": 5e-5,
+        "betas": (0.9, 0.999),
+        "eps": 1e-8,
+    }
+
+    optimizer = optimizer_cls(optimizer_grouped_parameters, **adam_kwargs)
    
-    lr_scheduler = 'linear'
-    lr_warmup_steps = 0
+    # lr_scheduler = 'linear'
+    # lr_warmup_steps = 0
     
-    lr_scheduler = get_scheduler(
-        lr_scheduler,
-        optimizer=optimizer,
-        num_warmup_steps=lr_warmup_steps * training_args.gradient_accumulation_steps,
-        num_training_steps=training_args.max_steps * training_args.gradient_accumulation_steps,
-    )
+    # lr_scheduler = get_scheduler(
+    #     lr_scheduler,
+    #     optimizer=optimizer,
+    #     num_warmup_steps=lr_warmup_steps * training_args.gradient_accumulation_steps,
+    #     num_training_steps=training_args.max_steps * training_args.gradient_accumulation_steps,
+    # )
     
     # Handle the repository creation
     if accelerator.is_main_process:
         if args.output_dir is not None:
             os.makedirs(args.output_dir, exist_ok=True)
             
-    # optimizer = accelerator.prepare(optimizer)
+    optimizer = accelerator.prepare(optimizer)
     # lr_scheduler = accelerator.prepare(lr_scheduler)
-    # generator = accelerator.prepare(generator)
-    # clip_model = accelerator.prepare(clip_model)
+    generator = accelerator.prepare(generator)
+    clip_model = accelerator.prepare(clip_model)
         
-    # train_dataloader = accelerator.prepare(train_dataloader)
-    # eval_dataloader = accelerator.prepare(eval_dataloader)
+    train_dataloader = accelerator.prepare(train_dataloader)
+    eval_dataloader = accelerator.prepare(eval_dataloader)
     
-    # text_encoder.to(accelerator.device, dtype=weight_dtype)
+    text_encoder.to(accelerator.device, dtype=weight_dtype)
     
     overrode_max_train_steps = False
     num_update_steps_per_epoch = math.ceil(len(train_dataloader) / training_args.gradient_accumulation_steps)
@@ -840,19 +846,7 @@ def main():
     
     accelerator.free_memory()
     clip_model.zero_grad()
-    optimizer = torch.optim.Adam(clip_model.parameters(), lr=1e-4)
-    optimizer = accelerator.prepare(optimizer)
-    
-    trainer = Trainer(
-        model=clip_model,
-        args=training_args,
-        train_dataset=train_dataset if training_args.do_train else None,
-        eval_dataset=eval_dataset if training_args.do_eval else None,
-        data_collator=collate_fn,
-    )
-    
-    
-    train_dataloader = trainer.get_train_dataloader()
+                
     for epoch in range(first_epoch, training_args.num_train_epochs):
         if training_args.do_train:
             # logging.info("*"*50)
@@ -935,7 +929,7 @@ def main():
                 # logits_per_text = output.logits_per_text
                 
                 loss = output.loss
-                
+                print("loss-",loss)
                 # Gather the losses across all processes for logging (if we use distributed training).
                 # avg_loss = accelerator.gather(loss.repeat(training_args.train_batch_size)).mean()
                 # train_loss += avg_loss.item() / training_args.gradient_accumulation_steps

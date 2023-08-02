@@ -1,3 +1,5 @@
+echo "run in run_clip_modify.sh"
+
 python run_clip_modify.py \
     --output_dir ./clip-roberta-finetuned \
     --model_name_or_path ../clip-roberta \
@@ -12,5 +14,5 @@ python run_clip_modify.py \
     --per_device_eval_batch_size="64" \
     --learning_rate="5e-5" --warmup_steps="0" --weight_decay 0.1 \
     --overwrite_output_dir \
-    --max_train_samples=50000 \
-    --max_eval_samples=10000 \
+    --max_train_samples=5000 \
+    --max_eval_samples=1000 \
