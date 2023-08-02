@@ -66,8 +66,8 @@ args = argparse.Namespace(
     remove_unused_columns=False,
     do_train=True,
     do_eval=True,
-    per_device_train_batch_size='64',
-    per_device_eval_batch_size='64',
+    per_device_train_batch_size='8',
+    per_device_eval_batch_size='8',
     learning_rate='5e-5',
     warmup_steps='0',
     weight_decay=0.1,
@@ -89,15 +89,15 @@ args_list = [
     '--remove_unused_columns', 'False',
     '--do_train',
     '--do_eval',
-    '--per_device_train_batch_size', '64',
-    '--per_device_eval_batch_size', '64',
+    '--per_device_train_batch_size', '8',
+    '--per_device_eval_batch_size', '8',
     '--learning_rate', '5e-5',
     '--warmup_steps', '0',
     '--weight_decay', '0.1',
     '--overwrite_output_dir',
     '--dataset_noise_type','clip_min_noise',
     '--dataset_normalize_flag','False',
-    '--max_train_samples','10000',
+    '--max_train_samples','100000',
     '--report_to','wandb'
 ]
     
@@ -776,7 +776,11 @@ def main():
     optimizer = accelerator.prepare(optimizer)
     # lr_scheduler = accelerator.prepare(lr_scheduler)
     generator = accelerator.prepare(generator)
+    
+    # For model
     clip_model = accelerator.prepare(clip_model)
+    if generator_train:
+        generator = accelerator.prepare(generator)
         
     train_dataloader = accelerator.prepare(train_dataloader)
     eval_dataloader = accelerator.prepare(eval_dataloader)
@@ -849,26 +853,26 @@ def main():
                 
     for epoch in range(first_epoch, training_args.num_train_epochs):
         if training_args.do_train:
-            # logging.info("*"*50)
-            # logging.info("Doing Training")
-            # logging.info("*"*50)
-            # if generator_train:
-            #     generator.train()
-            # else:
-            #     generator.eval()
+            logging.info("*"*50)
+            logging.info("Doing Training")
+            logging.info("*"*50)
+            if generator_train:
+                generator.train()
+            else:
+                generator.eval()
                 
-            # if clip_train:
-            #     clip_model.train()
-            # else:
-            #     clip_model.eval()
+            if clip_train:
+                clip_model.train()
+            else:
+                clip_model.eval()
                 
             progress_bar.set_description("Training Steps")
             train_loss = 0.0
 
-            # generator_step_M = 1
-            # clip_step_N = 1
-            # train_target_list = ["generator"]*generator_step_M + ["clip"]*clip_step_N
-            # cur_index = 0
+            generator_step_M = 1
+            clip_step_N = 1
+            train_target_list = ["generator"]*generator_step_M + ["clip"]*clip_step_N
+            cur_index = 0
             for step, batch in enumerate(train_dataloader):
                 clip_model.train()
                 # Skip steps until we reach the resumed step
@@ -877,53 +881,45 @@ def main():
                         progress_bar.update(1)
                     continue
                 # which to train
-                # train_target = train_target_list[cur_index]
-                # cur_index = (cur_index + 1) % len(train_target_list)
-                # if train_target == "generator":
-                #     pass
+                train_target = train_target_list[cur_index]
+                cur_index = (cur_index + 1) % len(train_target_list)
+                if train_target == "generator":
+                    pass
 
                 # Convert images to latent space
-                # img_pixel_values = batch["pixel_values"]  # [6,3,224,224]
-                # # Get the text embedding for conditioning
-                # batch_token_ids = batch["input_ids"]
+                img_pixel_values = batch["pixel_values"]  # [6,3,224,224]
+                # Get the text tokens for conditioning
+                batch_token_ids = batch["input_ids"]
                 
-                # generator.zero_grad()
-                
-
-                # generator_train = False
-                # if generator_train:
-                #     encoder_hidden_states = text_encoder(batch_token_ids)[0]  # [6,77,768]                
-                #     noise = generator(img_pixel_values, encoder_hidden_states)
+                add_noise = False
+                generator_train = False
+                if add_noise:
+                    encoder_hidden_states = text_encoder(batch_token_ids)[0]  # [6,77,768]                
+                    noise = generator(img_pixel_values, encoder_hidden_states)
                     
-                #     # limit the norm of the noise
-                #     norm_type = 'l2'
-                #     epsilon = 16
-                #     if norm_type == 'l2':
-                #         temp = torch.norm(noise.view(noise.shape[0], -1), dim=1).view(-1, 1, 1, 1)
-                #         noise = noise * epsilon / temp
-                #     else:
-                #         noise = torch.clamp(noise, -epsilon / 255, epsilon / 255)
-                        
-                #     add_noise = False
-                #     if add_noise:
-                #         image = img_pixel_values + noise
-                #     else:
-                #         image = img_pixel_values + noise * torch.tensor(0.0).to(noise.device)
-                # else:
-                #     image = img_pixel_values 
-                # image = img_pixel_values 
-                # image = torch.clamp(image, -1, 1)
-                
-                # use_normailize = False
-                # if use_normailize:
-                #     image = normalize_fn(image)
+                    # limit the norm of the noise
+                    norm_type = 'l2'
+                    epsilon = 16
+                    if norm_type == 'l2':
+                        temp = torch.norm(noise.view(noise.shape[0], -1), dim=1).view(-1, 1, 1, 1)
+                        noise = noise * epsilon / temp
+                    else:
+                        noise = torch.clamp(noise, -epsilon / 255, epsilon / 255)
+                    image = img_pixel_values + noise 
+                    image = torch.clamp(image, -1, 1)
+                else:
+                    image = img_pixel_values
+                     
+                use_normailize = False
+                if use_normailize:
+                    image = normalize_fn(image)
                     
-                # data_input = {
-                #     "input_ids":batch_token_ids,
-                #     "pixel_values" : image,
-                #     "attention_mask":batch["attention_mask"],
-                #     "return_loss": True
-                # }
+                batch_data_input = {
+                    "input_ids":batch_token_ids,
+                    "pixel_values" : image,
+                    "attention_mask":batch["attention_mask"],
+                    "return_loss": True
+                }
                 output = clip_model(**batch)
                 # logits_per_image = output.logits_per_image   # for training , image_logits is the same as logits text
                 # logits_per_text = output.logits_per_text
@@ -935,20 +931,20 @@ def main():
                 # train_loss += avg_loss.item() / training_args.gradient_accumulation_steps
 
                 # Backpropagate
-                # accelerator.backward(loss)
-                loss.backward()
+                accelerator.backward(loss)
 
-                # if accelerator.sync_gradients:
-                #     if generator_train:
-                #         accelerator.clip_grad_norm_(generator.parameters(), training_args.max_grad_norm)
-                #     elif clip_train:
-                #         accelerator.clip_grad_norm_(clip_model.parameters(), training_args.max_grad_norm)
+                if accelerator.sync_gradients:
+                    if generator_train:
+                        accelerator.clip_grad_norm_(generator.parameters(), training_args.max_grad_norm)
+                    elif clip_train:
+                        accelerator.clip_grad_norm_(clip_model.parameters(), training_args.max_grad_norm)
                 
                 # Update optimizer
                 optimizer.step()
                 # lr_scheduler.step()
                 
                 clip_model.zero_grad()
+                generator.zero_grad()
                 # optimizer.zero_grad()
 
                 # Checks if the accelerator has performed an optimization step behind the scenes
