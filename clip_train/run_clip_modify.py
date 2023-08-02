@@ -899,7 +899,7 @@ def main():
             checkpoint = last_checkpoint
         # trainer.train(resume_from_checkpoint=checkpoint)
         # # This is the replace version of _inner_training_loop
-        # accelerator.free_memory()
+        accelerator.free_memory()
         
         
         model.zero_grad()
@@ -907,7 +907,7 @@ def main():
         for epoch in range(10):
             for step, inputs in enumerate(train_dataloader):
                 model.train()
-                # inputs = trainer._prepare_inputs(inputs)
+                inputs = trainer._prepare_inputs(inputs)
                 tr_loss = model(**inputs)['loss']
                 print("loss",tr_loss)
                 tr_loss.backward()

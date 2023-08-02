@@ -466,7 +466,7 @@ def main():
     revision = None
     pretrained_model_name_or_path = "CompVis/stable-diffusion-v1-4"
     
-    use_clip_tokenizer = False
+    use_clip_tokenizer = True
     if use_clip_tokenizer:
         tokenizer = CLIPTokenizer.from_pretrained(
             pretrained_model_name_or_path, subfolder="tokenizer", revision=revision
