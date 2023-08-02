@@ -13,6 +13,7 @@ from PIL import Image
 from torchvision.io import ImageReadMode, read_image
 from torchvision.transforms import CenterCrop, ConvertImageDtype, Normalize, Resize
 from torchvision.transforms.functional import InterpolationMode
+import torchvision.transforms as transforms
 import torch.nn as nn
 import accelerate
 import datasets
@@ -51,6 +52,54 @@ from accelerate.utils import ProjectConfiguration, set_seed
 
 if is_wandb_available():
     import wandb
+
+import argparse
+
+args = argparse.Namespace(
+    output_dir='./clip-roberta-finetuned',
+    model_name_or_path='../clip-roberta',
+    data_dir='/remote-home/songtianwei/research/diffusion_model_my/data',
+    dataset_name='ydshieh/coco_dataset_script',
+    dataset_config_name='2017',
+    image_column='image_path',
+    caption_column='caption',
+    remove_unused_columns=False,
+    do_train=True,
+    do_eval=True,
+    per_device_train_batch_size='64',
+    per_device_eval_batch_size='64',
+    learning_rate='5e-5',
+    warmup_steps='0',
+    weight_decay=0.1,
+    overwrite_output_dir=True,
+    input_perturbation=0.1,
+    dataset_noise_type='clip_min_noise',
+    dataset_normalize_flag=False,
+    max_train_samples=10000
+)
+
+args_list = [
+    '--output_dir', './clip-roberta-finetuned',
+    '--model_name_or_path', '/remote-home/songtianwei/research/diffusion_model_my/clip-roberta',
+    '--data_dir', '/remote-home/songtianwei/research/diffusion_model_my/data',
+    '--dataset_name', 'ydshieh/coco_dataset_script',
+    '--dataset_config_name', '2017',
+    '--image_column', 'image_path',
+    '--caption_column', 'caption',
+    '--remove_unused_columns', 'False',
+    '--do_train',
+    '--do_eval',
+    '--per_device_train_batch_size', '64',
+    '--per_device_eval_batch_size', '64',
+    '--learning_rate', '5e-5',
+    '--warmup_steps', '0',
+    '--weight_decay', '0.1',
+    '--overwrite_output_dir',
+    '--dataset_noise_type','clip_min_noise',
+    '--dataset_normalize_flag','False',
+    '--max_train_samples','10000',
+    '--report_to','wandb'
+]
     
 logger = get_logger(__name__, log_level="INFO")
 
@@ -539,3 +588,458 @@ def main():
             raise ValueError(
                 f"--caption_column' value '{data_args.caption_column}' needs to be one of: {', '.join(column_names)}"
             )
+
+    # Initialize torchvision transforms and jit it for faster processing.
+    image_transformations = Transform(
+        config.vision_config.image_size, image_processor.image_mean, image_processor.image_std
+    )
+    image_transformations = torch.jit.script(image_transformations)
+    
+    data_args.max_seq_length = 77
+    
+    # Preprocessing the datasets.
+    # We need to tokenize input captions and transform the images.
+    def tokenize_captions(examples):
+        captions = list(examples[caption_column])
+        text_inputs = tokenizer(captions, max_length=data_args.max_seq_length, padding="max_length", truncation=True)
+        examples["input_ids"] = text_inputs.input_ids
+        examples["attention_mask"] = text_inputs.attention_mask
+        return examples
+
+    
+    def transform_images(examples):
+        images = [read_image(image_file, mode=ImageReadMode.RGB) for image_file in examples[image_column]]
+        examples["pixel_values"] = [image_transformations(image) for image in images]
+        return examples
+    
+    def filter_corrupt_images(examples):
+        """remove problematic images"""
+        valid_images = []
+        for image_file in examples[image_column]:
+            try:
+                Image.open(image_file)
+                valid_images.append(True)
+            except Exception:
+                valid_images.append(False)
+        return valid_images
+
+    if training_args.do_train:
+        with accelerator.main_process_first():
+            if "train" not in dataset:
+                raise ValueError("--do_train requires a train dataset")
+            train_dataset = dataset["train"]
+            if data_args.max_train_samples is not None:
+                max_train_samples = min(len(train_dataset), data_args.max_train_samples)
+                train_dataset = train_dataset.select(range(max_train_samples))
+            # print(len(train_dataset))
+            train_dataset = train_dataset.filter(
+                filter_corrupt_images, batched=True, num_proc=data_args.preprocessing_num_workers
+            )
+            
+            train_dataset = train_dataset.map(
+                function=tokenize_captions,
+                batched=True,
+                remove_columns=[col for col in column_names if col != image_column],
+                num_proc=data_args.preprocessing_num_workers,
+                load_from_cache_file=not data_args.overwrite_cache,
+                desc="Running tokenizer on train dataset",
+            )
+        
+            # Transform images on the fly as doing it on the whole dataset takes too much time.
+            train_dataset.set_transform(transform_images)
+
+    
+    # train dataloader
+    train_dataloader = torch.utils.data.DataLoader(
+        train_dataset,
+        shuffle=False,  # here change to False to check the order of the images
+        collate_fn=collate_fn,
+        batch_size=training_args.train_batch_size,
+        num_workers=training_args.dataloader_num_workers,
+        drop_last=True,
+    )
+    
+        
+    if training_args.do_eval:
+        with accelerator.main_process_first():
+            if "validation" not in dataset:
+                raise ValueError("--do_eval requires a train validation")
+            eval_dataset = dataset["validation"]
+            if data_args.max_eval_samples is not None:
+                max_eval_samples = min(len(eval_dataset), data_args.max_eval_samples)
+                eval_dataset = eval_dataset.select(range(max_eval_samples))
+        
+            eval_dataset = eval_dataset.filter(
+                filter_corrupt_images, batched=True, num_proc=data_args.preprocessing_num_workers
+            )
+            eval_dataset = eval_dataset.map(
+                function=tokenize_captions,
+                batched=True,
+                num_proc=data_args.preprocessing_num_workers,
+                remove_columns=[col for col in column_names if col != image_column],
+                load_from_cache_file=not data_args.overwrite_cache,
+                desc="Running tokenizer on validation dataset",
+            )
+        
+            # Transform images on the fly as doing it on the whole dataset takes too much time.
+            eval_dataset.set_transform(transform_images)
+
+    # evaluation dataloader
+    eval_dataloader = torch.utils.data.DataLoader(
+        eval_dataset,
+        shuffle=True,
+        collate_fn=collate_fn,
+        batch_size=training_args.eval_batch_size,
+        num_workers=training_args.dataloader_num_workers,
+        drop_last=True,
+    )
+
+
+    if training_args.do_predict:
+        with accelerator.main_process_first():
+            if "test" not in dataset:
+                raise ValueError("--do_predict requires a test dataset")
+            test_dataset = dataset["test"]
+            if data_args.max_eval_samples is not None:
+                max_eval_samples = min(len(test_dataset), data_args.max_eval_samples)
+                test_dataset = test_dataset.select(range(max_eval_samples))
+        
+            test_dataset = test_dataset.filter(
+                filter_corrupt_images, batched=True, num_proc=data_args.preprocessing_num_workers
+            )
+            test_dataset = test_dataset.map(
+                function=tokenize_captions,
+                batched=True,
+                num_proc=data_args.preprocessing_num_workers,
+                remove_columns=[col for col in column_names if col != image_column],
+                load_from_cache_file=not data_args.overwrite_cache,
+                desc="Running tokenizer on test dataset",
+            )
+        
+            # Transform images on the fly as doing it on the whole dataset takes too much time.
+            test_dataset.set_transform(transform_images)
+            
+    def normalize_fn(x, mean, std):
+        return transforms.Normalize(mean=mean, std=std)(x)
+    
+    # Initialize the optimizer
+    use_8bit_adam = False
+    if use_8bit_adam:
+        try:
+            import bitsandbytes as bnb
+        except ImportError:
+            raise ImportError(
+                "Please install bitsandbytes to use 8-bit Adam. You can do so by running `pip install bitsandbytes`"
+            )
+
+        optimizer_cls = bnb.optim.AdamW8bit
+    else:
+        optimizer_cls = torch.optim.AdamW
+        
+    decay_parameters = get_parameter_names(clip_model, ALL_LAYERNORM_LAYERS)
+    decay_parameters = [name for name in decay_parameters if "bias" not in name]
+    optimizer_grouped_parameters = [
+            {
+                "params": [
+                    p for n, p in clip_model.named_parameters() if (n in decay_parameters and p.requires_grad)
+                ],
+                "weight_decay": 0.1,
+            },
+            {
+                "params": [
+                    p for n, p in clip_model.named_parameters() if (n not in decay_parameters and p.requires_grad)
+                ],
+                "weight_decay": 0.0,
+            },
+        ]
+    optimizer = optimizer_cls(optimizer_grouped_parameters)
+   
+    lr_scheduler = 'linear'
+    lr_warmup_steps = 0
+    
+    lr_scheduler = get_scheduler(
+        lr_scheduler,
+        optimizer=optimizer,
+        num_warmup_steps=lr_warmup_steps * training_args.gradient_accumulation_steps,
+        num_training_steps=training_args.max_steps * training_args.gradient_accumulation_steps,
+    )
+    
+    # Handle the repository creation
+    if accelerator.is_main_process:
+        if args.output_dir is not None:
+            os.makedirs(args.output_dir, exist_ok=True)
+            
+    optimizer = accelerator.prepare(optimizer)
+    lr_scheduler = accelerator.prepare(lr_scheduler)
+    generator = accelerator.prepare(generator)
+    clip_model = accelerator.prepare(clip_model)
+        
+    train_dataloader = accelerator.prepare(train_dataloader)
+    eval_dataloader = accelerator.prepare(eval_dataloader)
+    
+    text_encoder.to(accelerator.device, dtype=weight_dtype)
+    
+    overrode_max_train_steps = False
+    num_update_steps_per_epoch = math.ceil(len(train_dataloader) / training_args.gradient_accumulation_steps)
+    if training_args.max_steps is None or training_args.max_steps <= 0:
+        training_args.max_steps = training_args.num_train_epochs * num_update_steps_per_epoch
+        overrode_max_train_steps = True
+    training_args.max_steps = (int)(training_args.max_steps)
+    training_args.num_train_epochs = (int)(training_args.num_train_epochs)
+    
+    tracker_project_name = "text2image-fine-tune"
+    
+    # We need to initialize the trackers we use, and also store our configuration.
+    # The trackers initializes automatically on the main process.
+    if accelerator.is_main_process:
+        tracker_config = dict(vars(args))
+        # tracker_config.pop("validation_prompts")
+        accelerator.init_trackers(tracker_project_name, tracker_config)
+        
+    total_batch_size = training_args.train_batch_size * accelerator.num_processes * training_args.gradient_accumulation_steps
+
+    logger.info("***** Running training *****")
+    if args.do_train:
+        logger.info(f"  Training num examples = {len(train_dataset)}")
+    if args.do_eval:
+        logger.info(f"  Evaluation num examples = {len(eval_dataset)}")
+    logger.info(f"  Num Epochs = {training_args.num_train_epochs}")
+    logger.info(f"  Instantaneous batch size per device = {training_args.train_batch_size}")
+    logger.info(f"  Total train batch size (w. parallel, distributed & accumulation) = {total_batch_size}")
+    logger.info(f"  Gradient Accumulation steps = {training_args.gradient_accumulation_steps}")
+    logger.info(f"  Total optimization steps = {training_args.max_steps}")
+    global_step = 0
+    first_epoch = 0
+
+    # Potentially load in the weights and states from a previous save
+    if training_args.resume_from_checkpoint:
+        if training_args.resume_from_checkpoint != "latest":
+            path = os.path.basename(training_args.resume_from_checkpoint)
+        else:
+            # Get the most recent checkpoint
+            dirs = os.listdir(args.output_dir)
+            dirs = [d for d in dirs if d.startswith("checkpoint")]
+            dirs = sorted(dirs, key=lambda x: int(x.split("-")[1]))
+            path = dirs[-1] if len(dirs) > 0 else None
+
+        if path is None:
+            accelerator.print(
+                f"Checkpoint '{args.resume_from_checkpoint}' does not exist. Starting a new training run."
+            )
+            args.resume_from_checkpoint = None
+        else:
+            accelerator.print(f"Resuming from checkpoint {path}")
+            accelerator.load_state(os.path.join(args.output_dir, path))
+            global_step = int(path.split("-")[1])
+
+            resume_global_step = global_step * args.gradient_accumulation_steps
+            first_epoch = global_step // num_update_steps_per_epoch
+            resume_step = resume_global_step % (num_update_steps_per_epoch * args.gradient_accumulation_steps)
+            
+    # Only show the progress bar once on each machine.
+    progress_bar = tqdm(range(global_step, training_args.max_steps), disable=not accelerator.is_local_main_process)
+    progress_bar.set_description("Training Steps")
+    
+    accelerator.free_memory()
+    
+    for epoch in range(first_epoch, training_args.num_train_epochs):
+        if training_args.do_train:
+            # logging.info("*"*50)
+            # logging.info("Doing Training")
+            # logging.info("*"*50)
+            # if generator_train:
+            #     generator.train()
+            # else:
+            #     generator.eval()
+                
+            # if clip_train:
+            #     clip_model.train()
+            # else:
+            #     clip_model.eval()
+                
+            progress_bar.set_description("Training Steps")
+            train_loss = 0.0
+
+            # generator_step_M = 1
+            # clip_step_N = 1
+            # train_target_list = ["generator"]*generator_step_M + ["clip"]*clip_step_N
+            # cur_index = 0
+            for step, batch in enumerate(train_dataloader):
+                clip_model.train()
+                # Skip steps until we reach the resumed step
+                # if training_args.resume_from_checkpoint and epoch == first_epoch and step < resume_step:
+                #     if step % training_args.gradient_accumulation_steps == 0:
+                #         progress_bar.update(1)
+                #     continue
+                # which to train
+                # train_target = train_target_list[cur_index]
+                # cur_index = (cur_index + 1) % len(train_target_list)
+                # if train_target == "generator":
+                #     pass
+
+                # Convert images to latent space
+                # img_pixel_values = batch["pixel_values"]  # [6,3,224,224]
+                # # Get the text embedding for conditioning
+                # batch_token_ids = batch["input_ids"]
+                
+                # generator.zero_grad()
+                
+
+                # generator_train = False
+                # if generator_train:
+                #     encoder_hidden_states = text_encoder(batch_token_ids)[0]  # [6,77,768]                
+                #     noise = generator(img_pixel_values, encoder_hidden_states)
+                    
+                #     # limit the norm of the noise
+                #     norm_type = 'l2'
+                #     epsilon = 16
+                #     if norm_type == 'l2':
+                #         temp = torch.norm(noise.view(noise.shape[0], -1), dim=1).view(-1, 1, 1, 1)
+                #         noise = noise * epsilon / temp
+                #     else:
+                #         noise = torch.clamp(noise, -epsilon / 255, epsilon / 255)
+                        
+                #     add_noise = False
+                #     if add_noise:
+                #         image = img_pixel_values + noise
+                #     else:
+                #         image = img_pixel_values + noise * torch.tensor(0.0).to(noise.device)
+                # else:
+                #     image = img_pixel_values 
+                # image = img_pixel_values 
+                # image = torch.clamp(image, -1, 1)
+                
+                # use_normailize = False
+                # if use_normailize:
+                #     image = normalize_fn(image)
+                    
+                # data_input = {
+                #     "input_ids":batch_token_ids,
+                #     "pixel_values" : image,
+                #     "attention_mask":batch["attention_mask"],
+                #     "return_loss": True
+                # }
+                output = clip_model(**batch)
+                # logits_per_image = output.logits_per_image   # for training , image_logits is the same as logits text
+                # logits_per_text = output.logits_per_text
+                
+                loss = output.loss
+                
+                # Gather the losses across all processes for logging (if we use distributed training).
+                # avg_loss = accelerator.gather(loss.repeat(training_args.train_batch_size)).mean()
+                # train_loss += avg_loss.item() / training_args.gradient_accumulation_steps
+
+                # Backpropagate
+                accelerator.backward(loss)
+
+                # if accelerator.sync_gradients:
+                #     if generator_train:
+                #         accelerator.clip_grad_norm_(generator.parameters(), training_args.max_grad_norm)
+                #     elif clip_train:
+                #         accelerator.clip_grad_norm_(clip_model.parameters(), training_args.max_grad_norm)
+                
+                # Update optimizer
+                optimizer.step()
+                # lr_scheduler.step()
+                
+                clip_model.zero_grad()
+                # optimizer.zero_grad()
+
+                # Checks if the accelerator has performed an optimization step behind the scenes
+                # if accelerator.sync_gradients:
+                #     progress_bar.update(1)
+                #     global_step += 1
+                #     accelerator.log({"train_loss": train_loss}, step=global_step)
+                #     train_loss = 0.0
+
+                #     checkpointing_steps = 100
+                #     if global_step % checkpointing_steps == 0:
+                #         logging.info("Epoch : {} ; Step : {} ; Save checkpoint to {}".format(epoch, global_step, training_args.output_dir))
+                #         if accelerator.is_main_process:
+                #             save_path = os.path.join(training_args.output_dir, f"checkpoint-{global_step}")
+                #             accelerator.save_state(save_path)
+                #             logger.info(f"Saved state to {save_path}")
+                
+                record = {
+                        "epoch": epoch,
+                        "step": step,
+                        "global_step":global_step,
+                        "train_loss": loss.detach().item(),
+                        # "lr": lr_scheduler.get_last_lr()[0],
+                        "lr": optimizer.param_groups[0]["lr"],
+                        }
+                wandb.log(record)  
+                progress_bar.set_postfix(**record)
+
+                # if global_step >= training_args.max_steps:
+                #     break
+
+        # evaluation on the eval dataset
+        # training_args.do_eval = False
+        # if training_args.do_eval and accelerator.is_main_process:
+            
+        #     logging.info("*"*50)
+        #     logging.info("Doing Evaluation")
+        #     logging.info("*"*50)
+        #     progress_bar.set_description("Evaluation Steps")
+            
+        #     generator.eval()
+        #     clip_model.eval()
+            
+        #     eval_losses = []
+        #     for step, batch in enumerate(tqdm(eval_dataloader)):
+        #         with torch.no_grad():
+        #             # Convert images to latent space
+        #             img_pixel_values = batch["pixel_values"].to(weight_dtype)  # [6,3,224,224]
+
+        #             # Get the text embedding for conditioning
+        #             batch_token_ids = batch["input_ids"]
+        #             if generator_train:
+        #                 encoder_hidden_states = text_encoder(batch_token_ids)[0]  # [6,77,768]                
+        #                 noise = generator.forward(img_pixel_values, encoder_hidden_states)
+                        
+        #                 # limit the norm of the noise
+        #                 norm_type = 'l2'
+        #                 epsilon = 16
+        #                 if norm_type == 'l2':
+        #                     temp = torch.norm(noise.view(noise.shape[0], -1), dim=1).view(-1, 1, 1, 1)
+        #                     noise = noise * epsilon / temp
+        #                 else:
+        #                     noise = torch.clamp(noise, -epsilon / 255, epsilon / 255)
+                            
+        #                 add_noise = False
+        #                 if add_noise:
+        #                     image = img_pixel_values + noise
+        #                 else:
+        #                     image = img_pixel_values + noise * torch.tensor(0.0).to(noise.device)
+        #             else:
+        #                 image = img_pixel_values 
+        #             image = torch.clamp(image, -1, 1)
+                    
+        #             use_normailize = False
+        #             if use_normailize:
+        #                 image = normalize_fn(image)
+                    
+        #             data_input = {
+        #                 "input_ids":batch_token_ids,
+        #                 "pixel_values" : image
+        #             }
+        #             output = clip_model(**data_input, return_loss=True)
+        #             logits_per_image = output.logits_per_image   # for training , image_logits is the same as logits text
+        #             logits_per_text = output.logits_per_text
+                    
+        #             loss = output.loss
+                    
+        #             # END MY CODE
+        #         eval_losses.append(loss.detach().item())
+        #         # logs = {"step" : step,  "lr": lr_scheduler.get_last_lr()[0],"eval_loss": loss.detach().item(),}
+        #         # progress_bar.set_postfix(**logs)
+        #     eval_mean_loss = np.mean(eval_losses)
+        #     eval_record = {
+        #                 "epoch": epoch,
+        #                 "global_step":global_step,
+        #                 "eval_avg_loss": eval_mean_loss,
+        #                 }
+        #     wandb.log(eval_record)  
+
+    accelerator.end_training()
