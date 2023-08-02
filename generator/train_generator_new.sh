@@ -13,6 +13,7 @@ export output_dir="my_train_results/$dataset_name/$(date '+%Y-%m-%d_%H:%M:%S')/"
 
 # 混合精度问题，出现nan
 # reference：https://www.cnblogs.com/jimchen1218/p/14315008.html
+
 accelerate launch --mixed_precision="no"  train_generator_new.py \
   --pretrained_model_name_or_path=$MODEL_NAME \
   --seed=42 \

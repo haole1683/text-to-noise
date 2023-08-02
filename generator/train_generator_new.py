@@ -558,11 +558,11 @@ def main():
         token=None,
     )
     clip_model_config = clip_model.config
-    # if clip_pretrained:
-    #     clip_model = AutoModel.from_pretrained("openai/clip-vit-base-patch32")
-    # else:
-    #     clip_model_config = AutoModel.from_pretrained("openai/clip-vit-base-patch32").config
-    #     clip_model = AutoModel(clip_model_config)
+    if clip_pretrained:
+        clip_model = AutoModel.from_pretrained("openai/clip-vit-base-patch32")
+    else:
+        clip_model_config = AutoModel.from_pretrained("openai/clip-vit-base-patch32").config
+        clip_model = AutoModel(clip_model_config)
         
         
     
@@ -869,17 +869,17 @@ def main():
         args.max_train_steps = args.num_train_epochs * num_update_steps_per_epoch
         overrode_max_train_steps = True
 
-    # lr_scheduler = get_scheduler(
-    #     args.lr_scheduler,
-    #     optimizer=optimizer,
-    #     num_warmup_steps=args.lr_warmup_steps * args.gradient_accumulation_steps,
-    #     num_training_steps=args.max_train_steps * args.gradient_accumulation_steps,
-    # )
+    lr_scheduler = get_scheduler(
+        args.lr_scheduler,
+        optimizer=optimizer,
+        num_warmup_steps=args.lr_warmup_steps * args.gradient_accumulation_steps,
+        num_training_steps=args.max_train_steps * args.gradient_accumulation_steps,
+    )
 
-    # optimizer = accelerator.prepare(optimizer)
-    # lr_scheduler = accelerator.prepare(lr_scheduler)
+    optimizer = accelerator.prepare(optimizer)
+    lr_scheduler = accelerator.prepare(lr_scheduler)
     generator = accelerator.prepare(generator)
-    # clip_model = accelerator.prepare(clip_model)
+    clip_model = accelerator.prepare(clip_model)
         
     train_dataloader = accelerator.prepare(train_dataloader)
     eval_dataloader = accelerator.prepare(eval_dataloader)

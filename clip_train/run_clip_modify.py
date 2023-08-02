@@ -22,11 +22,11 @@ and text models:
 Vision models: ViT(https://huggingface.co/models?filter=vit), CLIP (https://huggingface.co/models?filter=clip)
 Text models: BERT, ROBERTa (https://huggingface.co/models?filter=fill-mask)
 """
-import ptvsd
-print("waiting for attaching")
-ptvsd.enable_attach(address = ('127.0.0.1', 5678))
-ptvsd.wait_for_attach()
-print("attached")
+# import ptvsd
+# print("waiting for attaching")
+# ptvsd.enable_attach(address = ('127.0.0.1', 5678))
+# ptvsd.wait_for_attach()
+# print("attached")
 
 import logging
 import os
@@ -42,15 +42,9 @@ from PIL import Image
 from torchvision.io import ImageReadMode, read_image
 from torchvision.transforms import CenterCrop, ConvertImageDtype, Normalize, Resize
 from torchvision.transforms.functional import InterpolationMode
-import torch.nn as nn
 
-import numpy as np
 import torch
 import torch.distributed as dist
-from huggingface_hub import Repository, create_repo
-from packaging import version
-from torch import nn
-from torch.utils.data import DataLoader, Dataset, RandomSampler, SequentialSampler
 if TYPE_CHECKING:
     import optuna
     
@@ -67,82 +61,28 @@ from transformers import (
 from transformers.trainer_utils import get_last_checkpoint
 from transformers.utils import check_min_version, send_example_telemetry
 from transformers.utils.versions import require_version
-from transformers.configuration_utils import PretrainedConfig
-from transformers.data.data_collator import DataCollator, DataCollatorWithPadding, default_data_collator
 from transformers.debug_utils import DebugOption, DebugUnderflowOverflow
-from transformers.deepspeed import deepspeed_init, deepspeed_load_checkpoint
-from transformers.dependency_versions_check import dep_version_check
-from transformers.hyperparameter_search import ALL_HYPERPARAMETER_SEARCH_BACKENDS, default_hp_search_backend
-from transformers.modelcard import TrainingSummary
-from transformers.modeling_utils import PreTrainedModel, load_sharded_checkpoint, unwrap_model
-from transformers.models.auto.modeling_auto import MODEL_FOR_CAUSAL_LM_MAPPING_NAMES, MODEL_MAPPING_NAMES
-from transformers.optimization import Adafactor, get_scheduler
-from transformers.pytorch_utils import ALL_LAYERNORM_LAYERS
-from transformers.tokenization_utils_base import PreTrainedTokenizerBase
 from transformers.trainer_callback import (
-    CallbackHandler,
-    DefaultFlowCallback,
-    PrinterCallback,
-    ProgressCallback,
-    TrainerCallback,
-    TrainerControl,
     TrainerState,
 )
 from transformers.trainer_utils import (
-    PREFIX_CHECKPOINT_DIR,
-    BestRun,
-    EvalLoopOutput,
-    EvalPrediction,
-    FSDPOption,
-    HPSearchBackend,
-    HubStrategy,
-    IntervalStrategy,
-    PredictionOutput,
-    RemoveColumnsCollator,
-    ShardedDDPOption,
-    TrainerMemoryTracker,
     TrainOutput,
-    default_compute_objective,
-    denumpify_detensorize,
-    enable_full_determinism,
     find_executable_batch_size,
     get_last_checkpoint,
     has_length,
-    number_of_arguments,
-    seed_worker,
     set_seed,
     speed_metrics,
 )
 from transformers.trainer_pt_utils import (
-    DistributedTensorGatherer,
-    IterableDatasetShard,
-    LabelSmoother,
-    LengthGroupedSampler,
-    SequentialDistributedSampler,
-    distributed_broadcast_scalars,
-    distributed_concat,
-    find_batch_size,
     get_model_param_count,
-    get_module_class_from_name,
-    get_parameter_names,
-    nested_concat,
-    nested_detach,
-    nested_numpify,
-    nested_xla_mesh_reduce,
-    reissue_pt_warnings,
 )
 from transformers.trainer_utils import (
-    HPSearchBackend,
-    ShardedDDPOption,
     TrainOutput,
     has_length,
     set_seed,
     speed_metrics,
 )
-from transformers.training_args import OptimizerNames, ParallelMode, TrainingArguments
-from transformers.integrations import (
-    hp_params,
-)
+from transformers.training_args import ParallelMode, TrainingArguments
 
 from accelerate import skip_first_batches
 
@@ -608,18 +548,13 @@ def main():
             trial: Union["optuna.Trial", Dict[str, Any]] = None,
             ignore_keys_for_eval: Optional[List[str]] = None,
             **kwargs,
-        ):
-            # if resume_from_checkpoint is False:
-            #     resume_from_checkpoint = None
-                
-            self._memory_tracker.start()
+        ):    
             args = self.args
             self.is_in_train = True
             self._hp_search_setup(trial)
             self._train_batch_size = self.args.train_batch_size
             
             # Model re-init
-            # model_reloaded = False
             inner_training_loop = find_executable_batch_size(
                 self._inner_training_loop, self._train_batch_size, args.auto_find_batch_size
             )
@@ -645,36 +580,22 @@ def main():
             # total number of training steps to execute: max_steps
             total_train_batch_size = self._train_batch_size * args.gradient_accumulation_steps * args.world_size
 
-            len_dataloader = None
-            if has_length(train_dataloader):  # delete
-                len_dataloader = len(train_dataloader)
-                num_update_steps_per_epoch = len_dataloader // args.gradient_accumulation_steps
-                num_update_steps_per_epoch = max(num_update_steps_per_epoch, 1)
-                num_examples = self.num_examples(train_dataloader)
-                if args.max_steps > 0:
-                    max_steps = args.max_steps
-                    num_train_epochs = args.max_steps // num_update_steps_per_epoch + int(
-                        args.max_steps % num_update_steps_per_epoch > 0
-                    )
-                    # May be slightly incorrect if the last batch in the training dataloader has a smaller size but it's
-                    # the best we can do.
-                    num_train_samples = args.max_steps * total_train_batch_size
-                else:
-                    max_steps = math.ceil(args.num_train_epochs * num_update_steps_per_epoch)
-                    num_train_epochs = math.ceil(args.num_train_epochs)
-                    num_train_samples = self.num_examples(train_dataloader) * args.num_train_epochs
-            elif args.max_steps > 0:  # Rely on max_steps when dataloader does not have a working size
+            len_dataloader = len(train_dataloader)
+            num_update_steps_per_epoch = len_dataloader // args.gradient_accumulation_steps
+            num_update_steps_per_epoch = max(num_update_steps_per_epoch, 1)
+            num_examples = self.num_examples(train_dataloader)
+            if args.max_steps > 0:
                 max_steps = args.max_steps
-                # Setting a very large number of epochs so we go as many times as necessary over the iterator.
-                num_train_epochs = sys.maxsize
-                num_update_steps_per_epoch = max_steps
-                num_examples = total_train_batch_size * args.max_steps
+                num_train_epochs = args.max_steps // num_update_steps_per_epoch + int(
+                    args.max_steps % num_update_steps_per_epoch > 0
+                )
+                # May be slightly incorrect if the last batch in the training dataloader has a smaller size but it's
+                # the best we can do.
                 num_train_samples = args.max_steps * total_train_batch_size
             else:
-                raise ValueError(
-                    "args.max_steps must be set to a positive value if dataloader does not have a length, was"
-                    f" {args.max_steps}"
-                )
+                max_steps = math.ceil(args.num_train_epochs * num_update_steps_per_epoch)
+                num_train_epochs = math.ceil(args.num_train_epochs)
+                num_train_samples = self.num_examples(train_dataloader) * args.num_train_epochs
 
             # Compute absolute values for logging, eval, and save if given as ratio
             if args.logging_steps and args.logging_steps < 1:
@@ -684,36 +605,14 @@ def main():
             if args.save_steps and args.save_steps < 1:
                 args.save_steps = math.ceil(max_steps * args.save_steps)
 
-            if DebugOption.UNDERFLOW_OVERFLOW in self.args.debug:
-                if self.args.n_gpu > 1:
-                    # nn.DataParallel(model) replicates the model, creating new variables and module
-                    # references registered here no longer work on other gpus, breaking the module
-                    raise ValueError(
-                        "Currently --debug underflow_overflow is not supported under DP. Please use DDP"
-                        " (torch.distributed.launch)."
-                    )
-                else:
-                    debug_overflow = DebugUnderflowOverflow(self.model)  # noqa
-
-            delay_optimizer_creation = False
-
             # We need to reset the scheduler, as its parameters may be different on subsequent calls
             if self._created_lr_scheduler:
                 self.lr_scheduler = None
                 self._created_lr_scheduler = False
-
-            # if self.is_deepspeed_enabled:
-            #     self.optimizer, self.lr_scheduler = deepspeed_init(self, num_training_steps=max_steps)
-
-            if not delay_optimizer_creation:
-                self.create_optimizer_and_scheduler(num_training_steps=max_steps)
+                
+            self.create_optimizer_and_scheduler(num_training_steps=max_steps)
 
             self.state = TrainerState()
-            # self.state.is_hyper_param_search = trial is not None
-
-            # Activate gradient checkpointing if needed
-            if args.gradient_checkpointing:
-                self.model.gradient_checkpointing_enable()
 
             model = self._wrap_model(self.model_wrapped)
 
@@ -722,10 +621,8 @@ def main():
             # Fairscale Sharded DDP, FSDP-XLA, SageMaker MP/DP, DataParallel, IPEX
             use_accelerator_prepare = True if model is self.model else False
 
-            if delay_optimizer_creation:
-                if use_accelerator_prepare:
-                    self.model = self.accelerator.prepare(self.model)
-                self.create_optimizer_and_scheduler(num_training_steps=max_steps)
+            if use_accelerator_prepare:
+                self.model = self.accelerator.prepare(self.model)
 
             # prepare using `accelerator` prepare
             if use_accelerator_prepare:
@@ -738,27 +635,9 @@ def main():
                         self.model, self.optimizer, self.lr_scheduler
                     )
 
-            if self.is_fsdp_enabled:
-                self.model = model
-
             # for the rest of this function `model` is the outside model, whether it was wrapped or not
             if model is not self.model:
                 self.model_wrapped = model
-
-            # backward compatibility
-            if self.is_deepspeed_enabled:
-                self.deepspeed = self.model_wrapped
-
-            # deepspeed ckpt loading
-            if resume_from_checkpoint is not None and self.is_deepspeed_enabled:
-                deepspeed_load_checkpoint(self.model_wrapped, resume_from_checkpoint)
-
-            # Check if saved optimizer or scheduler states exist
-            self._load_optimizer_and_scheduler(resume_from_checkpoint)
-
-            # important: at this point:
-            # self.model         is the Transformers Model
-            # self.model_wrapped is DDP(Transformers Model), Deepspeed(Transformers Model), etc.
 
             # Train!
             logger.info("***** Running training *****")
@@ -804,15 +683,8 @@ def main():
             self.callback_handler.optimizer = self.optimizer
             self.callback_handler.lr_scheduler = self.lr_scheduler
             self.callback_handler.train_dataloader = train_dataloader
-            if self.hp_name is not None and self._trial is not None:
-                # use self._trial because the SigOpt/Optuna hpo only call `_hp_search_setup(trial)` instead of passing trial
-                # parameter to Train when using DDP.
-                self.state.trial_name = self.hp_name(self._trial)
-            if trial is not None:
-                assignments = trial.assignments if self.hp_search_backend == HPSearchBackend.SIGOPT else trial
-                self.state.trial_params = hp_params(assignments)
-            else:
-                self.state.trial_params = None
+
+            self.state.trial_params = None
             # This should be the same if the state has been saved but in case the training arguments changed, it's safer
             # to set this after the load.
             self.state.max_steps = max_steps
@@ -838,11 +710,6 @@ def main():
             total_batched_samples = 0
             for epoch in range(epochs_trained, num_train_epochs):
                 epoch_iterator = train_dataloader
-
-                # Reset the past mems state at the beginning of each epoch if necessary.
-                if args.past_index >= 0:
-                    self._past = None
-
                 steps_in_epoch = (
                     len(epoch_iterator)
                     if len_dataloader is not None
@@ -885,7 +752,8 @@ def main():
 
                     with self.accelerator.accumulate(model):
                         tr_loss_step = self.training_step(model, inputs)
-
+                    print(tr_loss_step)
+                    
                     if (
                         args.logging_nan_inf_filter
                         and (torch.isnan(tr_loss_step) or torch.isinf(tr_loss_step))
@@ -978,8 +846,6 @@ def main():
             if args.load_best_model_at_end and self.state.best_model_checkpoint is not None:
                 if args.parallel_mode == ParallelMode.DISTRIBUTED:
                     dist.barrier()
-
-
                 self._load_best_model()
 
             # add remaining tr_loss
@@ -1037,17 +903,17 @@ def main():
         # accelerator.free_memory()
         
         
-        # model.zero_grad()
-        # optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
-        # for epoch in range(10):
-        #     for step, inputs in enumerate(train_dataloader):
-        #         model.train()
-        #         inputs = trainer._prepare_inputs(inputs)
-        #         tr_loss = model(**inputs)['loss']
-        #         print("loss",tr_loss)
-        #         tr_loss.backward()
-        #         optimizer.step()
-        #         model.zero_grad()
+        model.zero_grad()
+        optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
+        for epoch in range(10):
+            for step, inputs in enumerate(train_dataloader):
+                model.train()
+                # inputs = trainer._prepare_inputs(inputs)
+                tr_loss = model(**inputs)['loss']
+                print("loss",tr_loss)
+                tr_loss.backward()
+                optimizer.step()
+                model.zero_grad()
 
         trainer.save_model()
         tokenizer.save_pretrained(training_args.output_dir)
