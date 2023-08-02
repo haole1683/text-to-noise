@@ -1,6 +1,6 @@
 echo "WTF"
 
-python run_clip_2.py \
+python run_clip_work.py \
     --output_dir ./clip-roberta-finetuned \
     --model_name_or_path ../clip-roberta \
     --data_dir /remote-home/songtianwei/research/diffusion_model_my/data \
