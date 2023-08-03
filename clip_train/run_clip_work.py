@@ -466,7 +466,8 @@ def main():
     revision = None
     pretrained_model_name_or_path = "CompVis/stable-diffusion-v1-4"
     
-    use_clip_tokenizer = True
+    # Note: Do not use the clip tokenizer, loss can not decrease
+    use_clip_tokenizer = False
     if use_clip_tokenizer:
         tokenizer = CLIPTokenizer.from_pretrained(
             pretrained_model_name_or_path, subfolder="tokenizer", revision=revision
@@ -775,7 +776,7 @@ def main():
             
     optimizer = accelerator.prepare(optimizer)
     # lr_scheduler = accelerator.prepare(lr_scheduler)
-    generator = accelerator.prepare(generator)
+    # generator = accelerator.prepare(generator)
     
     # For model
     clip_model = accelerator.prepare(clip_model)
@@ -931,7 +932,8 @@ def main():
                 # train_loss += avg_loss.item() / training_args.gradient_accumulation_steps
 
                 # Backpropagate
-                accelerator.backward(loss)
+                # accelerator.backward(loss)
+                loss.backward()
 
                 if accelerator.sync_gradients:
                     if generator_train:
@@ -944,7 +946,7 @@ def main():
                 # lr_scheduler.step()
                 
                 clip_model.zero_grad()
-                generator.zero_grad()
+                # generator.zero_grad()
                 # optimizer.zero_grad()
 
                 # Checks if the accelerator has performed an optimization step behind the scenes
