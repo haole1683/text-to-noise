@@ -768,20 +768,21 @@ def main():
     accelerator.free_memory()
     
     
-    add_noise = add_noise
+    add_noise = False
     
     generator_train = False
     clip_train = True
     
-    if add_noise and generator_train:
-        generator.train()
-        generator.requires_grad_(True)
-        generator.zero_grad()
-    elif add_noise and not generator_train:
-        generator.eval()
-        generator.requires_grad_(False)
+    if add_noise:
+        if generator_train:
+            generator.train()
+            generator.requires_grad_(True)
+            generator.zero_grad()
+        else:
+            generator.eval()
+            generator.requires_grad_(False)
     else:
-        raise ValueError("add_noise is False, generator_train should be False")
+        pass
         
     if clip_train:
         clip_model.train()
