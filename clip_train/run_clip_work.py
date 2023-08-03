@@ -838,7 +838,7 @@ def main():
                 batch_attention_mask = batch["attention_mask"]
                 
                 if add_noise:
-                    encoder_hidden_states = text_encoder(batch_input_ids)[0]  # [6,128,768]                
+                    encoder_hidden_states = text_encoder(batch_input_ids,batch_attention_mask)[0]  # [6,128,768]                
                     noise = generator(batch_pixel_values, encoder_hidden_states)
                     
                     # limit the norm of the noise
