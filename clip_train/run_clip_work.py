@@ -53,54 +53,6 @@ from accelerate.utils import ProjectConfiguration, set_seed
 if is_wandb_available():
     import wandb
 
-import argparse
-
-args = argparse.Namespace(
-    output_dir='./clip-roberta-finetuned',
-    model_name_or_path='../clip-roberta',
-    data_dir='/remote-home/songtianwei/research/diffusion_model_my/data',
-    dataset_name='ydshieh/coco_dataset_script',
-    dataset_config_name='2017',
-    image_column='image_path',
-    caption_column='caption',
-    remove_unused_columns=False,
-    do_train=True,
-    do_eval=True,
-    per_device_train_batch_size='8',
-    per_device_eval_batch_size='8',
-    learning_rate='5e-5',
-    warmup_steps='0',
-    weight_decay=0.1,
-    overwrite_output_dir=True,
-    input_perturbation=0.1,
-    dataset_noise_type='clip_min_noise',
-    dataset_normalize_flag=False,
-    max_train_samples=10000
-)
-
-args_list = [
-    '--output_dir', './clip-roberta-finetuned',
-    '--model_name_or_path', '/remote-home/songtianwei/research/diffusion_model_my/clip-roberta',
-    '--data_dir', '/remote-home/songtianwei/research/diffusion_model_my/data',
-    '--dataset_name', 'ydshieh/coco_dataset_script',
-    '--dataset_config_name', '2017',
-    '--image_column', 'image_path',
-    '--caption_column', 'caption',
-    '--remove_unused_columns', 'False',
-    '--do_train',
-    '--do_eval',
-    '--per_device_train_batch_size', '8',
-    '--per_device_eval_batch_size', '8',
-    '--learning_rate', '5e-5',
-    '--warmup_steps', '0',
-    '--weight_decay', '0.1',
-    '--overwrite_output_dir',
-    '--dataset_noise_type','clip_min_noise',
-    '--dataset_normalize_flag','False',
-    '--max_train_samples','100000',
-    '--report_to','wandb'
-]
-    
 logger = get_logger(__name__, log_level="INFO")
 
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
@@ -249,21 +201,25 @@ dataset_name_mapping = {
 }
 
 class Transform(torch.nn.Module):
-    def __init__(self, image_size, mean, std):
+    def __init__(self, image_size, mean=None, std=None):
         super().__init__()
         self.transforms = torch.nn.Sequential(
             Resize([image_size], interpolation=InterpolationMode.BICUBIC,antialias=None),
-            CenterCrop(image_size),
-            ConvertImageDtype(torch.float),
-            Normalize(mean, std),
+            CenterCrop(image_size),  # CenterCrop is required because Resize doesn't ensure same output size
+            ConvertImageDtype(torch.float),   
         )
+        if mean is not None and std is not None:
+            self.transforms.add_module("normalize", Normalize(mean=mean, std=std))
 
     def forward(self, x) -> torch.Tensor:
         """`x` should be an instance of `PIL.Image.Image`"""
         with torch.no_grad():
             x = self.transforms(x)
         return x
-    
+
+def normalize_fn(x, mean, std):
+    return Normalize(mean=mean, std=std)(x)
+
 def collate_fn(examples):
     pixel_values = torch.stack([example["pixel_values"] for example in examples])
     input_ids = torch.tensor([example["input_ids"] for example in examples], dtype=torch.long)
@@ -348,7 +304,7 @@ def main():
         model_args, data_args, training_args = parser.parse_json_file(json_file=os.path.abspath(sys.argv[1]))
     else:
         print("1")
-        model_args, data_args, training_args = parser.parse_args_into_dataclasses(args=args_list)
+        model_args, data_args, training_args = parser.parse_args_into_dataclasses()
 
     # Sending telemetry. Tracking the example usage helps us better allocate resources to maintain them. The
     # information sent is the one passed as arguments along with your Python/PyTorch versions.
@@ -412,15 +368,7 @@ def main():
                 "the `--output_dir` or add `--overwrite_output_dir` to train from scratch."
             )
             
-        
 
-    # Get the datasets: you can either provide your own CSV/JSON training and evaluation files (see below)
-    # or just provide the name of one of the public datasets available on the hub at https://huggingface.co/datasets/
-    # (the dataset will be downloaded automatically from the datasets Hub).
-    #
-    # For CSV/JSON files this script will use the first column for the full image path and the second column for the
-    # captions (unless you specify column names for this with the `image_column` and `caption_column` arguments).
-    #
     if data_args.dataset_name is not None:
         # Downloading and loading a dataset from the hub.
         dataset = load_dataset(
@@ -487,16 +435,12 @@ def main():
         revision=model_args.model_revision,
         use_auth_token=True if model_args.use_auth_token else None,
     )
-    config = clip_model.config
-    
     clip_model_config = clip_model.config
     clip_pretrained = False
-    
-    # if clip_pretrained:
-    #     clip_model = AutoModel.from_pretrained("openai/clip-vit-base-patch32")
-    # else:
-    #     clip_model_config = AutoModel.from_pretrained("openai/clip-vit-base-patch32").config
-    #     clip_model = AutoModel.from_config(clip_model_config)
+    if clip_pretrained:
+        pass
+    else:
+        clip_model = AutoModel.from_config(clip_model_config)
         
     
     clip_train = True
@@ -771,12 +715,12 @@ def main():
     
     # Handle the repository creation
     if accelerator.is_main_process:
-        if args.output_dir is not None:
-            os.makedirs(args.output_dir, exist_ok=True)
+        if training_args.output_dir is not None:
+            os.makedirs(training_args.output_dir, exist_ok=True)
             
     optimizer = accelerator.prepare(optimizer)
     # lr_scheduler = accelerator.prepare(lr_scheduler)
-    # generator = accelerator.prepare(generator)
+    generator = accelerator.prepare(generator)
     
     # For model
     clip_model = accelerator.prepare(clip_model)
@@ -796,21 +740,20 @@ def main():
     training_args.max_steps = (int)(training_args.max_steps)
     training_args.num_train_epochs = (int)(training_args.num_train_epochs)
     
-    tracker_project_name = "text2image-fine-tune"
+    
     
     # We need to initialize the trackers we use, and also store our configuration.
     # The trackers initializes automatically on the main process.
     if accelerator.is_main_process:
-        tracker_config = dict(vars(args))
-        # tracker_config.pop("validation_prompts")
-        accelerator.init_trackers(tracker_project_name, tracker_config)
+        tracker_project_name = "poison_clip"
+        accelerator.init_trackers(tracker_project_name)
         
     total_batch_size = training_args.train_batch_size * accelerator.num_processes * training_args.gradient_accumulation_steps
 
     logger.info("***** Running training *****")
-    if args.do_train:
+    if training_args.do_train:
         logger.info(f"  Training num examples = {len(train_dataset)}")
-    if args.do_eval:
+    if training_args.do_eval:
         logger.info(f"  Evaluation num examples = {len(eval_dataset)}")
     logger.info(f"  Num Epochs = {training_args.num_train_epochs}")
     logger.info(f"  Instantaneous batch size per device = {training_args.train_batch_size}")
@@ -826,24 +769,24 @@ def main():
             path = os.path.basename(training_args.resume_from_checkpoint)
         else:
             # Get the most recent checkpoint
-            dirs = os.listdir(args.output_dir)
+            dirs = os.listdir(training_args.output_dir)
             dirs = [d for d in dirs if d.startswith("checkpoint")]
             dirs = sorted(dirs, key=lambda x: int(x.split("-")[1]))
             path = dirs[-1] if len(dirs) > 0 else None
 
         if path is None:
             accelerator.print(
-                f"Checkpoint '{args.resume_from_checkpoint}' does not exist. Starting a new training run."
+                f"Checkpoint '{training_args.resume_from_checkpoint}' does not exist. Starting a new training run."
             )
-            args.resume_from_checkpoint = None
+            training_args.resume_from_checkpoint = None
         else:
             accelerator.print(f"Resuming from checkpoint {path}")
-            accelerator.load_state(os.path.join(args.output_dir, path))
+            accelerator.load_state(os.path.join(training_args.output_dir, path))
             global_step = int(path.split("-")[1])
 
-            resume_global_step = global_step * args.gradient_accumulation_steps
+            resume_global_step = global_step * training_args.gradient_accumulation_steps
             first_epoch = global_step // num_update_steps_per_epoch
-            resume_step = resume_global_step % (num_update_steps_per_epoch * args.gradient_accumulation_steps)
+            resume_step = resume_global_step % (num_update_steps_per_epoch * training_args.gradient_accumulation_steps)
             
     # Only show the progress bar once on each machine.
     progress_bar = tqdm(range(global_step, training_args.max_steps), disable=not accelerator.is_local_main_process)
@@ -851,21 +794,28 @@ def main():
     
     accelerator.free_memory()
     clip_model.zero_grad()
-                
+    
+    if generator_train:
+        generator.train()
+    else:
+        generator.eval()
+        
+    if clip_train:
+        clip_model.train()
+    else:
+        clip_model.eval()
+        
+    add_noise = False
+    generator_train = False
+    use_normailize = True
+    logger.info("clip_train: {}, generator_train: {}".format(clip_train, generator_train))
+    logger.info(f"add_noise: {add_noise}, use_normailize: {use_normailize}")
+     
     for epoch in range(first_epoch, training_args.num_train_epochs):
         if training_args.do_train:
             logging.info("*"*50)
             logging.info("Doing Training")
             logging.info("*"*50)
-            if generator_train:
-                generator.train()
-            else:
-                generator.eval()
-                
-            if clip_train:
-                clip_model.train()
-            else:
-                clip_model.eval()
                 
             progress_bar.set_description("Training Steps")
             train_loss = 0.0
@@ -875,7 +825,6 @@ def main():
             train_target_list = ["generator"]*generator_step_M + ["clip"]*clip_step_N
             cur_index = 0
             for step, batch in enumerate(train_dataloader):
-                clip_model.train()
                 # Skip steps until we reach the resumed step
                 if training_args.resume_from_checkpoint and epoch == first_epoch and step < resume_step:
                     if step % training_args.gradient_accumulation_steps == 0:
@@ -887,16 +836,13 @@ def main():
                 if train_target == "generator":
                     pass
 
-                # Convert images to latent space
-                img_pixel_values = batch["pixel_values"]  # [6,3,224,224]
-                # Get the text tokens for conditioning
-                batch_token_ids = batch["input_ids"]
+                batch_pixel_values = batch["pixel_values"]  # [6,3,224,224]
+                batch_input_ids = batch["input_ids"]
+                batch_attention_mask = batch["attention_mask"]
                 
-                add_noise = False
-                generator_train = False
                 if add_noise:
-                    encoder_hidden_states = text_encoder(batch_token_ids)[0]  # [6,77,768]                
-                    noise = generator(img_pixel_values, encoder_hidden_states)
+                    encoder_hidden_states = text_encoder(batch_input_ids)[0]  # [6,77,768]                
+                    noise = generator(batch_pixel_values, encoder_hidden_states)
                     
                     # limit the norm of the noise
                     norm_type = 'l2'
@@ -906,34 +852,32 @@ def main():
                         noise = noise * epsilon / temp
                     else:
                         noise = torch.clamp(noise, -epsilon / 255, epsilon / 255)
-                    image = img_pixel_values + noise 
+                    image = batch_pixel_values + noise 
                     image = torch.clamp(image, -1, 1)
                 else:
-                    image = img_pixel_values
+                    image = batch_pixel_values
                      
-                use_normailize = False
                 if use_normailize:
-                    image = normalize_fn(image)
+                    image = normalize_fn(image, mean=image_processor.image_mean, std=image_processor.image_std)
                     
                 batch_data_input = {
-                    "input_ids":batch_token_ids,
+                    "input_ids":batch_input_ids,
                     "pixel_values" : image,
                     "attention_mask":batch["attention_mask"],
                     "return_loss": True
                 }
-                output = clip_model(**batch)
-                # logits_per_image = output.logits_per_image   # for training , image_logits is the same as logits text
-                # logits_per_text = output.logits_per_text
+                output = clip_model(**batch_data_input)
+                logits_per_image = output.logits_per_image   # for training , image_logits is the same as logits text
+                logits_per_text = output.logits_per_text
                 
                 loss = output.loss
-                print("loss-",loss)
+
                 # Gather the losses across all processes for logging (if we use distributed training).
-                # avg_loss = accelerator.gather(loss.repeat(training_args.train_batch_size)).mean()
-                # train_loss += avg_loss.item() / training_args.gradient_accumulation_steps
+                avg_loss = accelerator.gather(loss.repeat(training_args.train_batch_size)).mean()
+                train_loss += avg_loss.item() / training_args.gradient_accumulation_steps
 
                 # Backpropagate
-                # accelerator.backward(loss)
-                loss.backward()
+                accelerator.backward(loss)
 
                 if accelerator.sync_gradients:
                     if generator_train:
@@ -946,105 +890,98 @@ def main():
                 # lr_scheduler.step()
                 
                 clip_model.zero_grad()
-                # generator.zero_grad()
+                generator.zero_grad()
                 # optimizer.zero_grad()
 
                 # Checks if the accelerator has performed an optimization step behind the scenes
                 if accelerator.sync_gradients:
                     progress_bar.update(1)
-                #     global_step += 1
-                #     accelerator.log({"train_loss": train_loss}, step=global_step)
-                #     train_loss = 0.0
+                    global_step += 1
+                    accelerator.log({"train_loss": train_loss}, step=global_step)
+                    train_loss = 0.0
 
-                #     checkpointing_steps = 100
-                #     if global_step % checkpointing_steps == 0:
-                #         logging.info("Epoch : {} ; Step : {} ; Save checkpoint to {}".format(epoch, global_step, training_args.output_dir))
-                #         if accelerator.is_main_process:
-                #             save_path = os.path.join(training_args.output_dir, f"checkpoint-{global_step}")
-                #             accelerator.save_state(save_path)
-                #             logger.info(f"Saved state to {save_path}")
+                    checkpointing_steps = 100
+                    if global_step % checkpointing_steps == 0:
+                        logging.info("Epoch : {} ; Step : {} ; Save checkpoint to {}".format(epoch, global_step, training_args.output_dir))
+                        if accelerator.is_main_process:
+                            save_path = os.path.join(training_args.output_dir, f"checkpoint-{global_step}")
+                            accelerator.save_state(save_path)
+                            logger.info(f"Saved state to {save_path}")
                 
                 record = {
                         "epoch": epoch,
                         "step": step,
                         "global_step":global_step,
                         "train_loss": loss.detach().item(),
-                        # "lr": lr_scheduler.get_last_lr()[0],
                         "lr": optimizer.param_groups[0]["lr"],
                         }
                 wandb.log(record)  
                 progress_bar.set_postfix(**record)
 
-                # if global_step >= training_args.max_steps:
-                #     break
+                if global_step >= training_args.max_steps:
+                    break
 
         # evaluation on the eval dataset
-        # training_args.do_eval = False
-        # if training_args.do_eval and accelerator.is_main_process:
+        training_args.do_eval = True
+        accelerator.wait_for_everyone()
+        if training_args.do_eval and accelerator.is_main_process:
+            logging.info("*"*50)
+            logging.info("Doing Evaluation")
+            logging.info("*"*50)
+            progress_bar.set_description("Evaluation Steps")
             
-        #     logging.info("*"*50)
-        #     logging.info("Doing Evaluation")
-        #     logging.info("*"*50)
-        #     progress_bar.set_description("Evaluation Steps")
+            generator.eval()
+            clip_model.eval()
             
-        #     generator.eval()
-        #     clip_model.eval()
-            
-        #     eval_losses = []
-        #     for step, batch in enumerate(tqdm(eval_dataloader)):
-        #         with torch.no_grad():
-        #             # Convert images to latent space
-        #             img_pixel_values = batch["pixel_values"].to(weight_dtype)  # [6,3,224,224]
-
-        #             # Get the text embedding for conditioning
-        #             batch_token_ids = batch["input_ids"]
-        #             if generator_train:
-        #                 encoder_hidden_states = text_encoder(batch_token_ids)[0]  # [6,77,768]                
-        #                 noise = generator.forward(img_pixel_values, encoder_hidden_states)
+            eval_losses = []
+            for step, batch in enumerate(tqdm(eval_dataloader)):
+                with torch.no_grad():
+                    batch_pixel_values = batch["pixel_values"]  # [6,3,224,224]
+                    batch_input_ids = batch["input_ids"]
+                    batch_attention_mask = batch["attention_mask"]
+                    
+                    if add_noise:
+                        encoder_hidden_states = text_encoder(batch_input_ids)[0]  # [6,77,768]                
+                        noise = generator(batch_pixel_values, encoder_hidden_states)
                         
-        #                 # limit the norm of the noise
-        #                 norm_type = 'l2'
-        #                 epsilon = 16
-        #                 if norm_type == 'l2':
-        #                     temp = torch.norm(noise.view(noise.shape[0], -1), dim=1).view(-1, 1, 1, 1)
-        #                     noise = noise * epsilon / temp
-        #                 else:
-        #                     noise = torch.clamp(noise, -epsilon / 255, epsilon / 255)
-                            
-        #                 add_noise = False
-        #                 if add_noise:
-        #                     image = img_pixel_values + noise
-        #                 else:
-        #                     image = img_pixel_values + noise * torch.tensor(0.0).to(noise.device)
-        #             else:
-        #                 image = img_pixel_values 
-        #             image = torch.clamp(image, -1, 1)
+                        # limit the norm of the noise
+                        norm_type = 'l2'
+                        epsilon = 16
+                        if norm_type == 'l2':
+                            temp = torch.norm(noise.view(noise.shape[0], -1), dim=1).view(-1, 1, 1, 1)
+                            noise = noise * epsilon / temp
+                        else:
+                            noise = torch.clamp(noise, -epsilon / 255, epsilon / 255)
+                        image = batch_pixel_values + noise 
+                        image = torch.clamp(image, -1, 1)
+                    else:
+                        image = batch_pixel_values
+
+                    if use_normailize:
+                        image = normalize_fn(image, mean=image_processor.image_mean, std=image_processor.image_std)
+                        
+                    batch_data_input = {
+                        "input_ids":batch_input_ids,
+                        "pixel_values" : image,
+                        "attention_mask":batch["attention_mask"],
+                        "return_loss": True
+                    }
+                    output = clip_model(**batch_data_input)
+                    logits_per_image = output.logits_per_image   # for training , image_logits is the same as logits text
+                    logits_per_text = output.logits_per_text
                     
-        #             use_normailize = False
-        #             if use_normailize:
-        #                 image = normalize_fn(image)
-                    
-        #             data_input = {
-        #                 "input_ids":batch_token_ids,
-        #                 "pixel_values" : image
-        #             }
-        #             output = clip_model(**data_input, return_loss=True)
-        #             logits_per_image = output.logits_per_image   # for training , image_logits is the same as logits text
-        #             logits_per_text = output.logits_per_text
-                    
-        #             loss = output.loss
-                    
-        #             # END MY CODE
-        #         eval_losses.append(loss.detach().item())
-        #         # logs = {"step" : step,  "lr": lr_scheduler.get_last_lr()[0],"eval_loss": loss.detach().item(),}
-        #         # progress_bar.set_postfix(**logs)
-        #     eval_mean_loss = np.mean(eval_losses)
-        #     eval_record = {
-        #                 "epoch": epoch,
-        #                 "global_step":global_step,
-        #                 "eval_avg_loss": eval_mean_loss,
-        #                 }
-        #     wandb.log(eval_record)  
+                    loss = output.loss
+                    logs = {"step" : step,  "eval_loss": loss.detach().item(),}
+                    progress_bar.set_postfix(**logs)
+                    eval_losses.append(loss.detach().item())
+                
+            eval_mean_loss = np.mean(eval_losses)
+            eval_record = {
+                        "epoch": epoch,
+                        "global_step":global_step,
+                        "eval_avg_loss": eval_mean_loss,
+                        }
+            wandb.log(eval_record)  
 
     accelerator.end_training()
     
