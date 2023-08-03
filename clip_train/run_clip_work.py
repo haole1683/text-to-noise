@@ -1,3 +1,9 @@
+import ptvsd
+print("waiting for attaching")
+ptvsd.enable_attach(address = ('127.0.0.1', 5678))
+ptvsd.wait_for_attach()
+print("attached")
+
 
 import logging
 import os
@@ -11,7 +17,7 @@ import torch
 from datasets import load_dataset
 from PIL import Image
 from torchvision.io import ImageReadMode, read_image
-from torchvision.transforms import CenterCrop, ConvertImageDtype, Normalize, Resize
+from torchvision.transforms import CenterCrop, ConvertImageDtype, Normalize, Resize, ToTensor
 from torchvision.transforms.functional import InterpolationMode
 import torchvision.transforms as transforms
 import torch.nn as nn
@@ -21,6 +27,7 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 import torch.utils.checkpoint
+from PIL import Image
 
 import transformers
 from transformers import (
@@ -28,12 +35,11 @@ from transformers import (
     AutoModel,
     AutoTokenizer,
     HfArgumentParser,
-    Trainer,
     TrainingArguments,
     set_seed,
 )
 from transformers.trainer_utils import get_last_checkpoint
-from transformers.utils import check_min_version, send_example_telemetry,ContextManagers
+from transformers.utils import send_example_telemetry,ContextManagers
 from transformers.utils.versions import require_version
 from transformers import CLIPTextModel, CLIPTokenizer
 from transformers.trainer_pt_utils import get_parameter_names
@@ -41,9 +47,8 @@ from transformers.pytorch_utils import ALL_LAYERNORM_LAYERS
 
 import diffusers
 from diffusers import AutoencoderKL, UNet2DConditionModel
-from diffusers.utils import check_min_version, is_wandb_available
+from diffusers.utils import is_wandb_available
 from diffusers.utils.import_utils import is_xformers_available
-from diffusers.optimization import get_scheduler
 
 from accelerate import Accelerator
 from accelerate.logging import get_logger
@@ -203,13 +208,14 @@ dataset_name_mapping = {
 class Transform(torch.nn.Module):
     def __init__(self, image_size, mean=None, std=None):
         super().__init__()
-        self.transforms = torch.nn.Sequential(
+        self.transforms = transforms.Compose([
             Resize([image_size], interpolation=InterpolationMode.BICUBIC,antialias=None),
             CenterCrop(image_size),  # CenterCrop is required because Resize doesn't ensure same output size
-            ConvertImageDtype(torch.float),   
-        )
+            # ConvertImageDtype(torch.float),
+            ToTensor(), 
+        ])
         if mean is not None and std is not None:
-            self.transforms.add_module("normalize", Normalize(mean=mean, std=std))
+            self.transforms.transforms.append(Normalize(mean=mean, std=std))
 
     def forward(self, x) -> torch.Tensor:
         """`x` should be an instance of `PIL.Image.Image`"""
@@ -442,17 +448,6 @@ def main():
     else:
         clip_model = AutoModel.from_config(clip_model_config)
         
-    
-    clip_train = True
-    logger.info(f"clip_train: {clip_train}")
-    if clip_train:
-        clip_model.train()
-        clip_model.requires_grad_(True)
-    else:
-        clip_model.eval()
-        clip_model.requires_grad_(False)
-        # _freeze_params(clip_model)
-        
     def _freeze_params(module):
         for param in module.parameters():
             param.requires_grad = False
@@ -466,15 +461,7 @@ def main():
     if training_args.seed is not None:
         set_seed(training_args.seed)
         
-    generator_train=True
     generator = Generator()
-    logger.info(f"generator_train: {generator_train}")
-    if generator_train:
-        generator.train()
-        generator.requires_grad_(True)
-    else:
-        generator.eval()
-        generator.requires_grad_(False)
         
     def deepspeed_zero_init_disabled_context_manager():
         """
@@ -493,13 +480,7 @@ def main():
     
     # text_encoder
     text_encoder.requires_grad_(False)
-    
-    # For mixed precision training we cast the text_encoder and vae weights to half-precision
-    # as these models are only used for inference, keeping weights in full precision is not required.
     weight_dtype = torch.float32
-
-    # Move text_encode and vae to gpu and cast to weight_dtype
-    text_encoder.to(accelerator.device, dtype=weight_dtype)
     
     # Preprocessing the datasets.
     # We need to tokenize inputs and targets.
@@ -534,11 +515,9 @@ def main():
 
     # Initialize torchvision transforms and jit it for faster processing.
     image_transformations = Transform(
-        config.vision_config.image_size, image_processor.image_mean, image_processor.image_std
+        clip_model_config.vision_config.image_size
     )
-    image_transformations = torch.jit.script(image_transformations)
-    
-    # data_args.max_seq_length = 77
+    # image_transformations = torch.jit.script(image_transformations)
     
     # Preprocessing the datasets.
     # We need to tokenize input captions and transform the images.
@@ -551,7 +530,13 @@ def main():
 
     
     def transform_images(examples):
-        images = [read_image(image_file, mode=ImageReadMode.RGB) for image_file in examples[image_column]]
+        if isinstance(examples[image_column][0],str):
+            # For coco dataset, the images are loaded as path
+            # images = [read_image(image_file, mode=ImageReadMode.RGB) for image_file in examples[image_column]]
+            images = [Image.open(image_file).convert("RGB") for image_file in examples[image_column]]
+        else:
+            # lambdalabs/pokemon-blip-captions
+            images = [image.convert("RGB") for image in examples[image_column]]
         examples["pixel_values"] = [image_transformations(image) for image in images]
         return examples
     
@@ -560,7 +545,7 @@ def main():
         valid_images = []
         for image_file in examples[image_column]:
             try:
-                Image.open(image_file)
+                Image.open(image_file).convert("RGB") 
                 valid_images.append(True)
             except Exception:
                 valid_images.append(False)
@@ -717,20 +702,20 @@ def main():
     if accelerator.is_main_process:
         if training_args.output_dir is not None:
             os.makedirs(training_args.output_dir, exist_ok=True)
-            
+    
+    # For optimizer and scheduler
     optimizer = accelerator.prepare(optimizer)
     # lr_scheduler = accelerator.prepare(lr_scheduler)
-    generator = accelerator.prepare(generator)
     
     # For model
+    add_noise = True
     clip_model = accelerator.prepare(clip_model)
-    if generator_train:
+    if add_noise:
         generator = accelerator.prepare(generator)
-        
     train_dataloader = accelerator.prepare(train_dataloader)
     eval_dataloader = accelerator.prepare(eval_dataloader)
-    
     text_encoder.to(accelerator.device, dtype=weight_dtype)
+    
     
     overrode_max_train_steps = False
     num_update_steps_per_epoch = math.ceil(len(train_dataloader) / training_args.gradient_accumulation_steps)
@@ -793,21 +778,33 @@ def main():
     progress_bar.set_description("Training Steps")
     
     accelerator.free_memory()
-    clip_model.zero_grad()
     
-    if generator_train:
+    
+    add_noise = add_noise
+    
+    generator_train = False
+    clip_train = True
+    
+    if add_noise and generator_train:
         generator.train()
-    else:
+        generator.requires_grad_(True)
+        generator.zero_grad()
+    elif add_noise and not generator_train:
         generator.eval()
+        generator.requires_grad_(False)
+    else:
+        raise ValueError("add_noise is False, generator_train should be False")
         
     if clip_train:
         clip_model.train()
+        clip_model.requires_grad_(True)
     else:
         clip_model.eval()
+        clip_model.requires_grad_(False)
+    clip_model.zero_grad()
         
-    add_noise = False
-    generator_train = False
     use_normailize = True
+    
     logger.info("clip_train: {}, generator_train: {}".format(clip_train, generator_train))
     logger.info(f"add_noise: {add_noise}, use_normailize: {use_normailize}")
      
@@ -841,7 +838,7 @@ def main():
                 batch_attention_mask = batch["attention_mask"]
                 
                 if add_noise:
-                    encoder_hidden_states = text_encoder(batch_input_ids)[0]  # [6,77,768]                
+                    encoder_hidden_states = text_encoder(batch_input_ids)[0]  # [6,128,768]                
                     noise = generator(batch_pixel_values, encoder_hidden_states)
                     
                     # limit the norm of the noise
