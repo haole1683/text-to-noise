@@ -250,7 +250,7 @@ class Generator(nn.Module):
                 1280
             ],
             "center_input_sample": False,
-            "cross_attention_dim": 768,
+            "cross_attention_dim": 768,  # NOTE 768
             "down_block_types": [
                 "CrossAttnDownBlock2D",
                 "CrossAttnDownBlock2D",
@@ -463,21 +463,9 @@ def main():
         
     generator = Generator()
         
-    def deepspeed_zero_init_disabled_context_manager():
-        """
-        returns either a context list that includes one that will disable zero.Init or an empty context list
-        """
-        deepspeed_plugin = AcceleratorState().deepspeed_plugin if accelerate.state.is_initialized() else None
-        if deepspeed_plugin is None:
-            return []
-
-        return [deepspeed_plugin.zero3_init_context_manager(enable=False)]
-    
-    with ContextManagers(deepspeed_zero_init_disabled_context_manager()):
-        text_encoder = CLIPTextModel.from_pretrained(
-            pretrained_model_name_or_path, subfolder="text_encoder", revision=revision
-        )
-    
+    text_encoder = CLIPTextModel.from_pretrained(
+        pretrained_model_name_or_path, subfolder="text_encoder", revision=revision
+    )
     # text_encoder
     text_encoder.requires_grad_(False)
     weight_dtype = torch.float32
@@ -838,7 +826,9 @@ def main():
                 batch_attention_mask = batch["attention_mask"]
                 
                 if add_noise:
-                    encoder_hidden_states = text_encoder(batch_input_ids,batch_attention_mask)[0]  # [6,128,768]                
+                    text_encoder = clip_model.text_model
+                    with torch.no_grad():
+                        encoder_hidden_states = text_encoder(batch_input_ids,batch_attention_mask)[0]  # [6,128,768]                
                     noise = generator(batch_pixel_values, encoder_hidden_states)
                     
                     # limit the norm of the noise
