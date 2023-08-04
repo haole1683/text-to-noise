@@ -1,8 +1,8 @@
-import ptvsd
-print("waiting for attaching")
-ptvsd.enable_attach(address = ('127.0.0.1', 5678))
-ptvsd.wait_for_attach()
-print("attached")
+# import ptvsd
+# print("waiting for attaching")
+# ptvsd.enable_attach(address = ('127.0.0.1', 5678))
+# ptvsd.wait_for_attach()
+# print("attached")
 
 
 import logging
@@ -39,16 +39,15 @@ from transformers import (
     set_seed,
 )
 from transformers.trainer_utils import get_last_checkpoint
-from transformers.utils import send_example_telemetry,ContextManagers
+from transformers.utils import send_example_telemetry
 from transformers.utils.versions import require_version
-from transformers import CLIPTextModel, CLIPTokenizer
+from transformers import CLIPTokenizer, CLIPConfig, CLIPModel
 from transformers.trainer_pt_utils import get_parameter_names
 from transformers.pytorch_utils import ALL_LAYERNORM_LAYERS
 
 import diffusers
 from diffusers import AutoencoderKL, UNet2DConditionModel
 from diffusers.utils import is_wandb_available
-from diffusers.utils.import_utils import is_xformers_available
 
 from accelerate import Accelerator
 from accelerate.logging import get_logger
@@ -470,12 +469,14 @@ def main():
         use_auth_token=True if model_args.use_auth_token else None,
     )
     
-    clip_model = AutoModel.from_pretrained(
-        model_args.model_name_or_path,
-        cache_dir=model_args.cache_dir,
-        revision=model_args.model_revision,
-        use_auth_token=True if model_args.use_auth_token else None,
-    )
+    clip_config = CLIPConfig()
+    # clip_model = AutoModel.from_pretrained(
+    #     model_args.model_name_or_path,
+    #     cache_dir=model_args.cache_dir,
+    #     revision=model_args.model_revision,
+    #     use_auth_token=True if model_args.use_auth_token else None,
+    # )
+    clip_model = CLIPModel(clip_config)
     clip_model_config = clip_model.config
     clip_pretrained = experiment_args.if_clip_pretrained
     if clip_pretrained:
@@ -705,7 +706,7 @@ def main():
             },
         ]
     adam_kwargs = {
-        "lr": 5e-5,
+        "lr": training_args.learning_rate,
         "betas": (0.9, 0.999),
         "eps": 1e-8,
     }
@@ -906,10 +907,9 @@ def main():
 
                 # Gather the losses across all processes for logging (if we use distributed training).
                 avg_loss = accelerator.gather(loss.repeat(training_args.train_batch_size)).mean()
-                train_loss += avg_loss.item() / training_args.gradient_accumulation_steps
 
                 # Backpropagate
-                accelerator.backward(avg_loss)
+                accelerator.backward(loss)
 
                 if accelerator.sync_gradients:
                     if if_generator_train:
