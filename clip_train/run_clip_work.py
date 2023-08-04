@@ -1,8 +1,8 @@
-import ptvsd
-print("waiting for attaching")
-ptvsd.enable_attach(address = ('127.0.0.1', 5678))
-ptvsd.wait_for_attach()
-print("attached")
+# import ptvsd
+# print("waiting for attaching")
+# ptvsd.enable_attach(address = ('127.0.0.1', 5678))
+# ptvsd.wait_for_attach()
+# print("attached")
 
 
 import logging
@@ -201,6 +201,35 @@ class DataTrainingArguments:
                 extension = self.validation_file.split(".")[-1]
                 assert extension == "json", "`validation_file` should be a json file."
 
+
+@dataclass
+class ExperimentArguments:
+    """
+    Hyperparameters for the experiment.
+    """
+    if_clip_pretrained: bool = field(
+        default=False, metadata={"help": "Whether to use the pretrained clip model."}
+    )
+    if_clip_train: bool = field(
+        default=True, metadata={"help": "Whether to train the clip model."}
+    )
+    if_add_noise : bool = field(
+        default=False, metadata={"help": "Whether to add noise to the dataset."}
+    )
+    if_generator_train: bool = field(
+        default=False, metadata={"help": "Whether to generate the training dataset."}
+    )
+    if_normalize: bool = field(
+        default=True, metadata={"help": "Whether to normalize the dataset."}
+    )
+    if_use_clip_tokenizer: bool = field(
+        default=False, metadata={"help": "Whether to use the clip tokenizer."}
+    )
+    if_use_8bit_adam: bool = field(
+        default=False, metadata={"help": "Whether to use the 8bit adam."}
+    )
+
+
 dataset_name_mapping = {
     "image_caption_dataset.py": ("image_path", "caption"),
 }
@@ -303,14 +332,14 @@ class Generator(nn.Module):
         self.vae.enable_xformers_memory_efficient_attention()
 
 def main():
-    parser = HfArgumentParser((ModelArguments, DataTrainingArguments, TrainingArguments))
+    parser = HfArgumentParser((ModelArguments, DataTrainingArguments, TrainingArguments, ExperimentArguments))
     if len(sys.argv) == 2 and sys.argv[1].endswith(".json"):
         # If we pass only one argument to the script and it's the path to a json file,
         # let's parse it to get our arguments.
-        model_args, data_args, training_args = parser.parse_json_file(json_file=os.path.abspath(sys.argv[1]))
+        model_args, data_args, training_args, experiment_args = parser.parse_json_file(json_file=os.path.abspath(sys.argv[1]))
     else:
         print("1")
-        model_args, data_args, training_args = parser.parse_args_into_dataclasses()
+        model_args, data_args, training_args, experiment_args = parser.parse_args_into_dataclasses()
 
     # Sending telemetry. Tracking the example usage helps us better allocate resources to maintain them. The
     # information sent is the one passed as arguments along with your Python/PyTorch versions.
@@ -421,7 +450,7 @@ def main():
     pretrained_model_name_or_path = "CompVis/stable-diffusion-v1-4"
     
     # Note: Do not use the clip tokenizer, loss can not decrease
-    use_clip_tokenizer = False
+    use_clip_tokenizer = experiment_args.if_use_clip_tokenizer
     if use_clip_tokenizer:
         tokenizer = CLIPTokenizer.from_pretrained(
             pretrained_model_name_or_path, subfolder="tokenizer", revision=revision
@@ -442,7 +471,7 @@ def main():
         use_auth_token=True if model_args.use_auth_token else None,
     )
     clip_model_config = clip_model.config
-    clip_pretrained = False
+    clip_pretrained = experiment_args.if_clip_pretrained
     if clip_pretrained:
         pass
     else:
@@ -463,12 +492,12 @@ def main():
         
     generator = Generator()
         
-    text_encoder = CLIPTextModel.from_pretrained(
-        pretrained_model_name_or_path, subfolder="text_encoder", revision=revision
-    )
-    # text_encoder
-    text_encoder.requires_grad_(False)
-    weight_dtype = torch.float32
+    # text_encoder = CLIPTextModel.from_pretrained(
+    #     pretrained_model_name_or_path, subfolder="text_encoder", revision=revision
+    # )
+    # # text_encoder
+    # text_encoder.requires_grad_(False)
+    # weight_dtype = torch.float32
     
     # Preprocessing the datasets.
     # We need to tokenize inputs and targets.
@@ -702,14 +731,12 @@ def main():
         generator = accelerator.prepare(generator)
     train_dataloader = accelerator.prepare(train_dataloader)
     eval_dataloader = accelerator.prepare(eval_dataloader)
-    text_encoder.to(accelerator.device, dtype=weight_dtype)
+    # text_encoder.to(accelerator.device, dtype=weight_dtype)
     
     
-    overrode_max_train_steps = False
     num_update_steps_per_epoch = math.ceil(len(train_dataloader) / training_args.gradient_accumulation_steps)
     if training_args.max_steps is None or training_args.max_steps <= 0:
         training_args.max_steps = training_args.num_train_epochs * num_update_steps_per_epoch
-        overrode_max_train_steps = True
     training_args.max_steps = (int)(training_args.max_steps)
     training_args.num_train_epochs = (int)(training_args.num_train_epochs)
     
@@ -768,13 +795,12 @@ def main():
     accelerator.free_memory()
     
     
-    add_noise = False
+    if_add_noise = experiment_args.if_add_noise
+    if_generator_train = experiment_args.if_generator_train
+    if_clip_train = experiment_args.if_clip_train
     
-    generator_train = False
-    clip_train = True
-    
-    if add_noise:
-        if generator_train:
+    if if_add_noise:
+        if if_generator_train:
             generator.train()
             generator.requires_grad_(True)
             generator.zero_grad()
@@ -784,7 +810,7 @@ def main():
     else:
         pass
         
-    if clip_train:
+    if if_clip_train:
         clip_model.train()
         clip_model.requires_grad_(True)
     else:
@@ -792,10 +818,10 @@ def main():
         clip_model.requires_grad_(False)
     clip_model.zero_grad()
         
-    use_normailize = True
+    if_normalize = experiment_args.if_normalize
     
-    logger.info("clip_train: {}, generator_train: {}".format(clip_train, generator_train))
-    logger.info(f"add_noise: {add_noise}, use_normailize: {use_normailize}")
+    logger.info("clip_train: {}, generator_train: {}".format(if_clip_train, if_generator_train))
+    logger.info(f"add_noise: {add_noise}, use_normailize: {if_normalize}")
      
     for epoch in range(first_epoch, training_args.num_train_epochs):
         if training_args.do_train:
@@ -845,7 +871,7 @@ def main():
                 else:
                     image = batch_pixel_values
                      
-                if use_normailize:
+                if if_normalize:
                     image = normalize_fn(image, mean=image_processor.image_mean, std=image_processor.image_std)
                     
                 batch_data_input = {
@@ -868,9 +894,9 @@ def main():
                 accelerator.backward(loss)
 
                 if accelerator.sync_gradients:
-                    if generator_train:
+                    if if_generator_train:
                         accelerator.clip_grad_norm_(generator.parameters(), training_args.max_grad_norm)
-                    elif clip_train:
+                    if if_clip_train:
                         accelerator.clip_grad_norm_(clip_model.parameters(), training_args.max_grad_norm)
                 
                 # Update optimizer
@@ -927,25 +953,10 @@ def main():
                     batch_pixel_values = batch["pixel_values"]  # [6,3,224,224]
                     batch_input_ids = batch["input_ids"]
                     batch_attention_mask = batch["attention_mask"]
-                    
-                    if add_noise:
-                        encoder_hidden_states = text_encoder(batch_input_ids)[0]  # [6,77,768]                
-                        noise = generator(batch_pixel_values, encoder_hidden_states)
-                        
-                        # limit the norm of the noise
-                        norm_type = 'l2'
-                        epsilon = 16
-                        if norm_type == 'l2':
-                            temp = torch.norm(noise.view(noise.shape[0], -1), dim=1).view(-1, 1, 1, 1)
-                            noise = noise * epsilon / temp
-                        else:
-                            noise = torch.clamp(noise, -epsilon / 255, epsilon / 255)
-                        image = batch_pixel_values + noise 
-                        image = torch.clamp(image, -1, 1)
-                    else:
-                        image = batch_pixel_values
 
-                    if use_normailize:
+                    image = batch_pixel_values
+
+                    if if_normalize:
                         image = normalize_fn(image, mean=image_processor.image_mean, std=image_processor.image_std)
                         
                     batch_data_input = {

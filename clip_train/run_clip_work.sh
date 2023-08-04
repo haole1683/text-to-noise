@@ -18,7 +18,12 @@ python run_clip_work.py \
     --overwrite_output_dir \
     --max_seq_length="77" \
     --max_steps=100000 \
-    --per_device_train_batch_size="32" \
-    --per_device_eval_batch_size="32" \
+    --num_train_epochs=100 \
+    --per_device_train_batch_size="6" \
+    --per_device_eval_batch_size="6" \
     --max_train_samples=5000 \
     --max_eval_samples=1000 \
+    --if_clip_train="True" \
+    --if_add_noise="True" \
+    --if_generator_train="True" \
+    --if_use_8bit_adam="True" \
