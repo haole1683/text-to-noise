@@ -21,9 +21,9 @@ python run_clip_work.py \
     --num_train_epochs=100 \
     --per_device_train_batch_size="6" \
     --per_device_eval_batch_size="6" \
-    --max_train_samples=5000 \
-    --max_eval_samples=1000 \
+    --max_train_samples=500 \
+    --max_eval_samples=100 \
     --if_clip_train="True" \
     --if_add_noise="False" \
-    --if_generator_train="True" \
+    --if_generator_train="False" \
     --if_use_8bit_adam="True" \

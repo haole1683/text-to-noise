@@ -344,6 +344,9 @@ def main():
         print("1")
         model_args, data_args, training_args, experiment_args = parser.parse_args_into_dataclasses()
 
+    if experiment_args.if_generator_train and not experiment_args.if_add_noise:
+        raise ValueError("if_generator_train is True, but if_add_noise is False")
+
     # Sending telemetry. Tracking the example usage helps us better allocate resources to maintain them. The
     # information sent is the one passed as arguments along with your Python/PyTorch versions.
     send_example_telemetry("run_clip", model_args, data_args)
@@ -846,6 +849,11 @@ def main():
             clip_step_N = 1
             train_target_list = ["generator"]*generator_step_M + ["clip"]*clip_step_N
             cur_index = 0
+            
+            clip_model.train()
+            if if_generator_train:
+                generator.train()
+                
             for step, batch in enumerate(train_dataloader):
                 # Skip steps until we reach the resumed step
                 if training_args.resume_from_checkpoint and epoch == first_epoch and step < resume_step:
@@ -947,7 +955,6 @@ def main():
                     break
 
         # evaluation on the eval dataset
-        training_args.do_eval = True
         accelerator.wait_for_everyone()
         if training_args.do_eval and accelerator.is_main_process:
             logging.info("*"*50)
