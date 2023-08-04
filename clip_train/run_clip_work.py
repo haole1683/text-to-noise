@@ -1,8 +1,8 @@
-# import ptvsd
-# print("waiting for attaching")
-# ptvsd.enable_attach(address = ('127.0.0.1', 5678))
-# ptvsd.wait_for_attach()
-# print("attached")
+import ptvsd
+print("waiting for attaching")
+ptvsd.enable_attach(address = ('127.0.0.1', 5678))
+ptvsd.wait_for_attach()
+print("attached")
 
 
 import logging
@@ -909,7 +909,7 @@ def main():
                 train_loss += avg_loss.item() / training_args.gradient_accumulation_steps
 
                 # Backpropagate
-                accelerator.backward(loss)
+                accelerator.backward(avg_loss)
 
                 if accelerator.sync_gradients:
                     if if_generator_train:
