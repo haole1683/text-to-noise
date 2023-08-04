@@ -24,6 +24,6 @@ python run_clip_work.py \
     --max_train_samples=5000 \
     --max_eval_samples=1000 \
     --if_clip_train="True" \
-    --if_add_noise="True" \
+    --if_add_noise="False" \
     --if_generator_train="True" \
     --if_use_8bit_adam="True" \

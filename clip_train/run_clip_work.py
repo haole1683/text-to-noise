@@ -668,7 +668,7 @@ def main():
         return transforms.Normalize(mean=mean, std=std)(x)
     
     # Initialize the optimizer
-    use_8bit_adam = False
+    use_8bit_adam = experiment_args.if_use_8bit_adam
     if use_8bit_adam:
         try:
             import bitsandbytes as bnb
@@ -704,6 +704,9 @@ def main():
     }
 
     optimizer = optimizer_cls(optimizer_grouped_parameters, **adam_kwargs)
+    if experiment_args.if_generator_train:
+        generator_parameters = generator.parameters()
+        optimizer_generator = optimizer_cls(generator_parameters, **adam_kwargs)
    
     # lr_scheduler = 'linear'
     # lr_warmup_steps = 0
@@ -720,14 +723,17 @@ def main():
         if training_args.output_dir is not None:
             os.makedirs(training_args.output_dir, exist_ok=True)
     
+    
+    # Accelerator
     # For optimizer and scheduler
     optimizer = accelerator.prepare(optimizer)
     # lr_scheduler = accelerator.prepare(lr_scheduler)
+    if experiment_args.if_generator_train:
+        optimizer_generator = accelerator.prepare(optimizer_generator)
     
     # For model
-    add_noise = True
     clip_model = accelerator.prepare(clip_model)
-    if add_noise:
+    if experiment_args.if_add_noise:
         generator = accelerator.prepare(generator)
     train_dataloader = accelerator.prepare(train_dataloader)
     eval_dataloader = accelerator.prepare(eval_dataloader)
@@ -821,7 +827,7 @@ def main():
     if_normalize = experiment_args.if_normalize
     
     logger.info("clip_train: {}, generator_train: {}".format(if_clip_train, if_generator_train))
-    logger.info(f"add_noise: {add_noise}, use_normailize: {if_normalize}")
+    logger.info("add_noise: {}, use_normailize:{}".format(if_add_noise,if_normalize))
      
     for epoch in range(first_epoch, training_args.num_train_epochs):
         if training_args.do_train:
