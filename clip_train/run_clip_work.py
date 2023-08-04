@@ -228,6 +228,9 @@ class ExperimentArguments:
     if_use_8bit_adam: bool = field(
         default=False, metadata={"help": "Whether to use the 8bit adam."}
     )
+    if_trainloader_shuffle: bool = field(
+        default=True, metadata={"help": "Whether to shuffle the trainloader."}
+    )
 
 
 dataset_name_mapping = {
@@ -490,7 +493,8 @@ def main():
     if training_args.seed is not None:
         set_seed(training_args.seed)
         
-    generator = Generator()
+    if experiment_args.if_add_noise:
+        generator = Generator()
         
     # text_encoder = CLIPTextModel.from_pretrained(
     #     pretrained_model_name_or_path, subfolder="text_encoder", revision=revision
@@ -597,7 +601,7 @@ def main():
     # train dataloader
     train_dataloader = torch.utils.data.DataLoader(
         train_dataset,
-        shuffle=False,  # here change to False to check the order of the images
+        shuffle=experiment_args.if_trainloader_shuffle,
         collate_fn=collate_fn,
         batch_size=training_args.train_batch_size,
         num_workers=training_args.dataloader_num_workers,
@@ -704,7 +708,7 @@ def main():
     }
 
     optimizer = optimizer_cls(optimizer_grouped_parameters, **adam_kwargs)
-    if experiment_args.if_generator_train:
+    if experiment_args.if_add_noise and experiment_args.if_generator_train:
         generator_parameters = generator.parameters()
         optimizer_generator = optimizer_cls(generator_parameters, **adam_kwargs)
    
@@ -728,7 +732,7 @@ def main():
     # For optimizer and scheduler
     optimizer = accelerator.prepare(optimizer)
     # lr_scheduler = accelerator.prepare(lr_scheduler)
-    if experiment_args.if_generator_train:
+    if experiment_args.if_add_noise and experiment_args.if_generator_train:
         optimizer_generator = accelerator.prepare(optimizer_generator)
     
     # For model
@@ -858,7 +862,7 @@ def main():
                 batch_input_ids = batch["input_ids"]
                 batch_attention_mask = batch["attention_mask"]
                 
-                if add_noise:
+                if if_add_noise:
                     text_encoder = clip_model.text_model
                     with torch.no_grad():
                         encoder_hidden_states = text_encoder(batch_input_ids,batch_attention_mask)[0]  # [6,128,768]                
@@ -910,7 +914,8 @@ def main():
                 # lr_scheduler.step()
                 
                 clip_model.zero_grad()
-                generator.zero_grad()
+                if if_add_noise and if_generator_train:
+                    generator.zero_grad()
                 # optimizer.zero_grad()
 
                 # Checks if the accelerator has performed an optimization step behind the scenes
@@ -950,7 +955,8 @@ def main():
             logging.info("*"*50)
             progress_bar.set_description("Evaluation Steps")
             
-            generator.eval()
+            if if_add_noise:
+                generator.eval()    
             clip_model.eval()
             
             eval_losses = []
