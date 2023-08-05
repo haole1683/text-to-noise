@@ -933,7 +933,7 @@ def main():
                     accelerator.log({"train_loss": train_loss}, step=global_step)
                     train_loss = 0.0
 
-                    checkpointing_steps = 100
+                    checkpointing_steps = 1000
                     if global_step % checkpointing_steps == 0:
                         logging.info("Epoch : {} ; Step : {} ; Save checkpoint to {}".format(epoch, global_step, training_args.output_dir))
                         if accelerator.is_main_process:
