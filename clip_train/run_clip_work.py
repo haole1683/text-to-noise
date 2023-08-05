@@ -1,8 +1,8 @@
-import ptvsd
-print("waiting for attaching")
-ptvsd.enable_attach(address = ('127.0.0.1', 5678))
-ptvsd.wait_for_attach()
-print("attached")
+# import ptvsd
+# print("waiting for attaching")
+# ptvsd.enable_attach(address = ('127.0.0.1', 5678))
+# ptvsd.wait_for_attach()
+# print("attached")
 
 
 import logging
@@ -222,7 +222,7 @@ class ExperimentArguments:
         default=True, metadata={"help": "Whether to normalize the dataset."}
     )
     if_use_clip_tokenizer: bool = field(
-        default=False, metadata={"help": "Whether to use the clip tokenizer."}
+        default=True, metadata={"help": "Whether to use the clip tokenizer."}
     )
     if_use_8bit_adam: bool = field(
         default=False, metadata={"help": "Whether to use the 8bit adam."}
@@ -907,7 +907,7 @@ def main():
 
                 # Gather the losses across all processes for logging (if we use distributed training).
                 avg_loss = accelerator.gather(loss.repeat(training_args.train_batch_size)).mean()
-
+                train_loss += avg_loss.item()/training_args.gradient_accumulation_steps
                 # Backpropagate
                 accelerator.backward(loss)
 

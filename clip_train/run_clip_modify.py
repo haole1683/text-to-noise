@@ -56,7 +56,7 @@ if TYPE_CHECKING:
 import transformers
 from transformers import (
     AutoImageProcessor,
-    AutoModel,
+    AutoModel, 
     AutoTokenizer,
     HfArgumentParser,
     Trainer,
