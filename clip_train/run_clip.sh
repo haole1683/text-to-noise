@@ -9,13 +9,13 @@ python run_clip.py \
     --remove_unused_columns=False \
     --do_train \
     --do_eval \
-    --per_device_train_batch_size="256" \
-    --per_device_eval_batch_size="256" \
+    --per_device_train_batch_size="128" \
+    --per_device_eval_batch_size="128" \
     --learning_rate="5e-5" --warmup_steps="0" --weight_decay 0.1 \
     --overwrite_output_dir \
     --max_train_samples=50000 \
     --max_eval_samples=10000 \
-    --num_train_epochs="20" \
+    --num_train_epochs="5" \
 
 
         # --do_train \
