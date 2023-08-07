@@ -16,11 +16,7 @@ should probably proofread and complete it, then remove this comment. -->
 
 This model is a fine-tuned version of [../clip-roberta](https://huggingface.co/../clip-roberta) on the ydshieh/coco_dataset_script 2017 dataset.
 It achieves the following results on the evaluation set:
-- eval_loss: 5.6186
-- eval_runtime: 1463.7184
-- eval_samples_per_second: 6.832
-- eval_steps_per_second: 0.027
-- step: 0
+- Loss: 2.1063
 
 ## Model description
 
@@ -40,12 +36,16 @@ More information needed
 
 The following hyperparameters were used during training:
 - learning_rate: 5e-05
-- train_batch_size: 256
-- eval_batch_size: 256
+- train_batch_size: 128
+- eval_batch_size: 128
 - seed: 42
 - optimizer: Adam with betas=(0.9,0.999) and epsilon=1e-08
 - lr_scheduler_type: linear
-- num_epochs: 3.0
+- num_epochs: 5.0
+
+### Training results
+
+
 
 ### Framework versions
 

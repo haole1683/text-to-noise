@@ -13,9 +13,10 @@ python run_clip.py \
     --per_device_eval_batch_size="128" \
     --learning_rate="5e-5" --warmup_steps="0" --weight_decay 0.1 \
     --overwrite_output_dir \
-    --max_train_samples=50000 \
+    --max_train_samples=5000 \
     --max_eval_samples=10000 \
-    --num_train_epochs="5" \
+    --num_train_epochs="1" \
+    # --checkpoint="/remote-home/songtianwei/research/diffusion_model_my/clip_train/clip-roberta-finetuned/checkpoint-15000" \
 
 
         # --do_train \

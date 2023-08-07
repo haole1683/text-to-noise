@@ -1,7 +1,7 @@
 echo "WTF"
 
 python run_clip_work.py \
-    --output_dir ./clip-train \
+    --output_dir ./clip-roberta-finetuned \
     --model_name_or_path ../clip-roberta \
     --data_dir /remote-home/songtianwei/research/diffusion_model_my/data \
     --dataset_name ydshieh/coco_dataset_script \
@@ -21,12 +21,11 @@ python run_clip_work.py \
     --num_train_epochs=10 \
     --per_device_train_batch_size="256" \
     --per_device_eval_batch_size="256" \
-    --max_train_samples=50000 \
+    --max_train_samples=500 \
     --max_eval_samples=10000 \
     --if_clip_train="True" \
     --if_add_noise="False" \
     --if_generator_train="False" \
     --if_use_8bit_adam="False" \
-    --resume_from_checkpoint="latest" \
 
 # lr 5e-5

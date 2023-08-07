@@ -1,8 +1,8 @@
-# import ptvsd
-# print("waiting for attaching")
-# ptvsd.enable_attach(address = ('127.0.0.1', 5678))
-# ptvsd.wait_for_attach()
-# print("attached")
+import ptvsd
+print("waiting for attaching")
+ptvsd.enable_attach(address = ('127.0.0.1', 5678))
+ptvsd.wait_for_attach()
+print("attached")
 
 
 import logging
@@ -542,11 +542,8 @@ def main():
             )
 
     # Initialize torchvision transforms and jit it for faster processing.
-    # image_transformations = Transform(
-    #     clip_model_config.vision_config.image_size
-    # )
     image_transformations = Transform(
-        clip_model_config.vision_config.image_size, mean=image_processor.mean, std=image_processor.std
+        clip_model_config.vision_config.image_size
     )
     
     # image_transformations = torch.jit.script(image_transformations)
@@ -844,7 +841,8 @@ def main():
     logger.info("add_noise: {}, use_normailize:{}".format(if_add_noise,if_normalize))
      
     for epoch in range(first_epoch, training_args.num_train_epochs):
-        if training_args.do_train:
+        do_train = False
+        if do_train:
             logging.info("*"*50)
             logging.info("Doing Training")
             logging.info("*"*50)
@@ -902,7 +900,7 @@ def main():
                 batch_data_input = {
                     "input_ids":batch_input_ids,
                     "pixel_values" : image,
-                    "attention_mask":batch["attention_mask"],
+                    "attention_mask":batch_attention_mask,
                     "return_loss": True
                 }
                 output = clip_model(**batch_data_input)
@@ -987,7 +985,7 @@ def main():
                     batch_data_input = {
                         "input_ids":batch_input_ids,
                         "pixel_values" : image,
-                        "attention_mask":batch["attention_mask"],
+                        "attention_mask":batch_attention_mask,
                         "return_loss": True
                     }
                     output = clip_model(**batch_data_input)
