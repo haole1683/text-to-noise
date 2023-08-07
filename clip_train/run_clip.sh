@@ -15,6 +15,7 @@ python run_clip.py \
     --overwrite_output_dir \
     --max_train_samples=50000 \
     --max_eval_samples=10000 \
+    --num_train_epochs="20" \
 
 
         # --do_train \
