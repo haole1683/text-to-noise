@@ -37,6 +37,7 @@ from transformers import (
     HfArgumentParser,
     TrainingArguments,
     set_seed,
+    Trainer
 )
 from transformers.trainer_utils import get_last_checkpoint
 from transformers.utils import send_example_telemetry
@@ -236,6 +237,9 @@ dataset_name_mapping = {
     "image_caption_dataset.py": ("image_path", "caption"),
 }
 
+def normalize_fn(x, mean, std):
+    return Normalize(mean=mean, std=std)(x)
+
 class Transform(torch.nn.Module):
     def __init__(self, image_size, mean=None, std=None):
         super().__init__()
@@ -254,8 +258,7 @@ class Transform(torch.nn.Module):
             x = self.transforms(x)
         return x
 
-def normalize_fn(x, mean, std):
-    return Normalize(mean=mean, std=std)(x)
+
 
 def collate_fn(examples):
     pixel_values = torch.stack([example["pixel_values"] for example in examples])
@@ -539,9 +542,13 @@ def main():
             )
 
     # Initialize torchvision transforms and jit it for faster processing.
+    # image_transformations = Transform(
+    #     clip_model_config.vision_config.image_size
+    # )
     image_transformations = Transform(
-        clip_model_config.vision_config.image_size
+        clip_model_config.vision_config.image_size, mean=image_processor.mean, std=image_processor.std
     )
+    
     # image_transformations = torch.jit.script(image_transformations)
     
     # Preprocessing the datasets.
@@ -601,7 +608,6 @@ def main():
             # Transform images on the fly as doing it on the whole dataset takes too much time.
             train_dataset.set_transform(transform_images)
 
-    
     # train dataloader
     train_dataloader = torch.utils.data.DataLoader(
         train_dataset,
@@ -636,7 +642,7 @@ def main():
         
             # Transform images on the fly as doing it on the whole dataset takes too much time.
             eval_dataset.set_transform(transform_images)
-
+    
     # evaluation dataloader
     eval_dataloader = torch.utils.data.DataLoader(
         eval_dataset,
@@ -953,9 +959,9 @@ def main():
 
                 if global_step >= training_args.max_steps:
                     break
-
+        
         # evaluation on the eval dataset
-        accelerator.wait_for_everyone()
+        # accelerator.wait_for_everyone()
         if training_args.do_eval and accelerator.is_main_process:
             logging.info("*"*50)
             logging.info("Doing Evaluation")

@@ -19,14 +19,14 @@ python run_clip_work.py \
     --max_seq_length="77" \
     --max_steps=100000 \
     --num_train_epochs=10 \
-    --per_device_train_batch_size="64" \
-    --per_device_eval_batch_size="64" \
+    --per_device_train_batch_size="256" \
+    --per_device_eval_batch_size="256" \
     --max_train_samples=50000 \
     --max_eval_samples=10000 \
     --if_clip_train="True" \
     --if_add_noise="False" \
     --if_generator_train="False" \
     --if_use_8bit_adam="False" \
-
+    --resume_from_checkpoint="latest" \
 
 # lr 5e-5

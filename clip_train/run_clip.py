@@ -22,11 +22,11 @@ and text models:
 Vision models: ViT(https://huggingface.co/models?filter=vit), CLIP (https://huggingface.co/models?filter=clip)
 Text models: BERT, ROBERTa (https://huggingface.co/models?filter=fill-mask)
 """
-import ptvsd
-print("waiting for attaching")
-ptvsd.enable_attach(address = ('127.0.0.1', 5678))
-ptvsd.wait_for_attach()
-print("attached")
+# import ptvsd
+# print("waiting for attaching")
+# ptvsd.enable_attach(address = ('127.0.0.1', 5678))
+# ptvsd.wait_for_attach()
+# print("attached")
 
 import logging
 import os
