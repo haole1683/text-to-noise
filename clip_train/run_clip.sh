@@ -7,6 +7,7 @@ python run_clip.py \
     --image_column image_path \
     --caption_column caption \
     --remove_unused_columns=False \
+    --do_train \
     --do_eval \
     --per_device_train_batch_size="256" \
     --per_device_eval_batch_size="256" \
@@ -14,5 +15,6 @@ python run_clip.py \
     --overwrite_output_dir \
     --max_train_samples=50000 \
     --max_eval_samples=10000 \
+
 
         # --do_train \
