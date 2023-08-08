@@ -1,8 +1,8 @@
-import ptvsd
-print("waiting for attaching")
-ptvsd.enable_attach(address = ('127.0.0.1', 5678))
-ptvsd.wait_for_attach()
-print("attached")
+# import ptvsd
+# print("waiting for attaching")
+# ptvsd.enable_attach(address = ('127.0.0.1', 5678))
+# ptvsd.wait_for_attach()
+# print("attached")
 
 
 import logging
@@ -642,7 +642,8 @@ def main():
     
     # evaluation dataloader
     eval_dataloader = torch.utils.data.DataLoader(
-        eval_dataset,
+        # eval_dataset,
+        train_dataset,
         shuffle=True,
         collate_fn=collate_fn,
         batch_size=training_args.eval_batch_size,
@@ -841,8 +842,7 @@ def main():
     logger.info("add_noise: {}, use_normailize:{}".format(if_add_noise,if_normalize))
      
     for epoch in range(first_epoch, training_args.num_train_epochs):
-        do_train = False
-        if do_train:
+        if training_args.do_train:
             logging.info("*"*50)
             logging.info("Doing Training")
             logging.info("*"*50)

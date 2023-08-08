@@ -21,7 +21,7 @@ python run_clip_work.py \
     --num_train_epochs=10 \
     --per_device_train_batch_size="256" \
     --per_device_eval_batch_size="256" \
-    --max_train_samples=500 \
+    --max_train_samples=50000 \
     --max_eval_samples=10000 \
     --if_clip_train="True" \
     --if_add_noise="False" \
