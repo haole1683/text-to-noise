@@ -479,13 +479,13 @@ def main():
     #     revision=model_args.model_revision,
     #     use_auth_token=True if model_args.use_auth_token else None,
     # )
-    clip_model = CLIPModel(clip_config)
-    clip_model_config = clip_model.config
+    
     clip_pretrained = experiment_args.if_clip_pretrained
+    clip_pretrained = True
     if clip_pretrained:
-        pass
+        clip_model = CLIPModel(clip_config)
     else:
-        clip_model = AutoModel.from_config(clip_model_config)
+        clip_model = AutoModel.from_config(clip_config)
         
     def _freeze_params(module):
         for param in module.parameters():

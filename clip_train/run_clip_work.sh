@@ -1,7 +1,8 @@
 echo "WTF"
 
 python run_clip_work.py \
-    --output_dir ./clip-roberta-finetuned \
+    --cache_dir /share/test/songtianwei/huggingface \
+    --output_dir /share/ckpt/songtianwei \
     --model_name_or_path ../clip-roberta \
     --data_dir /remote-home/songtianwei/research/diffusion_model_my/data \
     --dataset_name ydshieh/coco_dataset_script \

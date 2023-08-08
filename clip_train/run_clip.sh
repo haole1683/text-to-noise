@@ -19,4 +19,4 @@ python run_clip.py \
     # --checkpoint="/remote-home/songtianwei/research/diffusion_model_my/clip_train/clip-roberta-finetuned/checkpoint-15000" \
 
 
-        # --do_train \
+    # --do_train \

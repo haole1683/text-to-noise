@@ -1,9 +1,0 @@
-https://thereisnospon.github.io/NovelAiTag/
-https://zhuanlan.zhihu.com/p/618762873
-
-prompt：
-https://civitai.com/models/62473?modelVersionId=84199
-https://docs.google.com/document/d/1NAVTmZXq7xRXKnFMyiAeJ2IyYN5QsgbSEaL7knv_xbs/edit
-
-Model :
-https://civitai.com/models/51057/or-kawaiiice
