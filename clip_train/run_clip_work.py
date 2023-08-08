@@ -907,12 +907,21 @@ def main():
                 
                 # Update optimizer
                 optimizer.step()
+                if if_add_noise and if_generator_train:
+                    optimizer_generator.step()
+                    
+                # update learning rate
                 # lr_scheduler.step()
                 
+                # zero the grad of model
                 clip_model.zero_grad()
                 if if_add_noise and if_generator_train:
                     generator.zero_grad()
-                # optimizer.zero_grad()
+                
+                # zero the grad of optimizer
+                optimizer.zero_grad()
+                if if_add_noise and if_generator_train:
+                    optimizer_generator.zero_grad()
 
                 # Checks if the accelerator has performed an optimization step behind the scenes
                 if accelerator.sync_gradients:

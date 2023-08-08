@@ -22,8 +22,8 @@ accelerate launch --multi_gpu run_clip_work.py \
     --max_seq_length="77" \
     --max_steps=100000 \
     --num_train_epochs=10 \
-    --per_device_train_batch_size="8" \
-    --per_device_eval_batch_size="8" \
+    --per_device_train_batch_size="2" \
+    --per_device_eval_batch_size="2" \
     --if_clip_train="True" \
     --if_clip_pretrained="True" \
     --if_add_noise="True" \
