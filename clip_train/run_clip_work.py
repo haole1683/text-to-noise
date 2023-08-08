@@ -454,15 +454,15 @@ def main():
             "You can do it from another script, save it, and load it from here, using --tokenizer_name."
         )
         
-    revision = None
-    pretrained_model_name_or_path = "CompVis/stable-diffusion-v1-4"
+    # revision = None
+    # pretrained_model_name_or_path = "CompVis/stable-diffusion-v1-4"
     
-    # Note: Do not use the clip tokenizer, loss can not decrease
-    use_clip_tokenizer = experiment_args.if_use_clip_tokenizer
-    if use_clip_tokenizer:
-        tokenizer = CLIPTokenizer.from_pretrained(
-            pretrained_model_name_or_path, subfolder="tokenizer", revision=revision
-        )
+    # # Note: Do not use the clip tokenizer, loss can not decrease
+    # use_clip_tokenizer = experiment_args.if_use_clip_tokenizer
+    # if use_clip_tokenizer:
+    #     tokenizer = CLIPTokenizer.from_pretrained(
+    #         model_args.cache_dir, subfolder="tokenizer", revision=revision
+    #     )
         
     # Load image_processor, in this script we only use this to get the mean and std for normalization.
     image_processor = AutoImageProcessor.from_pretrained(
@@ -473,12 +473,6 @@ def main():
     )
     
     clip_config = CLIPConfig()
-    # clip_model = AutoModel.from_pretrained(
-    #     model_args.model_name_or_path,
-    #     cache_dir=model_args.cache_dir,
-    #     revision=model_args.model_revision,
-    #     use_auth_token=True if model_args.use_auth_token else None,
-    # )
     
     clip_pretrained = experiment_args.if_clip_pretrained
     clip_pretrained = True
@@ -543,7 +537,7 @@ def main():
 
     # Initialize torchvision transforms and jit it for faster processing.
     image_transformations = Transform(
-        clip_model_config.vision_config.image_size
+        clip_config.vision_config.image_size
     )
     
     # image_transformations = torch.jit.script(image_transformations)
@@ -642,8 +636,8 @@ def main():
     
     # evaluation dataloader
     eval_dataloader = torch.utils.data.DataLoader(
-        # eval_dataset,
-        train_dataset,
+        eval_dataset,
+        # train_dataset,
         shuffle=True,
         collate_fn=collate_fn,
         batch_size=training_args.eval_batch_size,
