@@ -208,7 +208,7 @@ class ExperimentArguments:
     Hyperparameters for the experiment.
     """
     if_clip_pretrained: bool = field(
-        default=False, metadata={"help": "Whether to use the pretrained clip model."}
+        default=True, metadata={"help": "Whether to use the pretrained clip model."}
     )
     if_clip_train: bool = field(
         default=True, metadata={"help": "Whether to train the clip model."}
@@ -257,6 +257,7 @@ class Transform(torch.nn.Module):
         with torch.no_grad():
             x = self.transforms(x)
         return x
+
 
 
 def collate_fn(examples):
@@ -453,16 +454,6 @@ def main():
             "You can do it from another script, save it, and load it from here, using --tokenizer_name."
         )
         
-    # revision = None
-    # pretrained_model_name_or_path = "CompVis/stable-diffusion-v1-4"
-    
-    # # Note: Do not use the clip tokenizer, loss can not decrease
-    # use_clip_tokenizer = experiment_args.if_use_clip_tokenizer
-    # if use_clip_tokenizer:
-    #     tokenizer = CLIPTokenizer.from_pretrained(
-    #         model_args.cache_dir, subfolder="tokenizer", revision=revision
-    #     )
-        
     # Load image_processor, in this script we only use this to get the mean and std for normalization.
     image_processor = AutoImageProcessor.from_pretrained(
         model_args.image_processor_name or model_args.model_name_or_path,
@@ -472,12 +463,16 @@ def main():
     )
     
     clip_config = CLIPConfig()
-    
     clip_pretrained = experiment_args.if_clip_pretrained
-    clip_pretrained = True
     if clip_pretrained:
-        clip_model = CLIPModel(clip_config)
+        clip_model = AutoModel.from_pretrained(
+            model_args.model_name_or_path,
+            cache_dir=model_args.cache_dir,
+            revision=model_args.model_revision,
+            token=True if model_args.use_auth_token else None,
+        )
     else:
+        # clip_model = CLIPModel(clip_config)
         clip_model = AutoModel.from_config(clip_config)
         
     def _freeze_params(module):
@@ -607,6 +602,7 @@ def main():
         num_workers=training_args.dataloader_num_workers,
         drop_last=True,
     )
+    
         
     if training_args.do_eval:
         with accelerator.main_process_first():
@@ -635,12 +631,14 @@ def main():
     # evaluation dataloader
     eval_dataloader = torch.utils.data.DataLoader(
         eval_dataset,
+        # train_dataset,
         shuffle=True,
         collate_fn=collate_fn,
         batch_size=training_args.eval_batch_size,
         num_workers=training_args.dataloader_num_workers,
         drop_last=True,
     )
+
 
     if training_args.do_predict:
         with accelerator.main_process_first():
@@ -671,6 +669,7 @@ def main():
     
     # Initialize the optimizer
     use_8bit_adam = experiment_args.if_use_8bit_adam
+    
     if use_8bit_adam:
         try:
             import bitsandbytes as bnb
@@ -709,16 +708,6 @@ def main():
     if experiment_args.if_add_noise and experiment_args.if_generator_train:
         generator_parameters = generator.parameters()
         optimizer_generator = optimizer_cls(generator_parameters, **adam_kwargs)
-   
-    # lr_scheduler = 'linear'
-    # lr_warmup_steps = 0
-    
-    # lr_scheduler = get_scheduler(
-    #     lr_scheduler,
-    #     optimizer=optimizer,
-    #     num_warmup_steps=lr_warmup_steps * training_args.gradient_accumulation_steps,
-    #     num_training_steps=training_args.max_steps * training_args.gradient_accumulation_steps,
-    # )
     
     # Handle the repository creation
     if accelerator.is_main_process:
@@ -830,7 +819,8 @@ def main():
     
     logger.info("clip_train: {}, generator_train: {}".format(if_clip_train, if_generator_train))
     logger.info("add_noise: {}, use_normailize:{}".format(if_add_noise,if_normalize))
-     
+    wandb.init()
+    
     for epoch in range(first_epoch, training_args.num_train_epochs):
         if training_args.do_train:
             logging.info("*"*50)
@@ -866,7 +856,11 @@ def main():
                 batch_attention_mask = batch["attention_mask"]
                 
                 if if_add_noise:
-                    text_encoder = clip_model.text_model
+                    # if this is not distrubution training
+                    if accelerator.use_distributed:
+                        text_encoder = clip_model.module.text_model
+                    else:
+                        text_encoder = clip_model.text_model
                     with torch.no_grad():
                         encoder_hidden_states = text_encoder(batch_input_ids,batch_attention_mask)[0]  # [6,128,768]                
                     noise = generator(batch_pixel_values, encoder_hidden_states)

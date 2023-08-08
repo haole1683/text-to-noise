@@ -1,6 +1,8 @@
 echo "WTF"
 
-python run_clip_work.py \
+wandb offline
+
+accelerate launch --multi_gpu run_clip_work.py \
     --cache_dir /share/test/songtianwei/huggingface \
     --output_dir /share/ckpt/songtianwei \
     --model_name_or_path /share/test/songtianwei/model_save \
@@ -20,13 +22,14 @@ python run_clip_work.py \
     --max_seq_length="77" \
     --max_steps=100000 \
     --num_train_epochs=10 \
-    --per_device_train_batch_size="256" \
-    --per_device_eval_batch_size="256" \
+    --per_device_train_batch_size="8" \
+    --per_device_eval_batch_size="8" \
+    --if_clip_train="True" \
+    --if_clip_pretrained="True" \
+    --if_add_noise="True" \
+    --if_generator_train="True" \
+    --if_use_8bit_adam="False" \
     --max_train_samples=50000 \
     --max_eval_samples=10000 \
-    --if_clip_train="True" \
-    --if_add_noise="False" \
-    --if_generator_train="False" \
-    --if_use_8bit_adam="False" \
-
+    
 # lr 5e-5
