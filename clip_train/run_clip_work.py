@@ -259,7 +259,6 @@ class Transform(torch.nn.Module):
         return x
 
 
-
 def collate_fn(examples):
     pixel_values = torch.stack([example["pixel_values"] for example in examples])
     input_ids = torch.tensor([example["input_ids"] for example in examples], dtype=torch.long)
@@ -608,7 +607,6 @@ def main():
         num_workers=training_args.dataloader_num_workers,
         drop_last=True,
     )
-    
         
     if training_args.do_eval:
         with accelerator.main_process_first():
@@ -637,14 +635,12 @@ def main():
     # evaluation dataloader
     eval_dataloader = torch.utils.data.DataLoader(
         eval_dataset,
-        # train_dataset,
         shuffle=True,
         collate_fn=collate_fn,
         batch_size=training_args.eval_batch_size,
         num_workers=training_args.dataloader_num_workers,
         drop_last=True,
     )
-
 
     if training_args.do_predict:
         with accelerator.main_process_first():
