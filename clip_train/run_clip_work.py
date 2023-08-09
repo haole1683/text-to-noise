@@ -845,6 +845,7 @@ def main():
     wandb.init()
     
     for epoch in range(first_epoch, training_args.num_train_epochs):
+        accelerator.wait_for_everyone()
         if training_args.do_train:
             logging.info("*"*50)
             logging.info("Doing Training")
@@ -914,19 +915,6 @@ def main():
                 # Gather the losses across all processes for logging (if we use distributed training).
                 avg_loss = accelerator.gather(loss.repeat(training_args.per_device_train_batch_size)).mean()
                 train_loss += avg_loss.item()/training_args.gradient_accumulation_steps
-                
-                # fix the bug of 
-                # making sure all forward function outputs participate in calculating loss
-                # if if_add_noise and if_generator_train:
-                #     # which to train
-                #     train_target = train_target_list[cur_index]
-                #     cur_index = (cur_index + 1) % len(train_target_list)
-                #     if train_target == "generator":
-                #         optimizer_generator.step()
-                #     elif train_target == "clip":
-                #         optimizer.step()
-                # else:
-                #     optimizer.step()
                 
                 # Backpropagate
                 accelerator.backward(loss)

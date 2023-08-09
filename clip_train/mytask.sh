@@ -1,5 +1,19 @@
-echo "WTF"
+#!/bin/bash
+# Parameters
+#SBATCH --cpus-per-task=2
+#SBATCH --gpus-per-node=8
+#SBATCH --job-name=deit
+#SBATCH --mem=320GB
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=8
+#SBATCH --open-mode=append
+#SBATCH --output=/vhome/songtianwei/research/text-to-noise/%j_0_log.out
+#SBATCH --partition=fvl
+#SBATCH --qos=high
+#SBATCH --time=1-00:00  
+#SBATCH --wckey=submitit
 
+# command
 wandb offline
 
 accelerate launch  \
@@ -33,4 +47,3 @@ accelerate launch  \
     --if_use_8bit_adam="True" \
     --max_train_samples=500 \
     --max_eval_samples=10000 \
-

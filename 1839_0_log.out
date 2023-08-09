@@ -1,0 +1,432 @@
+W&B offline. Running your script from this directory will only write metadata locally. Use wandb disabled to completely turn off W&B.
+1
+1
+08/09/2023 17:19:16 - WARNING - __main__ - Process rank: 0, device: cuda:0, n_gpu: 1distributed training: True, 16-bits training: False
+08/09/2023 17:19:16 - INFO - __main__ - Training/evaluation parameters TrainingArguments(
+_n_gpu=1,
+adafactor=False,
+adam_beta1=0.9,
+adam_beta2=0.999,
+adam_epsilon=1e-08,
+auto_find_batch_size=False,
+bf16=False,
+bf16_full_eval=False,
+data_seed=None,
+dataloader_drop_last=False,
+dataloader_num_workers=0,
+dataloader_pin_memory=True,
+ddp_backend=None,
+ddp_broadcast_buffers=None,
+ddp_bucket_cap_mb=None,
+ddp_find_unused_parameters=None,
+ddp_timeout=1800,
+debug=[],
+deepspeed=None,
+disable_tqdm=False,
+do_eval=True,
+do_predict=False,
+do_train=True,
+eval_accumulation_steps=None,
+eval_delay=0,
+eval_steps=None,
+evaluation_strategy=no,
+fp16=False,
+fp16_backend=auto,
+fp16_full_eval=False,
+fp16_opt_level=O1,
+fsdp=[],
+fsdp_config={'fsdp_min_num_params': 0, 'xla': False, 'xla_fsdp_grad_ckpt': False},
+fsdp_min_num_params=0,
+fsdp_transformer_layer_cls_to_wrap=None,
+full_determinism=False,
+gradient_accumulation_steps=1,
+gradient_checkpointing=False,
+greater_is_better=None,
+group_by_length=False,
+half_precision_backend=auto,
+hub_model_id=None,
+hub_private_repo=False,
+hub_strategy=every_save,
+hub_token=<HUB_TOKEN>,
+ignore_data_skip=False,
+include_inputs_for_metrics=False,
+jit_mode_eval=False,
+label_names=None,
+label_smoothing_factor=0.0,
+learning_rate=5e-05,
+length_column_name=length,
+load_best_model_at_end=False,
+local_rank=0,
+log_level=passive,
+log_level_replica=warning,
+log_on_each_node=True,
+logging_dir=/share/ckpt/songtianwei/runs/Aug09_17-19-14_fvl04,
+logging_first_step=False,
+logging_nan_inf_filter=True,
+logging_steps=500,
+logging_strategy=steps,
+lr_scheduler_type=linear,
+max_grad_norm=1.0,
+max_steps=100000,
+metric_for_best_model=None,
+mp_parameters=,
+no_cuda=False,
+num_train_epochs=5.0,
+optim=adamw_hf,
+optim_args=None,
+output_dir=/share/ckpt/songtianwei,
+overwrite_output_dir=True,
+past_index=-1,
+per_device_eval_batch_size=128,
+per_device_train_batch_size=4,
+prediction_loss_only=False,
+push_to_hub=False,
+push_to_hub_model_id=None,
+push_to_hub_organization=None,
+push_to_hub_token=<PUSH_TO_HUB_TOKEN>,
+ray_scope=last,
+remove_unused_columns=False,
+report_to=['wandb'],
+resume_from_checkpoint=None,
+run_name=/share/ckpt/songtianwei,
+save_on_each_node=False,
+save_safetensors=False,
+save_steps=500,
+save_strategy=steps,
+save_total_limit=None,
+seed=42,
+sharded_ddp=[],
+skip_memory_metrics=True,
+tf32=None,
+torch_compile=False,
+torch_compile_backend=None,
+torch_compile_mode=None,
+torchdynamo=None,
+tpu_metrics_debug=False,
+tpu_num_cores=None,
+use_ipex=False,
+use_legacy_prediction_loop=False,
+use_mps_device=False,
+warmup_ratio=0.0,
+warmup_steps=0,
+weight_decay=0.1,
+xpu_backend=None,
+)
+08/09/2023 17:19:16 - INFO - __main__ - Distributed environment: MULTI_GPU  Backend: nccl
+Num processes: 2
+Process index: 0
+Local process index: 0
+Device: cuda:0
+
+Mixed precision type: no
+
+/vhome/songtianwei/anaconda3/envs/pytorch2/lib/python3.9/site-packages/datasets/load.py:2069: FutureWarning: 'use_auth_token' was deprecated in favor of 'token' in version 2.14.0 and will be removed in 3.0.0.
+You can remove this warning by passing 'token=None' instead.
+  warnings.warn(
+/vhome/songtianwei/anaconda3/envs/pytorch2/lib/python3.9/site-packages/datasets/load.py:2069: FutureWarning: 'use_auth_token' was deprecated in favor of 'token' in version 2.14.0 and will be removed in 3.0.0.
+You can remove this warning by passing 'token=None' instead.
+  warnings.warn(
+Repo card metadata block was not found. Setting CardData to empty.
+08/09/2023 17:19:20 - WARNING - huggingface_hub.repocard - Repo card metadata block was not found. Setting CardData to empty.
+Repo card metadata block was not found. Setting CardData to empty.
+08/09/2023 17:19:22 - WARNING - huggingface_hub.repocard - Repo card metadata block was not found. Setting CardData to empty.
+wandb: Tracking run with wandb version 0.15.8
+wandb: W&B syncing is set to `offline` in this directory.  
+wandb: Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+08/09/2023 17:25:06 - INFO - __main__ - ***** Running training *****
+08/09/2023 17:25:06 - INFO - __main__ -   Training num examples = 500
+08/09/2023 17:25:06 - INFO - __main__ -   Evaluation num examples = 10000
+08/09/2023 17:25:06 - INFO - __main__ -   Num Epochs = 5
+08/09/2023 17:25:06 - INFO - __main__ -   Instantaneous batch size per device = 4
+08/09/2023 17:25:06 - INFO - __main__ -   Total train batch size (w. parallel, distributed & accumulation) = 8
+08/09/2023 17:25:06 - INFO - __main__ -   Gradient Accumulation steps = 1
+08/09/2023 17:25:06 - INFO - __main__ -   Total optimization steps = 100000
+
+  0%|          | 0/100000 [00:00<?, ?it/s]
+Training Steps:   0%|          | 0/100000 [00:00<?, ?it/s]wandb: Tracking run with wandb version 0.15.8
+wandb: W&B syncing is set to `offline` in this directory.  
+wandb: Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+08/09/2023 17:25:06 - INFO - root - **************************************************
+08/09/2023 17:25:06 - INFO - root - Doing Training
+08/09/2023 17:25:06 - INFO - root - **************************************************
+08/09/2023 17:25:06 - INFO - __main__ - clip_train: True, generator_train: True
+08/09/2023 17:25:06 - INFO - __main__ - add_noise: True, use_normailize:True
+08/09/2023 17:25:06 - INFO - root - **************************************************
+08/09/2023 17:25:06 - INFO - root - Doing Training
+08/09/2023 17:25:06 - INFO - root - **************************************************
+
+Training Steps:   0%|          | 0/100000 [00:00<?, ?it/s]Forward upsample size to force interpolation output size.
+[W reducer.cpp:1300] Warning: find_unused_parameters=True was specified in DDP constructor, but did not find any unused parameters in the forward pass. This flag results in an extra traversal of the autograd graph every iteration,  which can adversely affect performance. If your model indeed never has any unused parameters in the forward pass, consider turning this flag off. Note that this warning may be a false positive if your model has flow control causing later iterations to have unused parameters. (function operator())
+[W reducer.cpp:1300] Warning: find_unused_parameters=True was specified in DDP constructor, but did not find any unused parameters in the forward pass. This flag results in an extra traversal of the autograd graph every iteration,  which can adversely affect performance. If your model indeed never has any unused parameters in the forward pass, consider turning this flag off. Note that this warning may be a false positive if your model has flow control causing later iterations to have unused parameters. (function operator())
+/vhome/songtianwei/anaconda3/envs/pytorch2/lib/python3.9/site-packages/torch/autograd/__init__.py:200: UserWarning: Grad strides do not match bucket view strides. This may indicate grad was not created according to the gradient layout contract, or that the param's strides changed since DDP was constructed.  This is not an error, but may impair performance.
+grad.sizes() = [128, 256, 1, 1], strides() = [256, 1, 256, 256]
+bucket_view.sizes() = [128, 256, 1, 1], strides() = [256, 1, 1, 1] (Triggered internally at /opt/conda/conda-bld/pytorch_1682343964576/work/torch/csrc/distributed/c10d/reducer.cpp:323.)
+  Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+/vhome/songtianwei/anaconda3/envs/pytorch2/lib/python3.9/site-packages/torch/autograd/__init__.py:200: UserWarning: Grad strides do not match bucket view strides. This may indicate grad was not created according to the gradient layout contract, or that the param's strides changed since DDP was constructed.  This is not an error, but may impair performance.
+grad.sizes() = [128, 256, 1, 1], strides() = [256, 1, 256, 256]
+bucket_view.sizes() = [128, 256, 1, 1], strides() = [256, 1, 1, 1] (Triggered internally at /opt/conda/conda-bld/pytorch_1682343964576/work/torch/csrc/distributed/c10d/reducer.cpp:323.)
+  Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+
+Training Steps:   0%|          | 1/100000 [00:43<1221:54:10, 43.99s/it]
+Training Steps:   0%|          | 1/100000 [00:43<1221:54:10, 43.99s/it, epoch=0, global_step=1, lr=5e-5, step=0, train_loss=1.4]Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 2/100000 [01:10<935:04:19, 33.66s/it, epoch=0, global_step=1, lr=5e-5, step=0, train_loss=1.4] 
+Training Steps:   0%|          | 2/100000 [01:10<935:04:19, 33.66s/it, epoch=0, global_step=2, lr=5e-5, step=1, train_loss=1.45]Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 3/100000 [01:47<980:51:34, 35.31s/it, epoch=0, global_step=2, lr=5e-5, step=1, train_loss=1.45]
+Training Steps:   0%|          | 3/100000 [01:47<980:51:34, 35.31s/it, epoch=0, global_step=3, lr=5e-5, step=2, train_loss=1.41]Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 4/100000 [02:14<892:45:55, 32.14s/it, epoch=0, global_step=3, lr=5e-5, step=2, train_loss=1.41]
+Training Steps:   0%|          | 4/100000 [02:14<892:45:55, 32.14s/it, epoch=0, global_step=4, lr=5e-5, step=3, train_loss=1.5] Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 5/100000 [02:52<945:05:08, 34.02s/it, epoch=0, global_step=4, lr=5e-5, step=3, train_loss=1.5]
+Training Steps:   0%|          | 5/100000 [02:52<945:05:08, 34.02s/it, epoch=0, global_step=5, lr=5e-5, step=4, train_loss=1.53]Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 6/100000 [03:22<910:13:28, 32.77s/it, epoch=0, global_step=5, lr=5e-5, step=4, train_loss=1.53]
+Training Steps:   0%|          | 6/100000 [03:22<910:13:28, 32.77s/it, epoch=0, global_step=6, lr=5e-5, step=5, train_loss=1.39]Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 7/100000 [04:01<968:56:40, 34.88s/it, epoch=0, global_step=6, lr=5e-5, step=5, train_loss=1.39]
+Training Steps:   0%|          | 7/100000 [04:01<968:56:40, 34.88s/it, epoch=0, global_step=7, lr=5e-5, step=6, train_loss=1.41]Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 8/100000 [04:36<967:31:24, 34.83s/it, epoch=0, global_step=7, lr=5e-5, step=6, train_loss=1.41]
+Training Steps:   0%|          | 8/100000 [04:36<967:31:24, 34.83s/it, epoch=0, global_step=8, lr=5e-5, step=7, train_loss=1.41]Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 9/100000 [05:06<923:28:20, 33.25s/it, epoch=0, global_step=8, lr=5e-5, step=7, train_loss=1.41]
+Training Steps:   0%|          | 9/100000 [05:06<923:28:20, 33.25s/it, epoch=0, global_step=9, lr=5e-5, step=8, train_loss=1.38]Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 10/100000 [05:48<999:53:07, 36.00s/it, epoch=0, global_step=9, lr=5e-5, step=8, train_loss=1.38]
+Training Steps:   0%|          | 10/100000 [05:48<999:53:07, 36.00s/it, epoch=0, global_step=10, lr=5e-5, step=9, train_loss=1.4]Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 11/100000 [06:26<1019:33:15, 36.71s/it, epoch=0, global_step=10, lr=5e-5, step=9, train_loss=1.4]
+Training Steps:   0%|          | 11/100000 [06:26<1019:33:15, 36.71s/it, epoch=0, global_step=11, lr=5e-5, step=10, train_loss=1.4]Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 12/100000 [07:09<1067:51:52, 38.45s/it, epoch=0, global_step=11, lr=5e-5, step=10, train_loss=1.4]
+Training Steps:   0%|          | 12/100000 [07:09<1067:51:52, 38.45s/it, epoch=0, global_step=12, lr=5e-5, step=11, train_loss=1.39]Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 13/100000 [07:44<1043:13:36, 37.56s/it, epoch=0, global_step=12, lr=5e-5, step=11, train_loss=1.39]
+Training Steps:   0%|          | 13/100000 [07:44<1043:13:36, 37.56s/it, epoch=0, global_step=13, lr=5e-5, step=12, train_loss=1.39]Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 14/100000 [08:19<1020:30:46, 36.74s/it, epoch=0, global_step=13, lr=5e-5, step=12, train_loss=1.39]
+Training Steps:   0%|          | 14/100000 [08:19<1020:30:46, 36.74s/it, epoch=0, global_step=14, lr=5e-5, step=13, train_loss=1.39]Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 15/100000 [08:54<1002:40:20, 36.10s/it, epoch=0, global_step=14, lr=5e-5, step=13, train_loss=1.39]
+Training Steps:   0%|          | 15/100000 [08:54<1002:40:20, 36.10s/it, epoch=0, global_step=15, lr=5e-5, step=14, train_loss=1.39]Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 16/100000 [09:29<994:58:39, 35.82s/it, epoch=0, global_step=15, lr=5e-5, step=14, train_loss=1.39] 
+Training Steps:   0%|          | 16/100000 [09:29<994:58:39, 35.82s/it, epoch=0, global_step=16, lr=5e-5, step=15, train_loss=1.39]Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 17/100000 [10:10<1040:01:50, 37.45s/it, epoch=0, global_step=16, lr=5e-5, step=15, train_loss=1.39]
+Training Steps:   0%|          | 17/100000 [10:10<1040:01:50, 37.45s/it, epoch=0, global_step=17, lr=5e-5, step=16, train_loss=1.39]Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 18/100000 [10:49<1050:25:42, 37.82s/it, epoch=0, global_step=17, lr=5e-5, step=16, train_loss=1.39]
+Training Steps:   0%|          | 18/100000 [10:49<1050:25:42, 37.82s/it, epoch=0, global_step=18, lr=5e-5, step=17, train_loss=1.39]Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 19/100000 [11:27<1054:02:51, 37.95s/it, epoch=0, global_step=18, lr=5e-5, step=17, train_loss=1.39]
+Training Steps:   0%|          | 19/100000 [11:27<1054:02:51, 37.95s/it, epoch=0, global_step=19, lr=5e-5, step=18, train_loss=1.4] Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 20/100000 [12:05<1049:32:18, 37.79s/it, epoch=0, global_step=19, lr=5e-5, step=18, train_loss=1.4]
+Training Steps:   0%|          | 20/100000 [12:05<1049:32:18, 37.79s/it, epoch=0, global_step=20, lr=5e-5, step=19, train_loss=1.38]Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 21/100000 [12:36<992:56:50, 35.75s/it, epoch=0, global_step=20, lr=5e-5, step=19, train_loss=1.38] 
+Training Steps:   0%|          | 21/100000 [12:36<992:56:50, 35.75s/it, epoch=0, global_step=21, lr=5e-5, step=20, train_loss=1.4] Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 22/100000 [13:13<1005:32:46, 36.21s/it, epoch=0, global_step=21, lr=5e-5, step=20, train_loss=1.4]
+Training Steps:   0%|          | 22/100000 [13:13<1005:32:46, 36.21s/it, epoch=0, global_step=22, lr=5e-5, step=21, train_loss=1.4]Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 23/100000 [13:51<1021:00:40, 36.76s/it, epoch=0, global_step=22, lr=5e-5, step=21, train_loss=1.4]
+Training Steps:   0%|          | 23/100000 [13:51<1021:00:40, 36.76s/it, epoch=0, global_step=23, lr=5e-5, step=22, train_loss=1.42]Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 24/100000 [14:27<1013:06:31, 36.48s/it, epoch=0, global_step=23, lr=5e-5, step=22, train_loss=1.42]
+Training Steps:   0%|          | 24/100000 [14:27<1013:06:31, 36.48s/it, epoch=0, global_step=24, lr=5e-5, step=23, train_loss=1.39]Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 25/100000 [15:08<1054:32:02, 37.97s/it, epoch=0, global_step=24, lr=5e-5, step=23, train_loss=1.39]
+Training Steps:   0%|          | 25/100000 [15:08<1054:32:02, 37.97s/it, epoch=0, global_step=25, lr=5e-5, step=24, train_loss=1.38]Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 26/100000 [15:42<1020:42:19, 36.75s/it, epoch=0, global_step=25, lr=5e-5, step=24, train_loss=1.38]
+Training Steps:   0%|          | 26/100000 [15:42<1020:42:19, 36.75s/it, epoch=0, global_step=26, lr=5e-5, step=25, train_loss=1.39]Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 27/100000 [16:25<1069:17:04, 38.50s/it, epoch=0, global_step=26, lr=5e-5, step=25, train_loss=1.39]
+Training Steps:   0%|          | 27/100000 [16:25<1069:17:04, 38.50s/it, epoch=0, global_step=27, lr=5e-5, step=26, train_loss=1.38]Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 28/100000 [17:04<1072:29:01, 38.62s/it, epoch=0, global_step=27, lr=5e-5, step=26, train_loss=1.38]
+Training Steps:   0%|          | 28/100000 [17:04<1072:29:01, 38.62s/it, epoch=0, global_step=28, lr=5e-5, step=27, train_loss=1.44]Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 29/100000 [17:35<1015:03:04, 36.55s/it, epoch=0, global_step=28, lr=5e-5, step=27, train_loss=1.44]
+Training Steps:   0%|          | 29/100000 [17:35<1015:03:04, 36.55s/it, epoch=0, global_step=29, lr=5e-5, step=28, train_loss=1.38]Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 30/100000 [18:13<1023:36:43, 36.86s/it, epoch=0, global_step=29, lr=5e-5, step=28, train_loss=1.38]
+Training Steps:   0%|          | 30/100000 [18:13<1023:36:43, 36.86s/it, epoch=0, global_step=30, lr=5e-5, step=29, train_loss=1.4] Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 31/100000 [18:50<1026:53:22, 36.98s/it, epoch=0, global_step=30, lr=5e-5, step=29, train_loss=1.4]
+Training Steps:   0%|          | 31/100000 [18:50<1026:53:22, 36.98s/it, epoch=0, global_step=31, lr=5e-5, step=30, train_loss=1.4]Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 32/100000 [19:27<1028:35:56, 37.04s/it, epoch=0, global_step=31, lr=5e-5, step=30, train_loss=1.4]
+Training Steps:   0%|          | 32/100000 [19:27<1028:35:56, 37.04s/it, epoch=0, global_step=32, lr=5e-5, step=31, train_loss=1.39]Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 33/100000 [19:56<955:11:59, 34.40s/it, epoch=0, global_step=32, lr=5e-5, step=31, train_loss=1.39] 
+Training Steps:   0%|          | 33/100000 [19:56<955:11:59, 34.40s/it, epoch=0, global_step=33, lr=5e-5, step=32, train_loss=1.39]Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 34/100000 [20:29<945:51:10, 34.06s/it, epoch=0, global_step=33, lr=5e-5, step=32, train_loss=1.39]
+Training Steps:   0%|          | 34/100000 [20:29<945:51:10, 34.06s/it, epoch=0, global_step=34, lr=5e-5, step=33, train_loss=1.38]Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 35/100000 [20:56<891:51:25, 32.12s/it, epoch=0, global_step=34, lr=5e-5, step=33, train_loss=1.38]
+Training Steps:   0%|          | 35/100000 [20:56<891:51:25, 32.12s/it, epoch=0, global_step=35, lr=5e-5, step=34, train_loss=1.37]Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 36/100000 [21:31<915:46:59, 32.98s/it, epoch=0, global_step=35, lr=5e-5, step=34, train_loss=1.37]
+Training Steps:   0%|          | 36/100000 [21:31<915:46:59, 32.98s/it, epoch=0, global_step=36, lr=5e-5, step=35, train_loss=1.4] Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 37/100000 [22:03<900:11:30, 32.42s/it, epoch=0, global_step=36, lr=5e-5, step=35, train_loss=1.4]
+Training Steps:   0%|          | 37/100000 [22:03<900:11:30, 32.42s/it, epoch=0, global_step=37, lr=5e-5, step=36, train_loss=1.38]Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 38/100000 [22:42<961:11:42, 34.62s/it, epoch=0, global_step=37, lr=5e-5, step=36, train_loss=1.38]
+Training Steps:   0%|          | 38/100000 [22:42<961:11:42, 34.62s/it, epoch=0, global_step=38, lr=5e-5, step=37, train_loss=1.4] Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 39/100000 [23:18<968:36:57, 34.88s/it, epoch=0, global_step=38, lr=5e-5, step=37, train_loss=1.4]
+Training Steps:   0%|          | 39/100000 [23:18<968:36:57, 34.88s/it, epoch=0, global_step=39, lr=5e-5, step=38, train_loss=1.41]Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 40/100000 [23:52<959:52:55, 34.57s/it, epoch=0, global_step=39, lr=5e-5, step=38, train_loss=1.41]
+Training Steps:   0%|          | 40/100000 [23:52<959:52:55, 34.57s/it, epoch=0, global_step=40, lr=5e-5, step=39, train_loss=1.34]Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 41/100000 [24:33<1015:11:49, 36.56s/it, epoch=0, global_step=40, lr=5e-5, step=39, train_loss=1.34]
+Training Steps:   0%|          | 41/100000 [24:33<1015:11:49, 36.56s/it, epoch=0, global_step=41, lr=5e-5, step=40, train_loss=1.36]Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 42/100000 [25:07<995:01:05, 35.84s/it, epoch=0, global_step=41, lr=5e-5, step=40, train_loss=1.36] 
+Training Steps:   0%|          | 42/100000 [25:07<995:01:05, 35.84s/it, epoch=0, global_step=42, lr=5e-5, step=41, train_loss=1.39]Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 43/100000 [25:54<1092:29:24, 39.35s/it, epoch=0, global_step=42, lr=5e-5, step=41, train_loss=1.39]
+Training Steps:   0%|          | 43/100000 [25:54<1092:29:24, 39.35s/it, epoch=0, global_step=43, lr=5e-5, step=42, train_loss=1.36]Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 44/100000 [26:37<1116:54:25, 40.23s/it, epoch=0, global_step=43, lr=5e-5, step=42, train_loss=1.36]
+Training Steps:   0%|          | 44/100000 [26:37<1116:54:25, 40.23s/it, epoch=0, global_step=44, lr=5e-5, step=43, train_loss=1.35]Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 45/100000 [27:14<1094:25:30, 39.42s/it, epoch=0, global_step=44, lr=5e-5, step=43, train_loss=1.35]
+Training Steps:   0%|          | 45/100000 [27:14<1094:25:30, 39.42s/it, epoch=0, global_step=45, lr=5e-5, step=44, train_loss=1.3] Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 46/100000 [27:54<1094:06:55, 39.41s/it, epoch=0, global_step=45, lr=5e-5, step=44, train_loss=1.3]
+Training Steps:   0%|          | 46/100000 [27:54<1094:06:55, 39.41s/it, epoch=0, global_step=46, lr=5e-5, step=45, train_loss=1.33]Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 47/100000 [28:41<1158:56:58, 41.74s/it, epoch=0, global_step=46, lr=5e-5, step=45, train_loss=1.33]
+Training Steps:   0%|          | 47/100000 [28:41<1158:56:58, 41.74s/it, epoch=0, global_step=47, lr=5e-5, step=46, train_loss=1.52]Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 48/100000 [29:17<1111:31:32, 40.03s/it, epoch=0, global_step=47, lr=5e-5, step=46, train_loss=1.52]
+Training Steps:   0%|          | 48/100000 [29:17<1111:31:32, 40.03s/it, epoch=0, global_step=48, lr=5e-5, step=47, train_loss=1.41]Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 49/100000 [29:56<1106:42:20, 39.86s/it, epoch=0, global_step=48, lr=5e-5, step=47, train_loss=1.41]
+Training Steps:   0%|          | 49/100000 [29:56<1106:42:20, 39.86s/it, epoch=0, global_step=49, lr=5e-5, step=48, train_loss=1.42]Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 50/100000 [30:35<1096:30:08, 39.49s/it, epoch=0, global_step=49, lr=5e-5, step=48, train_loss=1.42]
+Training Steps:   0%|          | 50/100000 [30:35<1096:30:08, 39.49s/it, epoch=0, global_step=50, lr=5e-5, step=49, train_loss=1.4] Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 51/100000 [31:09<1052:46:41, 37.92s/it, epoch=0, global_step=50, lr=5e-5, step=49, train_loss=1.4]
+Training Steps:   0%|          | 51/100000 [31:09<1052:46:41, 37.92s/it, epoch=0, global_step=51, lr=5e-5, step=50, train_loss=1.37]Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 52/100000 [31:45<1037:54:25, 37.38s/it, epoch=0, global_step=51, lr=5e-5, step=50, train_loss=1.37]
+Training Steps:   0%|          | 52/100000 [31:45<1037:54:25, 37.38s/it, epoch=0, global_step=52, lr=5e-5, step=51, train_loss=1.52]Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 53/100000 [32:28<1078:59:16, 38.86s/it, epoch=0, global_step=52, lr=5e-5, step=51, train_loss=1.52]
+Training Steps:   0%|          | 53/100000 [32:28<1078:59:16, 38.86s/it, epoch=0, global_step=53, lr=5e-5, step=52, train_loss=1.46]Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 54/100000 [33:06<1071:36:35, 38.60s/it, epoch=0, global_step=53, lr=5e-5, step=52, train_loss=1.46]
+Training Steps:   0%|          | 54/100000 [33:06<1071:36:35, 38.60s/it, epoch=0, global_step=54, lr=5e-5, step=53, train_loss=1.43]Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 55/100000 [33:48<1099:04:03, 39.59s/it, epoch=0, global_step=54, lr=5e-5, step=53, train_loss=1.43]
+Training Steps:   0%|          | 55/100000 [33:48<1099:04:03, 39.59s/it, epoch=0, global_step=55, lr=5e-5, step=54, train_loss=1.43]Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 56/100000 [34:27<1101:05:51, 39.66s/it, epoch=0, global_step=55, lr=5e-5, step=54, train_loss=1.43]
+Training Steps:   0%|          | 56/100000 [34:27<1101:05:51, 39.66s/it, epoch=0, global_step=56, lr=5e-5, step=55, train_loss=1.38]Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 57/100000 [35:05<1084:44:03, 39.07s/it, epoch=0, global_step=56, lr=5e-5, step=55, train_loss=1.38]
+Training Steps:   0%|          | 57/100000 [35:05<1084:44:03, 39.07s/it, epoch=0, global_step=57, lr=5e-5, step=56, train_loss=1.38]Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 58/100000 [35:44<1082:55:29, 39.01s/it, epoch=0, global_step=57, lr=5e-5, step=56, train_loss=1.38]
+Training Steps:   0%|          | 58/100000 [35:44<1082:55:29, 39.01s/it, epoch=0, global_step=58, lr=5e-5, step=57, train_loss=1.39]Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 59/100000 [36:23<1084:57:04, 39.08s/it, epoch=0, global_step=58, lr=5e-5, step=57, train_loss=1.39]
+Training Steps:   0%|          | 59/100000 [36:23<1084:57:04, 39.08s/it, epoch=0, global_step=59, lr=5e-5, step=58, train_loss=1.39]Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 60/100000 [36:58<1048:58:40, 37.79s/it, epoch=0, global_step=59, lr=5e-5, step=58, train_loss=1.39]
+Training Steps:   0%|          | 60/100000 [36:58<1048:58:40, 37.79s/it, epoch=0, global_step=60, lr=5e-5, step=59, train_loss=1.39]Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 61/100000 [37:43<1106:27:51, 39.86s/it, epoch=0, global_step=60, lr=5e-5, step=59, train_loss=1.39]
+Training Steps:   0%|          | 61/100000 [37:43<1106:27:51, 39.86s/it, epoch=0, global_step=61, lr=5e-5, step=60, train_loss=1.37]Forward upsample size to force interpolation output size.
+
+Training Steps:   0%|          | 62/100000 [37:45<790:42:57, 28.48s/it, epoch=0, global_step=61, lr=5e-5, step=60, train_loss=1.37] 
+Training Steps:   0%|          | 62/100000 [37:45<790:42:57, 28.48s/it, epoch=0, global_step=62, lr=5e-5, step=61, train_loss=1.37]08/09/2023 18:02:51 - INFO - root - **************************************************
+08/09/2023 18:02:51 - INFO - root - Doing Evaluation
+08/09/2023 18:02:51 - INFO - root - **************************************************
+
+Evaluation Steps:   0%|          | 62/100000 [37:45<790:42:57, 28.48s/it, epoch=0, global_step=62, lr=5e-5, step=61, train_loss=1.37]08/09/2023 18:02:51 - INFO - root - **************************************************
+08/09/2023 18:02:51 - INFO - root - Doing Training
+08/09/2023 18:02:51 - INFO - root - **************************************************
+
+
+  0%|          | 0/39 [00:00<?, ?it/s][A
+Evaluation Steps:   0%|          | 62/100000 [1:04:05<790:42:57, 28.48s/it, eval_loss=4.85, step=0]                                  
+
+  3%|▎         | 1/39 [26:20<16:40:42, 1580.06s/it][A[E ProcessGroupNCCL.cpp:828] [Rank 1] Watchdog caught collective operation timeout: WorkNCCL(SeqNum=8895, OpType=ALLGATHER, Timeout(ms)=1800000) ran for 1806365 milliseconds before timing out.
+Traceback (most recent call last):
+  File "/vhome/songtianwei/research/text-to-noise/clip_train/run_clip_work.py", line 1044, in <module>
+    main()
+  File "/vhome/songtianwei/research/text-to-noise/clip_train/run_clip_work.py", line 932, in main
+    accelerator.backward(loss)
+  File "/vhome/songtianwei/anaconda3/envs/pytorch2/lib/python3.9/site-packages/accelerate/accelerator.py", line 1853, in backward
+    loss.backward(**kwargs)
+  File "/vhome/songtianwei/anaconda3/envs/pytorch2/lib/python3.9/site-packages/torch/_tensor.py", line 487, in backward
+    torch.autograd.backward(
+  File "/vhome/songtianwei/anaconda3/envs/pytorch2/lib/python3.9/site-packages/torch/autograd/__init__.py", line 200, in backward
+    Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+RuntimeError: NCCL communicator was aborted on rank 1.  Original reason for failure was: [Rank 1] Watchdog caught collective operation timeout: WorkNCCL(SeqNum=8895, OpType=ALLGATHER, Timeout(ms)=1800000) ran for 1806365 milliseconds before timing out.
+wandb: Waiting for W&B process to finish... (failed 1).
+wandb: 
+wandb: Run history:
+wandb:       epoch ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb: global_step ▁▁▁▁▂▂▂▂▂▃▃▃▃▃▃▄▄▄▄▄▅▅▅▅▅▅▆▆▆▆▆▇▇▇▇▇▇███
+wandb:          lr ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:        step ▁▁▁▁▂▂▂▂▂▃▃▃▃▃▃▄▄▄▄▄▅▅▅▅▅▅▆▆▆▆▆▇▇▇▇▇▇███
+wandb:  train_loss ▅▇▆▄▃▃▄▃▃▄▃▃▃▃▃▅▃▄▄▃▃▃▄▃▃▄▃▃▄█▃▄▄█▅▁▃▄▃▄
+wandb: 
+wandb: Run summary:
+wandb:       epoch 0
+wandb: global_step 62
+wandb:          lr 5e-05
+wandb:        step 61
+wandb:  train_loss 1.3972
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /vhome/songtianwei/research/text-to-noise/clip_train/wandb/offline-run-20230809_172503-m9hnsyhi
+wandb: Find logs at: ./wandb/offline-run-20230809_172503-m9hnsyhi/logs
+[E ProcessGroupNCCL.cpp:455] Some NCCL operations have failed or timed out. Due to the asynchronous nature of CUDA kernels, subsequent GPU operations might run on corrupted/incomplete data.
+[E ProcessGroupNCCL.cpp:460] To avoid data inconsistency, we are taking the entire process down.
+WARNING:torch.distributed.elastic.multiprocessing.api:Sending process 3841001 closing signal SIGTERM
+ERROR:torch.distributed.elastic.multiprocessing.api:failed (exitcode: -6) local_rank: 1 (pid: 3841002) of binary: /vhome/songtianwei/anaconda3/envs/pytorch2/bin/python3.9
+Traceback (most recent call last):
+  File "/vhome/songtianwei/anaconda3/envs/pytorch2/bin/accelerate", line 10, in <module>
+    sys.exit(main())
+  File "/vhome/songtianwei/anaconda3/envs/pytorch2/lib/python3.9/site-packages/accelerate/commands/accelerate_cli.py", line 45, in main
+    args.func(args)
+  File "/vhome/songtianwei/anaconda3/envs/pytorch2/lib/python3.9/site-packages/accelerate/commands/launch.py", line 970, in launch_command
+    multi_gpu_launcher(args)
+  File "/vhome/songtianwei/anaconda3/envs/pytorch2/lib/python3.9/site-packages/accelerate/commands/launch.py", line 646, in multi_gpu_launcher
+    distrib_run.run(args)
+  File "/vhome/songtianwei/anaconda3/envs/pytorch2/lib/python3.9/site-packages/torch/distributed/run.py", line 785, in run
+    elastic_launch(
+  File "/vhome/songtianwei/anaconda3/envs/pytorch2/lib/python3.9/site-packages/torch/distributed/launcher/api.py", line 134, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+  File "/vhome/songtianwei/anaconda3/envs/pytorch2/lib/python3.9/site-packages/torch/distributed/launcher/api.py", line 250, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+========================================================
+run_clip_work.py FAILED
+--------------------------------------------------------
+Failures:
+  <NO_OTHER_FAILURES>
+--------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2023-08-09_18:34:21
+  host      : fvl04
+  rank      : 1 (local_rank: 1)
+  exitcode  : -6 (pid: 3841002)
+  error_file: <N/A>
+  traceback : Signal 6 (SIGABRT) received by PID 3841002
+========================================================
