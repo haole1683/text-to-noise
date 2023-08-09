@@ -37,7 +37,6 @@ from transformers import (
     HfArgumentParser,
     TrainingArguments,
     set_seed,
-    Trainer
 )
 from transformers.trainer_utils import get_last_checkpoint
 from transformers.utils import send_example_telemetry
@@ -52,8 +51,8 @@ from diffusers.utils import is_wandb_available
 
 from accelerate import Accelerator
 from accelerate.logging import get_logger
-from accelerate.state import AcceleratorState
 from accelerate.utils import ProjectConfiguration, set_seed
+from accelerate.utils import DistributedDataParallelKwargs
 
 if is_wandb_available():
     import wandb
@@ -259,7 +258,6 @@ class Transform(torch.nn.Module):
         return x
 
 
-
 def collate_fn(examples):
     pixel_values = torch.stack([example["pixel_values"] for example in examples])
     input_ids = torch.tensor([example["input_ids"] for example in examples], dtype=torch.long)
@@ -271,30 +269,18 @@ def collate_fn(examples):
         "return_loss": True,
     }
 
+
 class Generator(nn.Module):
-    def __init__(self, size=[3,224,224]):
+    def __init__(self, image_channel=3, image_shape=[224,224], text_embedding_dim=512):
         super(Generator, self).__init__()
-        channel = size[0]
-        sample_size = size[1:2]
-        
-        self.vae_config_sd = {
-            'in_channels': 3,
-            'out_channels': 3,
-            'down_block_types': ['DownEncoderBlock2D', 'DownEncoderBlock2D', 'DownEncoderBlock2D', 'DownEncoderBlock2D'],
-            'up_block_types': ['UpDecoderBlock2D', 'UpDecoderBlock2D', 'UpDecoderBlock2D', 'UpDecoderBlock2D'],
-            'block_out_channels': [128, 256, 512, 512],
-            'layers_per_block': 2,
-            'act_fn': 'silu',
-            'latent_channels': 4,
-            'norm_num_groups': 32,
-            'sample_size': 512,  # 512
-            'scaling_factor': 0.18215,
-        }
+        self.image_channel = image_channel
+        self.image_shape = image_shape if isinstance(image_shape, list) else [image_shape, image_shape]
+        self.text_embedding_dim = text_embedding_dim
         
         self.vae_config = {
-            'sample_size': sample_size,  # 512
-            'in_channels': channel,
-            'out_channels': channel,
+            'sample_size': self.image_shape,  # 512
+            'in_channels': self.image_channel,
+            'out_channels': self.image_channel,
             'down_block_types': ['DownEncoderBlock2D', 'DownEncoderBlock2D', 'DownEncoderBlock2D', 'DownEncoderBlock2D'],
             'up_block_types': ['UpDecoderBlock2D', 'UpDecoderBlock2D', 'UpDecoderBlock2D', 'UpDecoderBlock2D'],
             'block_out_channels': [128, 256, 512, 512],
@@ -306,41 +292,6 @@ class Generator(nn.Module):
         }
          
         self.vae = AutoencoderKL(**self.vae_config)
-        
-        self.unet_config_sd = {
-            "act_fn": "silu",
-            "attention_head_dim": 8,
-            "block_out_channels": [
-                320,
-                640,
-                1280,
-                1280
-            ],
-            "center_input_sample": False,
-            "cross_attention_dim": 768,  
-            "down_block_types": [
-                "CrossAttnDownBlock2D",
-                "CrossAttnDownBlock2D",
-                "CrossAttnDownBlock2D",
-                "DownBlock2D"
-            ],
-            "downsample_padding": 1,
-            "flip_sin_to_cos": True,
-            "freq_shift": 0,
-            "in_channels": 4,
-            "layers_per_block": 2,
-            "mid_block_scale_factor": 1,
-            "norm_eps": 1e-05,
-            "norm_num_groups": 32,
-            "out_channels": 4,
-            "sample_size": 224,
-            "up_block_types": [
-                "UpBlock2D",
-                "CrossAttnUpBlock2D",
-                "CrossAttnUpBlock2D",
-                "CrossAttnUpBlock2D"
-            ]
-        }
         
         self.unet_config = {
             "in_channels": self.vae_config["latent_channels"],
@@ -355,7 +306,7 @@ class Generator(nn.Module):
                 1280
             ],
             "center_input_sample": False,
-            "cross_attention_dim": 768,  
+            "cross_attention_dim": self.text_embedding_dim,  
             "down_block_types": [
                 "CrossAttnDownBlock2D",
                 "CrossAttnDownBlock2D",
@@ -436,11 +387,14 @@ def main():
     
     accelerator_project_config = ProjectConfiguration(total_limit=training_args.save_total_limit)
 
+    # reference from https://github.com/huggingface/accelerate/issues/497
+    ddp_scaler = DistributedDataParallelKwargs(bucket_cap_mb=15, find_unused_parameters=True)
     accelerator = Accelerator(
         gradient_accumulation_steps=training_args.gradient_accumulation_steps,
         mixed_precision="no",
         log_with=training_args.report_to,
         project_config=accelerator_project_config,
+        kwargs_handlers=[ddp_scaler],
     )
 
     logger.info(accelerator.state, main_process_only=False)
@@ -496,7 +450,7 @@ def main():
             cache_dir=model_args.cache_dir,
             use_auth_token=True if model_args.use_auth_token else None,
         )
-        
+    
     if model_args.tokenizer_name:
         tokenizer = AutoTokenizer.from_pretrained(
             model_args.tokenizer_name, cache_dir=model_args.cache_dir, use_fast=model_args.use_fast_tokenizer
@@ -510,7 +464,11 @@ def main():
             "You are instantiating a new tokenizer from scratch. This is not supported by this script."
             "You can do it from another script, save it, and load it from here, using --tokenizer_name."
         )
-        
+    if experiment_args.if_clip_pretrained:
+        pass
+    else:
+        tokenizer = CLIPTokenizer.from_pretrained("openai/clip-vit-base-patch32")
+    
     # Load image_processor, in this script we only use this to get the mean and std for normalization.
     image_processor = AutoImageProcessor.from_pretrained(
         model_args.image_processor_name or model_args.model_name_or_path,
@@ -546,7 +504,15 @@ def main():
         set_seed(training_args.seed)
         
     if experiment_args.if_add_noise:
-        generator = Generator()
+        if hasattr(clip_model.text_model.embeddings,"word_embeddings"):
+            text_embedding_dim = clip_model.text_model.embeddings.word_embeddings.embedding_dim
+        elif hasattr(clip_model.text_model.embeddings,"token_embedding"):
+            text_embedding_dim = clip_model.text_model.embeddings.token_embedding.embedding_dim
+        else:
+            pass
+        image_channel = clip_config.vision_config.num_channels
+        image_shape = clip_config.vision_config.image_size
+        generator = Generator(image_channel,image_shape,text_embedding_dim)
         
     # text_encoder = CLIPTextModel.from_pretrained(
     #     pretrained_model_name_or_path, subfolder="text_encoder", revision=revision
@@ -895,18 +861,13 @@ def main():
             clip_model.train()
             if if_generator_train:
                 generator.train()
-                
+            
             for step, batch in enumerate(train_dataloader):
                 # Skip steps until we reach the resumed step
                 if training_args.resume_from_checkpoint and epoch == first_epoch and step < resume_step:
                     if step % training_args.gradient_accumulation_steps == 0:
                         progress_bar.update(1)
                     continue
-                # which to train
-                train_target = train_target_list[cur_index]
-                cur_index = (cur_index + 1) % len(train_target_list)
-                if train_target == "generator":
-                    pass
 
                 batch_pixel_values = batch["pixel_values"]  # [6,3,224,224]
                 batch_input_ids = batch["input_ids"]
@@ -919,11 +880,9 @@ def main():
                     else:
                         text_encoder = clip_model.text_model
                     with torch.no_grad():
-                        # text_encoder.requires_grad_(False)
-                        encoder_hidden_states = text_encoder(batch_input_ids,batch_attention_mask)[0]  # [6,128,768]   
-                        # encoder_hidden_states = torch.ones(batch_input_ids.shape[0], 128, 768, device=batch_input_ids.device)             
+                        encoder_hidden_states = text_encoder(batch_input_ids,batch_attention_mask)[0]               
                     noise = generator(batch_pixel_values, encoder_hidden_states)
-                    print(noise.shape)
+
                     # limit the norm of the noise
                     norm_type = 'l2'
                     epsilon = 16
@@ -950,12 +909,25 @@ def main():
                 output = clip_model(**batch_data_input)
                 logits_per_image = output.logits_per_image   # for training , image_logits is the same as logits text
                 logits_per_text = output.logits_per_text
-                
                 loss = output.loss
 
                 # Gather the losses across all processes for logging (if we use distributed training).
                 avg_loss = accelerator.gather(loss.repeat(training_args.per_device_train_batch_size)).mean()
                 train_loss += avg_loss.item()/training_args.gradient_accumulation_steps
+                
+                # fix the bug of 
+                # making sure all forward function outputs participate in calculating loss
+                # if if_add_noise and if_generator_train:
+                #     # which to train
+                #     train_target = train_target_list[cur_index]
+                #     cur_index = (cur_index + 1) % len(train_target_list)
+                #     if train_target == "generator":
+                #         optimizer_generator.step()
+                #     elif train_target == "clip":
+                #         optimizer.step()
+                # else:
+                #     optimizer.step()
+                
                 # Backpropagate
                 accelerator.backward(loss)
 
@@ -966,9 +938,16 @@ def main():
                         accelerator.clip_grad_norm_(clip_model.parameters(), training_args.max_grad_norm)
                 
                 # Update optimizer
-                optimizer.step()
                 if if_add_noise and if_generator_train:
-                    optimizer_generator.step()
+                    # which to train
+                    train_target = train_target_list[cur_index]
+                    cur_index = (cur_index + 1) % len(train_target_list)
+                    if train_target == "generator":
+                        optimizer_generator.step()
+                    elif train_target == "clip":
+                        optimizer.step()
+                else:
+                    optimizer.step()
                     
                 # update learning rate
                 # lr_scheduler.step()
