@@ -272,9 +272,42 @@ def collate_fn(examples):
     }
 
 class Generator(nn.Module):
-    def __init__(self):
+    def __init__(self, size=[3,224,224]):
         super(Generator, self).__init__()
-        self.unet_config = {
+        channel = size[0]
+        sample_size = size[1:2]
+        
+        self.vae_config_sd = {
+            'in_channels': 3,
+            'out_channels': 3,
+            'down_block_types': ['DownEncoderBlock2D', 'DownEncoderBlock2D', 'DownEncoderBlock2D', 'DownEncoderBlock2D'],
+            'up_block_types': ['UpDecoderBlock2D', 'UpDecoderBlock2D', 'UpDecoderBlock2D', 'UpDecoderBlock2D'],
+            'block_out_channels': [128, 256, 512, 512],
+            'layers_per_block': 2,
+            'act_fn': 'silu',
+            'latent_channels': 4,
+            'norm_num_groups': 32,
+            'sample_size': 512,  # 512
+            'scaling_factor': 0.18215,
+        }
+        
+        self.vae_config = {
+            'sample_size': sample_size,  # 512
+            'in_channels': channel,
+            'out_channels': channel,
+            'down_block_types': ['DownEncoderBlock2D', 'DownEncoderBlock2D', 'DownEncoderBlock2D', 'DownEncoderBlock2D'],
+            'up_block_types': ['UpDecoderBlock2D', 'UpDecoderBlock2D', 'UpDecoderBlock2D', 'UpDecoderBlock2D'],
+            'block_out_channels': [128, 256, 512, 512],
+            'layers_per_block': 2,
+            'act_fn': 'silu',
+            'latent_channels': 4,
+            'norm_num_groups': 32,
+            'scaling_factor': 0.18215,
+        }
+         
+        self.vae = AutoencoderKL(**self.vae_config)
+        
+        self.unet_config_sd = {
             "act_fn": "silu",
             "attention_head_dim": 8,
             "block_out_channels": [
@@ -284,7 +317,7 @@ class Generator(nn.Module):
                 1280
             ],
             "center_input_sample": False,
-            "cross_attention_dim": 768,  # NOTE 768
+            "cross_attention_dim": 768,  
             "down_block_types": [
                 "CrossAttnDownBlock2D",
                 "CrossAttnDownBlock2D",
@@ -308,21 +341,44 @@ class Generator(nn.Module):
                 "CrossAttnUpBlock2D"
             ]
         }
-        self.unet = UNet2DConditionModel(**self.unet_config)
-        self.vae_config = {
-            'in_channels': 3,
-            'out_channels': 3,
-            'down_block_types': ['DownEncoderBlock2D', 'DownEncoderBlock2D', 'DownEncoderBlock2D', 'DownEncoderBlock2D'],
-            'up_block_types': ['UpDecoderBlock2D', 'UpDecoderBlock2D', 'UpDecoderBlock2D', 'UpDecoderBlock2D'],
-            'block_out_channels': [128, 256, 512, 512],
-            'layers_per_block': 2,
-            'act_fn': 'silu',
-            'latent_channels': 4,
-            'norm_num_groups': 32,
-            'sample_size': 512,
-            'scaling_factor': 0.18215,
+        
+        self.unet_config = {
+            "in_channels": self.vae_config["latent_channels"],
+            "out_channels": self.vae_config["latent_channels"],
+            "sample_size": 28,
+            "act_fn": "silu",
+            "attention_head_dim": 8,
+            "block_out_channels": [
+                320,
+                640,
+                1280,
+                1280
+            ],
+            "center_input_sample": False,
+            "cross_attention_dim": 768,  
+            "down_block_types": [
+                "CrossAttnDownBlock2D",
+                "CrossAttnDownBlock2D",
+                "CrossAttnDownBlock2D",
+                "DownBlock2D"
+            ],
+            "downsample_padding": 1,
+            "flip_sin_to_cos": True,
+            "freq_shift": 0,
+            "layers_per_block": 2,
+            "mid_block_scale_factor": 1,
+            "norm_eps": 1e-05,
+            "norm_num_groups": 32,
+            "up_block_types": [
+                "UpBlock2D",
+                "CrossAttnUpBlock2D",
+                "CrossAttnUpBlock2D",
+                "CrossAttnUpBlock2D"
+            ]
         }
-        self.vae = AutoencoderKL(**self.vae_config)
+
+        self.unet = UNet2DConditionModel(**self.unet_config)
+        
         
     def forward(self, img_pixel_values, encoder_hidden_states):
         latent = self.vae.encode(img_pixel_values).latent_dist.sample()
@@ -331,6 +387,7 @@ class Generator(nn.Module):
         unet_pred = self.unet(latent, timesteps, encoder_hidden_states).sample
         vae_decoding = self.vae.decoder(unet_pred)
         return vae_decoding
+    
     
     def enable_xformers_memory_efficient_attention(self):
         self.unet.enable_xformers_memory_efficient_attention()
@@ -598,7 +655,7 @@ def main():
         train_dataset,
         shuffle=experiment_args.if_trainloader_shuffle,
         collate_fn=collate_fn,
-        batch_size=training_args.train_batch_size,
+        batch_size=training_args.per_device_train_batch_size,
         num_workers=training_args.dataloader_num_workers,
         drop_last=True,
     )
@@ -634,7 +691,7 @@ def main():
         # train_dataset,
         shuffle=True,
         collate_fn=collate_fn,
-        batch_size=training_args.eval_batch_size,
+        batch_size=training_args.per_device_eval_batch_size,
         num_workers=training_args.dataloader_num_workers,
         drop_last=True,
     )
@@ -745,7 +802,7 @@ def main():
         tracker_project_name = "poison_clip"
         accelerator.init_trackers(tracker_project_name)
         
-    total_batch_size = training_args.train_batch_size * accelerator.num_processes * training_args.gradient_accumulation_steps
+    total_batch_size = training_args.per_device_train_batch_size * accelerator.num_processes * training_args.gradient_accumulation_steps
 
     logger.info("***** Running training *****")
     if training_args.do_train:
@@ -753,7 +810,7 @@ def main():
     if training_args.do_eval:
         logger.info(f"  Evaluation num examples = {len(eval_dataset)}")
     logger.info(f"  Num Epochs = {training_args.num_train_epochs}")
-    logger.info(f"  Instantaneous batch size per device = {training_args.train_batch_size}")
+    logger.info(f"  Instantaneous batch size per device = {training_args.per_device_train_batch_size}")
     logger.info(f"  Total train batch size (w. parallel, distributed & accumulation) = {total_batch_size}")
     logger.info(f"  Gradient Accumulation steps = {training_args.gradient_accumulation_steps}")
     logger.info(f"  Total optimization steps = {training_args.max_steps}")
@@ -862,9 +919,11 @@ def main():
                     else:
                         text_encoder = clip_model.text_model
                     with torch.no_grad():
-                        encoder_hidden_states = text_encoder(batch_input_ids,batch_attention_mask)[0]  # [6,128,768]                
+                        # text_encoder.requires_grad_(False)
+                        encoder_hidden_states = text_encoder(batch_input_ids,batch_attention_mask)[0]  # [6,128,768]   
+                        # encoder_hidden_states = torch.ones(batch_input_ids.shape[0], 128, 768, device=batch_input_ids.device)             
                     noise = generator(batch_pixel_values, encoder_hidden_states)
-                    
+                    print(noise.shape)
                     # limit the norm of the noise
                     norm_type = 'l2'
                     epsilon = 16
@@ -887,6 +946,7 @@ def main():
                     "attention_mask":batch_attention_mask,
                     "return_loss": True
                 }
+                # text_encoder.requires_grad_(True)
                 output = clip_model(**batch_data_input)
                 logits_per_image = output.logits_per_image   # for training , image_logits is the same as logits text
                 logits_per_text = output.logits_per_text
@@ -894,7 +954,7 @@ def main():
                 loss = output.loss
 
                 # Gather the losses across all processes for logging (if we use distributed training).
-                avg_loss = accelerator.gather(loss.repeat(training_args.train_batch_size)).mean()
+                avg_loss = accelerator.gather(loss.repeat(training_args.per_device_train_batch_size)).mean()
                 train_loss += avg_loss.item()/training_args.gradient_accumulation_steps
                 # Backpropagate
                 accelerator.backward(loss)
