@@ -2,7 +2,9 @@ echo "WTF"
 
 wandb offline
 
-accelerate launch --multi_gpu run_clip_work.py \
+accelerate launch  \
+    --multi_gpu \
+    run_clip_work.py \
     --cache_dir /share/test/songtianwei/huggingface \
     --output_dir /share/ckpt/songtianwei \
     --model_name_or_path /share/test/songtianwei/model_save \
@@ -25,9 +27,9 @@ accelerate launch --multi_gpu run_clip_work.py \
     --per_device_train_batch_size="6" \
     --per_device_eval_batch_size="6" \
     --if_clip_train="True" \
-    --if_clip_pretrained="True" \
-    --if_add_noise="True" \
-    --if_generator_train="True" \
+    --if_clip_pretrained="False" \
+    --if_add_noise="False" \
+    --if_generator_train="False" \
     --if_use_8bit_adam="True" \
     --max_train_samples=50000 \
     --max_eval_samples=10000 \
