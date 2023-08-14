@@ -1,0 +1,129 @@
+W&B offline. Running your script from this directory will only write metadata locally. Use wandb disabled to completely turn off W&B.
+1
+1
+08/14/2023 20:27:18 - WARNING - __main__ - Process rank: 0, device: cuda:0, n_gpu: 1distributed training: True, 16-bits training: False
+08/14/2023 20:27:18 - INFO - __main__ - Training/evaluation parameters TrainingArguments(
+_n_gpu=1,
+adafactor=False,
+adam_beta1=0.9,
+adam_beta2=0.999,
+adam_epsilon=1e-08,
+auto_find_batch_size=False,
+bf16=False,
+bf16_full_eval=False,
+data_seed=None,
+dataloader_drop_last=False,
+dataloader_num_workers=0,
+dataloader_pin_memory=True,
+ddp_backend=None,
+ddp_broadcast_buffers=None,
+ddp_bucket_cap_mb=None,
+ddp_find_unused_parameters=None,
+ddp_timeout=1800,
+debug=[],
+deepspeed=None,
+disable_tqdm=False,
+do_eval=True,
+do_predict=False,
+do_train=True,
+eval_accumulation_steps=None,
+eval_delay=0,
+eval_steps=None,
+evaluation_strategy=no,
+fp16=False,
+fp16_backend=auto,
+fp16_full_eval=False,
+fp16_opt_level=O1,
+fsdp=[],
+fsdp_config={'fsdp_min_num_params': 0, 'xla': False, 'xla_fsdp_grad_ckpt': False},
+fsdp_min_num_params=0,
+fsdp_transformer_layer_cls_to_wrap=None,
+full_determinism=False,
+gradient_accumulation_steps=1,
+gradient_checkpointing=False,
+greater_is_better=None,
+group_by_length=False,
+half_precision_backend=auto,
+hub_model_id=None,
+hub_private_repo=False,
+hub_strategy=every_save,
+hub_token=<HUB_TOKEN>,
+ignore_data_skip=False,
+include_inputs_for_metrics=False,
+jit_mode_eval=False,
+label_names=None,
+label_smoothing_factor=0.0,
+learning_rate=5e-05,
+length_column_name=length,
+load_best_model_at_end=False,
+local_rank=0,
+log_level=passive,
+log_level_replica=warning,
+log_on_each_node=True,
+logging_dir=/share/ckpt/songtianwei/runs/Aug14_20-27-17_fvl11,
+logging_first_step=False,
+logging_nan_inf_filter=True,
+logging_steps=500,
+logging_strategy=steps,
+lr_scheduler_type=linear,
+max_grad_norm=1.0,
+max_steps=100000,
+metric_for_best_model=None,
+mp_parameters=,
+no_cuda=False,
+num_train_epochs=15.0,
+optim=adamw_hf,
+optim_args=None,
+output_dir=/share/ckpt/songtianwei,
+overwrite_output_dir=True,
+past_index=-1,
+per_device_eval_batch_size=128,
+per_device_train_batch_size=128,
+prediction_loss_only=False,
+push_to_hub=False,
+push_to_hub_model_id=None,
+push_to_hub_organization=None,
+push_to_hub_token=<PUSH_TO_HUB_TOKEN>,
+ray_scope=last,
+remove_unused_columns=False,
+report_to=['wandb'],
+resume_from_checkpoint=None,
+run_name=/share/ckpt/songtianwei,
+save_on_each_node=False,
+save_safetensors=False,
+save_steps=500,
+save_strategy=steps,
+save_total_limit=None,
+seed=42,
+sharded_ddp=[],
+skip_memory_metrics=True,
+tf32=None,
+torch_compile=False,
+torch_compile_backend=None,
+torch_compile_mode=None,
+torchdynamo=None,
+tpu_metrics_debug=False,
+tpu_num_cores=None,
+use_ipex=False,
+use_legacy_prediction_loop=False,
+use_mps_device=False,
+warmup_ratio=0.0,
+warmup_steps=0,
+weight_decay=0.1,
+xpu_backend=None,
+)
+08/14/2023 20:27:18 - INFO - __main__ - Distributed environment: MULTI_GPU  Backend: nccl
+Num processes: 2
+Process index: 0
+Local process index: 0
+Device: cuda:0
+
+Mixed precision type: no
+
+Using the latest cached version of the module from /vhome/songtianwei/.cache/huggingface/modules/datasets_modules/datasets/ydshieh--coco_dataset_script/e033205c0266a54c10be132f9264f2a39dcf893e798f6756d224b1ff5078998f (last modified on Tue Aug  8 12:24:12 2023) since it couldn't be found locally at ydshieh/coco_dataset_script., or remotely on the Hugging Face Hub.
+08/14/2023 20:27:21 - WARNING - datasets.load - Using the latest cached version of the module from /vhome/songtianwei/.cache/huggingface/modules/datasets_modules/datasets/ydshieh--coco_dataset_script/e033205c0266a54c10be132f9264f2a39dcf893e798f6756d224b1ff5078998f (last modified on Tue Aug  8 12:24:12 2023) since it couldn't be found locally at ydshieh/coco_dataset_script., or remotely on the Hugging Face Hub.
+Repo card metadata block was not found. Setting CardData to empty.
+08/14/2023 20:27:21 - WARNING - huggingface_hub.repocard - Repo card metadata block was not found. Setting CardData to empty.
+Repo card metadata block was not found. Setting CardData to empty.
+08/14/2023 20:27:21 - WARNING - huggingface_hub.repocard - Repo card metadata block was not found. Setting CardData to empty.
+Filter (num_proc=8):   0%|          | 0/591753 [00:00<?, ? examples/s]Filter (num_proc=8):   0%|          | 1000/591753 [00:20<3:20:44, 49.05 examples/s]Filter (num_proc=8):   0%|          | 2000/591753 [00:25<1:50:24, 89.03 examples/s]Filter (num_proc=8):   1%|          | 3000/591753 [00:25<1:02:28, 157.04 examples/s]Filter (num_proc=8):   1%|          | 6000/591753 [00:26<21:31, 453.48 examples/s]  Filter (num_proc=8):   1%|          | 7000/591753 [00:26<18:31, 525.90 examples/s]Filter (num_proc=8):   1%|▏         | 8000/591753 [00:40<18:29, 525.90 examples/s]Filter (num_proc=8):   2%|▏         | 9000/591753 [00:40<37:33, 258.63 examples/s]Filter (num_proc=8):   2%|▏         | 10000/591753 [00:47<45:01, 215.33 examples/s]Filter (num_proc=8):   2%|▏         | 11000/591753 [00:48<35:19, 274.06 examples/s]Filter (num_proc=8):   2%|▏         | 12000/591753 [00:50<30:58, 312.03 examples/s]Filter (num_proc=8):   2%|▏         | 13000/591753 [00:52<27:23, 352.24 examples/s]Filter (num_proc=8):   2%|▏         | 14000/591753 [00:52<20:31, 469.17 examples/s]Filter (num_proc=8):   3%|▎         | 15000/591753 [00:53<17:03, 563.55 examples/s]Filter (num_proc=8):   3%|▎         | 16000/591753 [00:54<15:42, 611.08 examples/s]Filter (num_proc=8):   3%|▎         | 17000/591753 [01:01<29:38, 323.13 examples/s]Filter (num_proc=8):   3%|▎         | 18000/591753 [01:07<37:23, 255.75 examples/s]Filter (num_proc=8):   3%|▎         | 19000/591753 [01:10<36:39, 260.39 examples/s]Filter (num_proc=8):   3%|▎         | 20000/591753 [01:15<39:31, 241.11 examples/s]Filter (num_proc=8):   4%|▎         | 21000/591753 [01:17<32:12, 295.37 examples/s]Filter (num_proc=8):   4%|▎         | 22000/591753 [01:17<24:29, 387.67 examples/s]Filter (num_proc=8):   4%|▍         | 23000/591753 [01:19<22:05, 429.03 examples/s]Filter (num_proc=8):   4%|▍         | 24000/591753 [01:20<17:19, 545.92 examples/s]Filter (num_proc=8):   4%|▍         | 25000/591753 [01:21<16:45, 563.64 examples/s]Filter (num_proc=8):   4%|▍         | 26000/591753 [01:25<22:56, 410.88 examples/s]Filter (num_proc=8):   5%|▍         | 27000/591753 [01:31<33:02, 284.81 examples/s]Filter (num_proc=8):   5%|▍         | 28000/591753 [01:37<37:40, 249.35 examples/s]Filter (num_proc=8):   5%|▍         | 29000/591753 [01:41<37:45, 248.38 examples/s]Filter (num_proc=8):   5%|▌         | 30000/591753 [01:41<28:18, 330.66 examples/s]Filter (num_proc=8):   5%|▌         | 31000/591753 [01:42<20:42, 451.15 examples/s]Filter (num_proc=8):   5%|▌         | 32000/591753 [01:42<15:05, 618.25 examples/s]Filter (num_proc=8):   6%|▌         | 33000/591753 [01:42<11:07, 837.15 examples/s]Filter (num_proc=8):   6%|▌         | 34000/591753 [01:42<08:41, 1070.15 examples/s]Filter (num_proc=8):   6%|▌         | 35000/591753 [01:44<11:21, 816.99 examples/s] Filter (num_proc=8):   6%|▌         | 36000/591753 [01:48<17:49, 519.52 examples/s]Filter (num_proc=8):   6%|▋         | 37000/591753 [01:48<13:12, 700.30 examples/s]Filter (num_proc=8):   6%|▋         | 38000/591753 [01:49<10:29, 879.86 examples/s]Filter (num_proc=8):   7%|▋         | 39000/591753 [01:49<08:35, 1073.28 examples/s]Filter (num_proc=8):   7%|▋         | 40000/591753 [01:49<06:44, 1363.34 examples/s]Filter (num_proc=8):   7%|▋         | 42000/591753 [01:50<05:28, 1671.43 examples/s]Filter (num_proc=8):   7%|▋         | 43000/591753 [01:51<04:58, 1835.34 examples/s]Filter (num_proc=8):   7%|▋         | 44000/591753 [01:54<11:07, 820.80 examples/s] Filter (num_proc=8):   8%|▊         | 45000/591753 [01:55<12:06, 752.91 examples/s]Filter (num_proc=8):   8%|▊         | 46000/591753 [01:56<09:14, 984.36 examples/s]Filter (num_proc=8):   8%|▊         | 47000/591753 [01:56<07:41, 1180.44 examples/s]Filter (num_proc=8):   8%|▊         | 48000/591753 [01:56<06:06, 1484.22 examples/s]Filter (num_proc=8):   8%|▊         | 50000/591753 [01:58<06:01, 1497.58 examples/s]Filter (num_proc=8):   9%|▊         | 51000/591753 [01:58<06:30, 1385.74 examples/s]Filter (num_proc=8):   9%|▉         | 52000/591753 [02:05<20:48, 432.36 examples/s] Filter (num_proc=8):   9%|▉         | 53000/591753 [02:13<34:11, 262.66 examples/s]Filter (num_proc=8):   9%|▉         | 54000/591753 [02:15<29:12, 306.83 examples/s]Filter (num_proc=8):   9%|▉         | 55000/591753 [02:16<22:56, 390.07 examples/s]Filter (num_proc=8):   9%|▉         | 56000/591753 [02:17<18:07, 492.53 examples/s]Filter (num_proc=8):  10%|▉         | 57000/591753 [02:18<17:01, 523.33 examples/s]Filter (num_proc=8):  10%|▉         | 58000/591753 [02:18<12:31, 710.68 examples/s]Filter (num_proc=8):  10%|▉         | 59000/591753 [02:19<10:24, 852.59 examples/s]Filter (num_proc=8):  10%|▉         | 59000/591753 [02:30<10:24, 852.59 examples/s]Filter (num_proc=8):  10%|█         | 60000/591753 [02:34<45:48, 193.44 examples/s]Filter (num_proc=8):  10%|█         | 61000/591753 [02:40<49:01, 180.41 examples/s]Filter (num_proc=8):  10%|█         | 62000/591753 [02:42<39:08, 225.58 examples/s]Filter (num_proc=8):  11%|█         | 63000/591753 [02:44<34:14, 257.36 examples/s]Filter (num_proc=8):  11%|█         | 64000/591753 [02:45<24:27, 359.64 examples/s]Filter (num_proc=8):  11%|█         | 65000/591753 [02:45<17:35, 498.96 examples/s]Filter (num_proc=8):  11%|█         | 66000/591753 [02:48<19:26, 450.55 examples/s]

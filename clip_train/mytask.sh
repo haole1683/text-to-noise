@@ -11,7 +11,6 @@
 #SBATCH --partition=fvl
 #SBATCH --qos=high
 #SBATCH --time=1-00:00  
-#SBATCH --wckey=submitit
 
 # command
 wandb offline
@@ -37,13 +36,12 @@ accelerate launch  \
     --overwrite_output_dir \
     --max_seq_length="77" \
     --max_steps=100000 \
-    --num_train_epochs=5 \
-    --per_device_train_batch_size="4" \
+    --num_train_epochs=15 \
+    --per_device_train_batch_size="128" \
     --per_device_eval_batch_size="128" \
     --if_clip_train="True" \
     --if_clip_pretrained="True" \
-    --if_add_noise="True" \
-    --if_generator_train="True" \
-    --if_use_8bit_adam="True" \
-    --max_train_samples=500 \
-    --max_eval_samples=10000 \
+    --if_add_noise="False" \
+    --if_generator_train="False" \
+    --if_use_8bit_adam="False" \
+    --preprocessing_num_workers=8 \

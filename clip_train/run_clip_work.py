@@ -431,7 +431,7 @@ def main():
             cache_dir=model_args.cache_dir,
             keep_in_memory=False,
             data_dir=data_args.data_dir,
-            use_auth_token=True if model_args.use_auth_token else None,
+            token=True if model_args.use_auth_token else None,
         )
     else:
         data_files = {}
@@ -840,12 +840,13 @@ def main():
         
     if_normalize = experiment_args.if_normalize
     
+    logger.info("GPU_NUM: {}".format(torch.cuda.device_count()))
     logger.info("clip_train: {}, generator_train: {}".format(if_clip_train, if_generator_train))
     logger.info("add_noise: {}, use_normailize:{}".format(if_add_noise,if_normalize))
     wandb.init()
     
     for epoch in range(first_epoch, training_args.num_train_epochs):
-        accelerator.wait_for_everyone()
+        
         if training_args.do_train:
             logging.info("*"*50)
             logging.info("Doing Training")
@@ -1025,6 +1026,7 @@ def main():
                         }
             wandb.log(eval_record)  
 
+        # accelerator.wait_for_everyone()
     accelerator.end_training()
     
 
