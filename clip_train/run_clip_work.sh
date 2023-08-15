@@ -6,7 +6,7 @@ wandb offline
 #     --multi_gpu \
     python run_clip_work.py \
     --cache_dir /share/test/songtianwei/huggingface \
-    --output_dir /share/ckpt/songtianwei \
+    --output_dir /vhome/songtianwei/research/text-to-noise/clip_train/checkpoints \
     --model_name_or_path /share/test/songtianwei/model_save \
     --data_dir /share/test/songtianwei/data \
     --dataset_name ydshieh/coco_dataset_script \
@@ -31,7 +31,6 @@ wandb offline
     --if_add_noise="False" \
     --if_generator_train="False" \
     --if_use_8bit_adam="False" \
-    --n_gpu=8 \
-    # --max_train_samples=50000 \
-    # --max_eval_samples=10000 \
+    --max_train_samples=50000 \
+    --max_eval_samples=10000 \
 

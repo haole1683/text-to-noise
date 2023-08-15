@@ -345,6 +345,9 @@ class Generator(nn.Module):
         self.vae.enable_xformers_memory_efficient_attention()
 
 def main():
+    # print("*"*100)
+    # print(torch.cuda.device_count())
+    
     parser = HfArgumentParser((ModelArguments, DataTrainingArguments, TrainingArguments, ExperimentArguments))
     if len(sys.argv) == 2 and sys.argv[1].endswith(".json"):
         # If we pass only one argument to the script and it's the path to a json file,
@@ -840,13 +843,14 @@ def main():
         
     if_normalize = experiment_args.if_normalize
     
+    logger.info("Accelerator.device {}".format(accelerator.device))
     logger.info("GPU_NUM: {}".format(torch.cuda.device_count()))
     logger.info("clip_train: {}, generator_train: {}".format(if_clip_train, if_generator_train))
     logger.info("add_noise: {}, use_normailize:{}".format(if_add_noise,if_normalize))
     wandb.init()
     
     for epoch in range(first_epoch, training_args.num_train_epochs):
-        
+        print("THE DEVICE",accelerator.device)
         if training_args.do_train:
             logging.info("*"*50)
             logging.info("Doing Training")
@@ -959,12 +963,12 @@ def main():
                     train_loss = 0.0
 
                     checkpointing_steps = 1000
-                    if global_step % checkpointing_steps == 0:
-                        logging.info("Epoch : {} ; Step : {} ; Save checkpoint to {}".format(epoch, global_step, training_args.output_dir))
-                        if accelerator.is_main_process:
-                            save_path = os.path.join(training_args.output_dir, f"checkpoint-{global_step}")
-                            accelerator.save_state(save_path)
-                            logger.info(f"Saved state to {save_path}")
+                    # if global_step % checkpointing_steps == 0:
+                    #     logging.info("Epoch : {} ; Step : {} ; Save checkpoint to {}".format(epoch, global_step, training_args.output_dir))
+                    #     if accelerator.is_main_process:
+                    #         save_path = os.path.join(training_args.output_dir, f"checkpoint-{global_step}")
+                    #         accelerator.save_state(save_path)
+                    #         logger.info(f"Saved state to {save_path}")
                 
                 record = {
                         "epoch": epoch,
