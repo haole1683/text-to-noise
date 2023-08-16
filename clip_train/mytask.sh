@@ -1,6 +1,6 @@
 #!/bin/bash
 # Parameters
-#SBATCH --cpus-per-task=1
+#SBATCH --cpus-per-task=4
 #SBATCH --gpus-per-node=8
 #SBATCH --job-name=deit
 #SBATCH --mem=200GB

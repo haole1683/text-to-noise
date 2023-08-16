@@ -391,7 +391,7 @@ def main():
     accelerator_project_config = ProjectConfiguration(total_limit=training_args.save_total_limit)
 
     # reference from https://github.com/huggingface/accelerate/issues/497
-    ddp_scaler = DistributedDataParallelKwargs(bucket_cap_mb=15, find_unused_parameters=True)
+    ddp_scaler = DistributedDataParallelKwargs(bucket_cap_mb=15, find_unused_parameters=False)
     accelerator = Accelerator(
         gradient_accumulation_steps=training_args.gradient_accumulation_steps,
         mixed_precision="no",
@@ -963,12 +963,12 @@ def main():
                     train_loss = 0.0
 
                     checkpointing_steps = 1000
-                    # if global_step % checkpointing_steps == 0:
-                    #     logging.info("Epoch : {} ; Step : {} ; Save checkpoint to {}".format(epoch, global_step, training_args.output_dir))
-                    #     if accelerator.is_main_process:
-                    #         save_path = os.path.join(training_args.output_dir, f"checkpoint-{global_step}")
-                    #         accelerator.save_state(save_path)
-                    #         logger.info(f"Saved state to {save_path}")
+                    if global_step % checkpointing_steps == 0:
+                        logging.info("Epoch : {} ; Step : {} ; Save checkpoint to {}".format(epoch, global_step, training_args.output_dir))
+                        if accelerator.is_main_process:
+                            save_path = os.path.join(training_args.output_dir, f"checkpoint-{global_step}")
+                            accelerator.save_state(save_path)
+                            logger.info(f"Saved state to {save_path}")
                 
                 record = {
                         "epoch": epoch,
