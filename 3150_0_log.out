@@ -1,0 +1,589 @@
+W&B offline. Running your script from this directory will only write metadata locally. Use wandb disabled to completely turn off W&B.
+1
+1
+1
+1
+1
+1
+1
+1
+08/17/2023 16:29:05 - WARNING - __main__ - Process rank: 0, device: cuda:0, n_gpu: 1distributed training: True, 16-bits training: False
+08/17/2023 16:29:05 - INFO - __main__ - Training/evaluation parameters TrainingArguments(
+_n_gpu=1,
+adafactor=False,
+adam_beta1=0.9,
+adam_beta2=0.999,
+adam_epsilon=1e-08,
+auto_find_batch_size=False,
+bf16=False,
+bf16_full_eval=False,
+data_seed=None,
+dataloader_drop_last=False,
+dataloader_num_workers=0,
+dataloader_pin_memory=True,
+ddp_backend=None,
+ddp_broadcast_buffers=None,
+ddp_bucket_cap_mb=None,
+ddp_find_unused_parameters=None,
+ddp_timeout=1800,
+debug=[],
+deepspeed=None,
+disable_tqdm=False,
+do_eval=True,
+do_predict=False,
+do_train=True,
+eval_accumulation_steps=None,
+eval_delay=0,
+eval_steps=None,
+evaluation_strategy=no,
+fp16=False,
+fp16_backend=auto,
+fp16_full_eval=False,
+fp16_opt_level=O1,
+fsdp=[],
+fsdp_config={'fsdp_min_num_params': 0, 'xla': False, 'xla_fsdp_grad_ckpt': False},
+fsdp_min_num_params=0,
+fsdp_transformer_layer_cls_to_wrap=None,
+full_determinism=False,
+gradient_accumulation_steps=1,
+gradient_checkpointing=False,
+greater_is_better=None,
+group_by_length=False,
+half_precision_backend=auto,
+hub_model_id=None,
+hub_private_repo=False,
+hub_strategy=every_save,
+hub_token=<HUB_TOKEN>,
+ignore_data_skip=False,
+include_inputs_for_metrics=False,
+jit_mode_eval=False,
+label_names=None,
+label_smoothing_factor=0.0,
+learning_rate=5e-05,
+length_column_name=length,
+load_best_model_at_end=False,
+local_rank=0,
+log_level=passive,
+log_level_replica=warning,
+log_on_each_node=True,
+logging_dir=/share/ckpt/songtianwei/runs/Aug17_16-29-04_fvl12,
+logging_first_step=False,
+logging_nan_inf_filter=True,
+logging_steps=500,
+logging_strategy=steps,
+lr_scheduler_type=linear,
+max_grad_norm=1.0,
+max_steps=100000,
+metric_for_best_model=None,
+mp_parameters=,
+no_cuda=False,
+num_train_epochs=15.0,
+optim=adamw_hf,
+optim_args=None,
+output_dir=/share/ckpt/songtianwei,
+overwrite_output_dir=True,
+past_index=-1,
+per_device_eval_batch_size=128,
+per_device_train_batch_size=6,
+prediction_loss_only=False,
+push_to_hub=False,
+push_to_hub_model_id=None,
+push_to_hub_organization=None,
+push_to_hub_token=<PUSH_TO_HUB_TOKEN>,
+ray_scope=last,
+remove_unused_columns=False,
+report_to=['wandb'],
+resume_from_checkpoint=None,
+run_name=/share/ckpt/songtianwei,
+save_on_each_node=False,
+save_safetensors=False,
+save_steps=500,
+save_strategy=steps,
+save_total_limit=None,
+seed=42,
+sharded_ddp=[],
+skip_memory_metrics=True,
+tf32=None,
+torch_compile=False,
+torch_compile_backend=None,
+torch_compile_mode=None,
+torchdynamo=None,
+tpu_metrics_debug=False,
+tpu_num_cores=None,
+use_ipex=False,
+use_legacy_prediction_loop=False,
+use_mps_device=False,
+warmup_ratio=0.0,
+warmup_steps=0,
+weight_decay=0.1,
+xpu_backend=None,
+)
+08/17/2023 16:29:05 - INFO - __main__ - Distributed environment: MULTI_GPU  Backend: nccl
+Num processes: 8
+Process index: 0
+Local process index: 0
+Device: cuda:0
+
+Mixed precision type: no
+
+Repo card metadata block was not found. Setting CardData to empty.
+08/17/2023 16:29:05 - WARNING - huggingface_hub.repocard - Repo card metadata block was not found. Setting CardData to empty.
+Repo card metadata block was not found. Setting CardData to empty.
+08/17/2023 16:29:05 - WARNING - huggingface_hub.repocard - Repo card metadata block was not found. Setting CardData to empty.
+Repo card metadata block was not found. Setting CardData to empty.
+08/17/2023 16:29:05 - WARNING - huggingface_hub.repocard - Repo card metadata block was not found. Setting CardData to empty.
+Repo card metadata block was not found. Setting CardData to empty.
+08/17/2023 16:29:05 - WARNING - huggingface_hub.repocard - Repo card metadata block was not found. Setting CardData to empty.
+Repo card metadata block was not found. Setting CardData to empty.
+08/17/2023 16:29:05 - WARNING - huggingface_hub.repocard - Repo card metadata block was not found. Setting CardData to empty.
+Repo card metadata block was not found. Setting CardData to empty.
+08/17/2023 16:29:05 - WARNING - huggingface_hub.repocard - Repo card metadata block was not found. Setting CardData to empty.
+Repo card metadata block was not found. Setting CardData to empty.
+08/17/2023 16:29:07 - WARNING - huggingface_hub.repocard - Repo card metadata block was not found. Setting CardData to empty.
+Repo card metadata block was not found. Setting CardData to empty.
+08/17/2023 16:29:09 - WARNING - huggingface_hub.repocard - Repo card metadata block was not found. Setting CardData to empty.
+wandb: Tracking run with wandb version 0.15.8
+wandb: W&B syncing is set to `offline` in this directory.  
+wandb: Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Tracking run with wandb version 0.15.8
+wandb: W&B syncing is set to `offline` in this directory.  
+wandb: Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Tracking run with wandb version 0.15.8
+wandb: W&B syncing is set to `offline` in this directory.  
+wandb: Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+THE DEVICE cuda:2
+08/17/2023 16:29:29 - INFO - root - **************************************************
+08/17/2023 16:29:29 - INFO - root - Doing Training
+08/17/2023 16:29:29 - INFO - root - **************************************************
+THE DEVICE cuda:7THE DEVICE
+08/17/2023 16:29:29 - INFO - root - **************************************************
+ cuda:308/17/2023 16:29:29 - INFO - root - Doing Training
+
+08/17/2023 16:29:29 - INFO - root - **************************************************
+08/17/2023 16:29:29 - INFO - root - **************************************************
+08/17/2023 16:29:29 - INFO - root - Doing Training
+08/17/2023 16:29:29 - INFO - root - **************************************************
+wandb: Tracking run with wandb version 0.15.8
+wandb: Tracking run with wandb version 0.15.8
+wandb: W&B syncing is set to `offline` in this directory.  
+wandb: Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: W&B syncing is set to `offline` in this directory.  
+wandb: Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+wandb: Tracking run with wandb version 0.15.8
+THE DEVICEwandb: W&B syncing is set to `offline` in this directory.  
+wandb: Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+ cuda:6
+THE DEVICE08/17/2023 16:29:29 - INFO - root - **************************************************
+08/17/2023 16:29:29 - INFO - root - Doing Training
+ 08/17/2023 16:29:29 - INFO - root - **************************************************
+cuda:1
+08/17/2023 16:29:29 - INFO - root - **************************************************
+08/17/2023 16:29:29 - INFO - root - Doing Training
+08/17/2023 16:29:29 - INFO - root - **************************************************
+08/17/2023 16:29:29 - INFO - __main__ - ***** Running training *****
+08/17/2023 16:29:29 - INFO - __main__ -   Training num examples = 591753
+wandb: Tracking run with wandb version 0.15.8
+08/17/2023 16:29:29 - INFO - __main__ -   Evaluation num examples = 25014
+wandb: W&B syncing is set to `offline` in this directory.  
+wandb: Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+08/17/2023 16:29:29 - INFO - __main__ -   Num Epochs = 15
+08/17/2023 16:29:29 - INFO - __main__ -   Instantaneous batch size per device = 6
+08/17/2023 16:29:29 - INFO - __main__ -   Total train batch size (w. parallel, distributed & accumulation) = 48
+08/17/2023 16:29:29 - INFO - __main__ -   Gradient Accumulation steps = 1
+08/17/2023 16:29:29 - INFO - __main__ -   Total optimization steps = 100000
+THE DEVICE cuda:4
+08/17/2023 16:29:29 - INFO - root - **************************************************
+08/17/2023 16:29:29 - INFO - root - Doing Training
+08/17/2023 16:29:29 - INFO - root - **************************************************
+  0%|          | 0/100000 [00:00<?, ?it/s]Training Steps:   0%|          | 0/100000 [00:00<?, ?it/s]wandb: Tracking run with wandb version 0.15.8
+wandb: W&B syncing is set to `offline` in this directory.  
+wandb: Run `wandb online` or set WANDB_MODE=online to enable cloud syncing.
+THE DEVICE cuda:5
+08/17/2023 16:29:29 - INFO - root - **************************************************
+08/17/2023 16:29:29 - INFO - root - Doing Training
+08/17/2023 16:29:29 - INFO - root - **************************************************
+08/17/2023 16:29:29 - INFO - __main__ - Accelerator.device cuda:0
+08/17/2023 16:29:29 - INFO - __main__ - GPU_NUM: 8
+08/17/2023 16:29:29 - INFO - __main__ - clip_train: True, generator_train: True
+08/17/2023 16:29:29 - INFO - __main__ - add_noise: True, use_normailize:True
+THE DEVICE cuda:0
+08/17/2023 16:29:29 - INFO - root - **************************************************
+08/17/2023 16:29:29 - INFO - root - Doing Training
+08/17/2023 16:29:29 - INFO - root - **************************************************
+Training Steps:   0%|          | 0/100000 [00:00<?, ?it/s]Forward upsample size to force interpolation output size.
+/vhome/songtianwei/anaconda3/envs/pytorch2/lib/python3.9/site-packages/torch/autograd/__init__.py:200: UserWarning: Grad strides do not match bucket view strides. This may indicate grad was not created according to the gradient layout contract, or that the param's strides changed since DDP was constructed.  This is not an error, but may impair performance.
+grad.sizes() = [128, 256, 1, 1], strides() = [256, 1, 256, 256]
+bucket_view.sizes() = [128, 256, 1, 1], strides() = [256, 1, 1, 1] (Triggered internally at /opt/conda/conda-bld/pytorch_1682343964576/work/torch/csrc/distributed/c10d/reducer.cpp:323.)
+  Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+/vhome/songtianwei/anaconda3/envs/pytorch2/lib/python3.9/site-packages/torch/autograd/__init__.py:200: UserWarning: Grad strides do not match bucket view strides. This may indicate grad was not created according to the gradient layout contract, or that the param's strides changed since DDP was constructed.  This is not an error, but may impair performance.
+grad.sizes() = [128, 256, 1, 1], strides() = [256, 1, 256, 256]
+bucket_view.sizes() = [128, 256, 1, 1], strides() = [256, 1, 1, 1] (Triggered internally at /opt/conda/conda-bld/pytorch_1682343964576/work/torch/csrc/distributed/c10d/reducer.cpp:323.)
+  Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+/vhome/songtianwei/anaconda3/envs/pytorch2/lib/python3.9/site-packages/torch/autograd/__init__.py:200: UserWarning: Grad strides do not match bucket view strides. This may indicate grad was not created according to the gradient layout contract, or that the param's strides changed since DDP was constructed.  This is not an error, but may impair performance.
+grad.sizes() = [128, 256, 1, 1], strides() = [256, 1, 256, 256]
+bucket_view.sizes() = [128, 256, 1, 1], strides() = [256, 1, 1, 1] (Triggered internally at /opt/conda/conda-bld/pytorch_1682343964576/work/torch/csrc/distributed/c10d/reducer.cpp:323.)
+  Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+/vhome/songtianwei/anaconda3/envs/pytorch2/lib/python3.9/site-packages/torch/autograd/__init__.py:200: UserWarning: Grad strides do not match bucket view strides. This may indicate grad was not created according to the gradient layout contract, or that the param's strides changed since DDP was constructed.  This is not an error, but may impair performance.
+grad.sizes() = [128, 256, 1, 1], strides() = [256, 1, 256, 256]
+bucket_view.sizes() = [128, 256, 1, 1], strides() = [256, 1, 1, 1] (Triggered internally at /opt/conda/conda-bld/pytorch_1682343964576/work/torch/csrc/distributed/c10d/reducer.cpp:323.)
+  Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+/vhome/songtianwei/anaconda3/envs/pytorch2/lib/python3.9/site-packages/torch/autograd/__init__.py:200: UserWarning: Grad strides do not match bucket view strides. This may indicate grad was not created according to the gradient layout contract, or that the param's strides changed since DDP was constructed.  This is not an error, but may impair performance.
+grad.sizes() = [128, 256, 1, 1], strides() = [256, 1, 256, 256]
+bucket_view.sizes() = [128, 256, 1, 1], strides() = [256, 1, 1, 1] (Triggered internally at /opt/conda/conda-bld/pytorch_1682343964576/work/torch/csrc/distributed/c10d/reducer.cpp:323.)
+  Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+/vhome/songtianwei/anaconda3/envs/pytorch2/lib/python3.9/site-packages/torch/autograd/__init__.py:200: UserWarning: Grad strides do not match bucket view strides. This may indicate grad was not created according to the gradient layout contract, or that the param's strides changed since DDP was constructed.  This is not an error, but may impair performance.
+grad.sizes() = [128, 256, 1, 1], strides() = [256, 1, 256, 256]
+bucket_view.sizes() = [128, 256, 1, 1], strides() = [256, 1, 1, 1] (Triggered internally at /opt/conda/conda-bld/pytorch_1682343964576/work/torch/csrc/distributed/c10d/reducer.cpp:323.)
+  Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+/vhome/songtianwei/anaconda3/envs/pytorch2/lib/python3.9/site-packages/torch/autograd/__init__.py:200: UserWarning: Grad strides do not match bucket view strides. This may indicate grad was not created according to the gradient layout contract, or that the param's strides changed since DDP was constructed.  This is not an error, but may impair performance.
+grad.sizes() = [128, 256, 1, 1], strides() = [256, 1, 256, 256]
+bucket_view.sizes() = [128, 256, 1, 1], strides() = [256, 1, 1, 1] (Triggered internally at /opt/conda/conda-bld/pytorch_1682343964576/work/torch/csrc/distributed/c10d/reducer.cpp:323.)
+  Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+/vhome/songtianwei/anaconda3/envs/pytorch2/lib/python3.9/site-packages/torch/autograd/__init__.py:200: UserWarning: Grad strides do not match bucket view strides. This may indicate grad was not created according to the gradient layout contract, or that the param's strides changed since DDP was constructed.  This is not an error, but may impair performance.
+grad.sizes() = [128, 256, 1, 1], strides() = [256, 1, 256, 256]
+bucket_view.sizes() = [128, 256, 1, 1], strides() = [256, 1, 1, 1] (Triggered internally at /opt/conda/conda-bld/pytorch_1682343964576/work/torch/csrc/distributed/c10d/reducer.cpp:323.)
+  Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+Training Steps:   0%|          | 1/100000 [00:03<89:44:55,  3.23s/it]Training Steps:   0%|          | 1/100000 [00:03<89:44:55,  3.23s/it, epoch=0, global_step=1, lr=5e-5, step=0, train_loss=1.84]Traceback (most recent call last):
+  File "/vhome/songtianwei/research/text-to-noise/clip_train/run_clip_work.py", line 1046, in <module>
+    main()
+  File "/vhome/songtianwei/research/text-to-noise/clip_train/run_clip_work.py", line 898, in main
+    noise = generator(batch_pixel_values, encoder_hidden_states)
+  File "/vhome/songtianwei/anaconda3/envs/pytorch2/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1501, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/vhome/songtianwei/anaconda3/envs/pytorch2/lib/python3.9/site-packages/torch/nn/parallel/distributed.py", line 1139, in forward
+    if torch.is_grad_enabled() and self.reducer._rebuild_buckets():
+RuntimeError: Expected to have finished reduction in the prior iteration before starting a new one. This error indicates that your module has parameters that were not used in producing loss. You can enable unused parameter detection by passing the keyword argument `find_unused_parameters=True` to `torch.nn.parallel.DistributedDataParallel`, and by 
+making sure all `forward` function outputs participate in calculating loss. 
+If you already have done the above, then the distributed data parallel module wasn't able to locate the output tensors in the return value of your module's `forward` function. Please include the loss function and the structure of the return value of `forward` of your module when reporting this issue (e.g. list, dict, iterable).
+Parameter indices which did not receive grad for rank 3: 246 247
+ In addition, you can set the environment variable TORCH_DISTRIBUTED_DEBUG to either INFO or DETAIL to print out information about which particular parameters did not receive gradient on this rank as part of this error
+Traceback (most recent call last):
+  File "/vhome/songtianwei/research/text-to-noise/clip_train/run_clip_work.py", line 1046, in <module>
+    main()
+  File "/vhome/songtianwei/research/text-to-noise/clip_train/run_clip_work.py", line 898, in main
+    noise = generator(batch_pixel_values, encoder_hidden_states)
+  File "/vhome/songtianwei/anaconda3/envs/pytorch2/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1501, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/vhome/songtianwei/anaconda3/envs/pytorch2/lib/python3.9/site-packages/torch/nn/parallel/distributed.py", line 1139, in forward
+    if torch.is_grad_enabled() and self.reducer._rebuild_buckets():
+Traceback (most recent call last):
+RuntimeError: Expected to have finished reduction in the prior iteration before starting a new one. This error indicates that your module has parameters that were not used in producing loss. You can enable unused parameter detection by passing the keyword argument `find_unused_parameters=True` to `torch.nn.parallel.DistributedDataParallel`, and by 
+making sure all `forward` function outputs participate in calculating loss. 
+If you already have done the above, then the distributed data parallel module wasn't able to locate the output tensors in the return value of your module's `forward` function. Please include the loss function and the structure of the return value of `forward` of your module when reporting this issue (e.g. list, dict, iterable).
+Parameter indices which did not receive grad for rank 6: 246 247
+ In addition, you can set the environment variable TORCH_DISTRIBUTED_DEBUG to either INFO or DETAIL to print out information about which particular parameters did not receive gradient on this rank as part of this error
+  File "/vhome/songtianwei/research/text-to-noise/clip_train/run_clip_work.py", line 1046, in <module>
+    main()
+  File "/vhome/songtianwei/research/text-to-noise/clip_train/run_clip_work.py", line 898, in main
+    noise = generator(batch_pixel_values, encoder_hidden_states)
+  File "/vhome/songtianwei/anaconda3/envs/pytorch2/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1501, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/vhome/songtianwei/anaconda3/envs/pytorch2/lib/python3.9/site-packages/torch/nn/parallel/distributed.py", line 1139, in forward
+    if torch.is_grad_enabled() and self.reducer._rebuild_buckets():
+RuntimeError: Expected to have finished reduction in the prior iteration before starting a new one. This error indicates that your module has parameters that were not used in producing loss. You can enable unused parameter detection by passing the keyword argument `find_unused_parameters=True` to `torch.nn.parallel.DistributedDataParallel`, and by 
+making sure all `forward` function outputs participate in calculating loss. 
+If you already have done the above, then the distributed data parallel module wasn't able to locate the output tensors in the return value of your module's `forward` function. Please include the loss function and the structure of the return value of `forward` of your module when reporting this issue (e.g. list, dict, iterable).
+Parameter indices which did not receive grad for rank 1: 246 247
+ In addition, you can set the environment variable TORCH_DISTRIBUTED_DEBUG to either INFO or DETAIL to print out information about which particular parameters did not receive gradient on this rank as part of this error
+wandb: Waiting for W&B process to finish... (failed 1).
+wandb: Waiting for W&B process to finish... (failed 1).
+Traceback (most recent call last):
+wandb: Waiting for W&B process to finish... (failed 1).
+  File "/vhome/songtianwei/research/text-to-noise/clip_train/run_clip_work.py", line 1046, in <module>
+    main()
+  File "/vhome/songtianwei/research/text-to-noise/clip_train/run_clip_work.py", line 898, in main
+    noise = generator(batch_pixel_values, encoder_hidden_states)
+  File "/vhome/songtianwei/anaconda3/envs/pytorch2/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1501, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/vhome/songtianwei/anaconda3/envs/pytorch2/lib/python3.9/site-packages/torch/nn/parallel/distributed.py", line 1139, in forward
+    if torch.is_grad_enabled() and self.reducer._rebuild_buckets():
+RuntimeError: Expected to have finished reduction in the prior iteration before starting a new one. This error indicates that your module has parameters that were not used in producing loss. You can enable unused parameter detection by passing the keyword argument `find_unused_parameters=True` to `torch.nn.parallel.DistributedDataParallel`, and by 
+making sure all `forward` function outputs participate in calculating loss. 
+If you already have done the above, then the distributed data parallel module wasn't able to locate the output tensors in the return value of your module's `forward` function. Please include the loss function and the structure of the return value of `forward` of your module when reporting this issue (e.g. list, dict, iterable).
+Parameter indices which did not receive grad for rank 4: 246 247
+ In addition, you can set the environment variable TORCH_DISTRIBUTED_DEBUG to either INFO or DETAIL to print out information about which particular parameters did not receive gradient on this rank as part of this error
+wandb: Waiting for W&B process to finish... (failed 1).
+Traceback (most recent call last):
+  File "/vhome/songtianwei/research/text-to-noise/clip_train/run_clip_work.py", line 1046, in <module>
+    main()
+  File "/vhome/songtianwei/research/text-to-noise/clip_train/run_clip_work.py", line 898, in main
+    noise = generator(batch_pixel_values, encoder_hidden_states)
+  File "/vhome/songtianwei/anaconda3/envs/pytorch2/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1501, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/vhome/songtianwei/anaconda3/envs/pytorch2/lib/python3.9/site-packages/torch/nn/parallel/distributed.py", line 1139, in forward
+    if torch.is_grad_enabled() and self.reducer._rebuild_buckets():
+Traceback (most recent call last):
+RuntimeError: Expected to have finished reduction in the prior iteration before starting a new one. This error indicates that your module has parameters that were not used in producing loss. You can enable unused parameter detection by passing the keyword argument `find_unused_parameters=True` to `torch.nn.parallel.DistributedDataParallel`, and by 
+making sure all `forward` function outputs participate in calculating loss. 
+If you already have done the above, then the distributed data parallel module wasn't able to locate the output tensors in the return value of your module's `forward` function. Please include the loss function and the structure of the return value of `forward` of your module when reporting this issue (e.g. list, dict, iterable).
+Parameter indices which did not receive grad for rank 7: 246 247
+ In addition, you can set the environment variable TORCH_DISTRIBUTED_DEBUG to either INFO or DETAIL to print out information about which particular parameters did not receive gradient on this rank as part of this error
+  File "/vhome/songtianwei/research/text-to-noise/clip_train/run_clip_work.py", line 1046, in <module>
+    main()
+  File "/vhome/songtianwei/research/text-to-noise/clip_train/run_clip_work.py", line 898, in main
+    noise = generator(batch_pixel_values, encoder_hidden_states)
+  File "/vhome/songtianwei/anaconda3/envs/pytorch2/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1501, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/vhome/songtianwei/anaconda3/envs/pytorch2/lib/python3.9/site-packages/torch/nn/parallel/distributed.py", line 1139, in forward
+    if torch.is_grad_enabled() and self.reducer._rebuild_buckets():
+RuntimeError: Expected to have finished reduction in the prior iteration before starting a new one. This error indicates that your module has parameters that were not used in producing loss. You can enable unused parameter detection by passing the keyword argument `find_unused_parameters=True` to `torch.nn.parallel.DistributedDataParallel`, and by 
+making sure all `forward` function outputs participate in calculating loss. 
+If you already have done the above, then the distributed data parallel module wasn't able to locate the output tensors in the return value of your module's `forward` function. Please include the loss function and the structure of the return value of `forward` of your module when reporting this issue (e.g. list, dict, iterable).
+Parameter indices which did not receive grad for rank 5: 246 247
+ In addition, you can set the environment variable TORCH_DISTRIBUTED_DEBUG to either INFO or DETAIL to print out information about which particular parameters did not receive gradient on this rank as part of this error
+Traceback (most recent call last):
+  File "/vhome/songtianwei/research/text-to-noise/clip_train/run_clip_work.py", line 1046, in <module>
+    main()
+wandb: Waiting for W&B process to finish... (failed 1).
+  File "/vhome/songtianwei/research/text-to-noise/clip_train/run_clip_work.py", line 898, in main
+    noise = generator(batch_pixel_values, encoder_hidden_states)
+  File "/vhome/songtianwei/anaconda3/envs/pytorch2/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1501, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/vhome/songtianwei/anaconda3/envs/pytorch2/lib/python3.9/site-packages/torch/nn/parallel/distributed.py", line 1139, in forward
+    if torch.is_grad_enabled() and self.reducer._rebuild_buckets():
+RuntimeError: Expected to have finished reduction in the prior iteration before starting a new one. This error indicates that your module has parameters that were not used in producing loss. You can enable unused parameter detection by passing the keyword argument `find_unused_parameters=True` to `torch.nn.parallel.DistributedDataParallel`, and by 
+making sure all `forward` function outputs participate in calculating loss. 
+If you already have done the above, then the distributed data parallel module wasn't able to locate the output tensors in the return value of your module's `forward` function. Please include the loss function and the structure of the return value of `forward` of your module when reporting this issue (e.g. list, dict, iterable).
+Parameter indices which did not receive grad for rank 2: 246 247
+ In addition, you can set the environment variable TORCH_DISTRIBUTED_DEBUG to either INFO or DETAIL to print out information about which particular parameters did not receive gradient on this rank as part of this error
+wandb: Waiting for W&B process to finish... (failed 1).
+wandb: Waiting for W&B process to finish... (failed 1).
+Traceback (most recent call last):
+  File "/vhome/songtianwei/research/text-to-noise/clip_train/run_clip_work.py", line 1046, in <module>
+    main()
+  File "/vhome/songtianwei/research/text-to-noise/clip_train/run_clip_work.py", line 898, in main
+    noise = generator(batch_pixel_values, encoder_hidden_states)
+  File "/vhome/songtianwei/anaconda3/envs/pytorch2/lib/python3.9/site-packages/torch/nn/modules/module.py", line 1501, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/vhome/songtianwei/anaconda3/envs/pytorch2/lib/python3.9/site-packages/torch/nn/parallel/distributed.py", line 1139, in forward
+    if torch.is_grad_enabled() and self.reducer._rebuild_buckets():
+RuntimeError: Expected to have finished reduction in the prior iteration before starting a new one. This error indicates that your module has parameters that were not used in producing loss. You can enable unused parameter detection by passing the keyword argument `find_unused_parameters=True` to `torch.nn.parallel.DistributedDataParallel`, and by 
+making sure all `forward` function outputs participate in calculating loss. 
+If you already have done the above, then the distributed data parallel module wasn't able to locate the output tensors in the return value of your module's `forward` function. Please include the loss function and the structure of the return value of `forward` of your module when reporting this issue (e.g. list, dict, iterable).
+Parameter indices which did not receive grad for rank 0: 246 247
+ In addition, you can set the environment variable TORCH_DISTRIBUTED_DEBUG to either INFO or DETAIL to print out information about which particular parameters did not receive gradient on this rank as part of this error
+wandb: Waiting for W&B process to finish... (failed 1).
+wandb: 
+wandb: Run history:
+wandb:       epoch ▁
+wandb: global_step ▁
+wandb:          lr ▁
+wandb:        step ▁
+wandb:  train_loss ▁
+wandb: 
+wandb: Run summary:
+wandb:       epoch 0
+wandb: global_step 1
+wandb:          lr 5e-05
+wandb:        step 0
+wandb:  train_loss 1.81651
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /vhome/songtianwei/research/text-to-noise/clip_train/wandb/offline-run-20230817_162925-n0ewngnu
+wandb: Find logs at: ./wandb/offline-run-20230817_162925-n0ewngnu/logs
+wandb: 
+wandb: Run history:
+wandb:       epoch ▁
+wandb: global_step ▁
+wandb:          lr ▁
+wandb:        step ▁
+wandb:  train_loss ▁
+wandb: 
+wandb: Run summary:
+wandb:       epoch 0
+wandb: global_step 1
+wandb:          lr 5e-05
+wandb:        step 0
+wandb:  train_loss 1.88115
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /vhome/songtianwei/research/text-to-noise/clip_train/wandb/offline-run-20230817_162925-ovciamo7
+wandb: Find logs at: ./wandb/offline-run-20230817_162925-ovciamo7/logs
+wandb: 
+wandb: Run history:
+wandb:       epoch ▁
+wandb: global_step ▁
+wandb:          lr ▁
+wandb:        step ▁
+wandb:  train_loss ▁
+wandb: 
+wandb: Run summary:
+wandb:       epoch 0
+wandb: global_step 1
+wandb:          lr 5e-05
+wandb:        step 0
+wandb:  train_loss 1.81995
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /vhome/songtianwei/research/text-to-noise/clip_train/wandb/offline-run-20230817_162925-qvv9fixl
+wandb: Find logs at: ./wandb/offline-run-20230817_162925-qvv9fixl/logs
+wandb: 
+wandb: Run history:
+wandb:       epoch ▁
+wandb: global_step ▁
+wandb:          lr ▁
+wandb:        step ▁
+wandb:  train_loss ▁
+wandb: 
+wandb: Run summary:
+wandb:       epoch 0
+wandb: global_step 1
+wandb:          lr 5e-05
+wandb:        step 0
+wandb:  train_loss 1.81978
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /vhome/songtianwei/research/text-to-noise/clip_train/wandb/offline-run-20230817_162925-v2d7dpht
+wandb: Find logs at: ./wandb/offline-run-20230817_162925-v2d7dpht/logs
+wandb: 
+wandb: Run history:
+wandb:       epoch ▁
+wandb: global_step ▁
+wandb:          lr ▁
+wandb:        step ▁
+wandb:  train_loss ▁
+wandb: 
+wandb: Run summary:
+wandb:       epoch 0
+wandb: global_step 1
+wandb:          lr 5e-05
+wandb:        step 0
+wandb:  train_loss 1.8073
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /vhome/songtianwei/research/text-to-noise/clip_train/wandb/offline-run-20230817_162925-zmr9e4w0
+wandb: Find logs at: ./wandb/offline-run-20230817_162925-zmr9e4w0/logs
+wandb: 
+wandb: Run history:
+wandb:       epoch ▁
+wandb: global_step ▁
+wandb:          lr ▁
+wandb:        step ▁
+wandb:  train_loss ▁
+wandb: 
+wandb: Run summary:
+wandb:       epoch 0
+wandb: global_step 1
+wandb:          lr 5e-05
+wandb:        step 0
+wandb:  train_loss 1.84468
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /vhome/songtianwei/research/text-to-noise/clip_train/wandb/offline-run-20230817_162925-lkxzim6y
+wandb: Find logs at: ./wandb/offline-run-20230817_162925-lkxzim6y/logs
+wandb: 
+wandb: Run history:
+wandb:       epoch ▁
+wandb: global_step ▁
+wandb:          lr ▁
+wandb:        step ▁
+wandb:  train_loss ▁
+wandb: 
+wandb: Run summary:
+wandb:       epoch 0
+wandb: global_step 1
+wandb:          lr 5e-05
+wandb:        step 0
+wandb:  train_loss 1.89435
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /vhome/songtianwei/research/text-to-noise/clip_train/wandb/offline-run-20230817_162925-62nw1z0e
+wandb: Find logs at: ./wandb/offline-run-20230817_162925-62nw1z0e/logs
+wandb: 
+wandb: Run history:
+wandb:       epoch ▁
+wandb: global_step ▁
+wandb:          lr ▁
+wandb:        step ▁
+wandb:  train_loss ▁
+wandb: 
+wandb: Run summary:
+wandb:       epoch 0
+wandb: global_step 1
+wandb:          lr 5e-05
+wandb:        step 0
+wandb:  train_loss 1.83696
+wandb: 
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync /vhome/songtianwei/research/text-to-noise/clip_train/wandb/offline-run-20230817_162925-nlbt2by7
+wandb: Find logs at: ./wandb/offline-run-20230817_162925-nlbt2by7/logs
+ERROR:torch.distributed.elastic.multiprocessing.api:failed (exitcode: 1) local_rank: 0 (pid: 1446352) of binary: /vhome/songtianwei/anaconda3/envs/pytorch2/bin/python3.9
+Traceback (most recent call last):
+  File "/vhome/songtianwei/anaconda3/envs/pytorch2/bin/accelerate", line 10, in <module>
+    sys.exit(main())
+  File "/vhome/songtianwei/anaconda3/envs/pytorch2/lib/python3.9/site-packages/accelerate/commands/accelerate_cli.py", line 45, in main
+    args.func(args)
+  File "/vhome/songtianwei/anaconda3/envs/pytorch2/lib/python3.9/site-packages/accelerate/commands/launch.py", line 970, in launch_command
+    multi_gpu_launcher(args)
+  File "/vhome/songtianwei/anaconda3/envs/pytorch2/lib/python3.9/site-packages/accelerate/commands/launch.py", line 646, in multi_gpu_launcher
+    distrib_run.run(args)
+  File "/vhome/songtianwei/anaconda3/envs/pytorch2/lib/python3.9/site-packages/torch/distributed/run.py", line 785, in run
+    elastic_launch(
+  File "/vhome/songtianwei/anaconda3/envs/pytorch2/lib/python3.9/site-packages/torch/distributed/launcher/api.py", line 134, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+  File "/vhome/songtianwei/anaconda3/envs/pytorch2/lib/python3.9/site-packages/torch/distributed/launcher/api.py", line 250, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+run_clip_work.py FAILED
+------------------------------------------------------------
+Failures:
+[1]:
+  time      : 2023-08-17_16:29:39
+  host      : fvl12
+  rank      : 1 (local_rank: 1)
+  exitcode  : 1 (pid: 1446353)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+[2]:
+  time      : 2023-08-17_16:29:39
+  host      : fvl12
+  rank      : 2 (local_rank: 2)
+  exitcode  : 1 (pid: 1446354)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+[3]:
+  time      : 2023-08-17_16:29:39
+  host      : fvl12
+  rank      : 3 (local_rank: 3)
+  exitcode  : 1 (pid: 1446355)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+[4]:
+  time      : 2023-08-17_16:29:39
+  host      : fvl12
+  rank      : 4 (local_rank: 4)
+  exitcode  : 1 (pid: 1446356)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+[5]:
+  time      : 2023-08-17_16:29:39
+  host      : fvl12
+  rank      : 5 (local_rank: 5)
+  exitcode  : 1 (pid: 1446357)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+[6]:
+  time      : 2023-08-17_16:29:39
+  host      : fvl12
+  rank      : 6 (local_rank: 6)
+  exitcode  : 1 (pid: 1446358)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+[7]:
+  time      : 2023-08-17_16:29:39
+  host      : fvl12
+  rank      : 7 (local_rank: 7)
+  exitcode  : 1 (pid: 1446359)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2023-08-17_16:29:39
+  host      : fvl12
+  rank      : 0 (local_rank: 0)
+  exitcode  : 1 (pid: 1446352)
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================

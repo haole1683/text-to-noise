@@ -27,7 +27,7 @@ accelerate launch  \
     --dataset_config_name=2017 \
     --image_column image_path \
     --caption_column caption \
-    --remove_unused_columns=False \
+    --remove_unused_columns="False" \
     --do_train  \
     --do_eval \
     --report_to="wandb" \
@@ -38,11 +38,11 @@ accelerate launch  \
     --max_seq_length="77" \
     --max_steps=100000 \
     --num_train_epochs=15 \
-    --per_device_train_batch_size="128" \
+    --per_device_train_batch_size="6" \
     --per_device_eval_batch_size="128" \
     --if_clip_train="True" \
     --if_clip_pretrained="True" \
-    --if_add_noise="False" \
-    --if_generator_train="False" \
-    --if_use_8bit_adam="False" \
+    --if_add_noise="True" \
+    --if_generator_train="True" \
+    --if_use_8bit_adam="True" \
     --preprocessing_num_workers=8 \

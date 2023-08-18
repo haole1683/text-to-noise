@@ -1,8 +1,8 @@
-# import ptvsd
-# print("waiting for attaching")
-# ptvsd.enable_attach(address = ('127.0.0.1', 5678))
-# ptvsd.wait_for_attach()
-# print("attached")
+import ptvsd
+print("waiting for attaching")
+ptvsd.enable_attach(address = ('127.0.0.1', 5678))
+ptvsd.wait_for_attach()
+print("attached")
 
 
 import logging
@@ -866,6 +866,7 @@ def main():
             clip_model.train()
             if if_generator_train:
                 generator.train()
+                # generator.enable_xformers_memory_efficient_attention()
             
             for step, batch in enumerate(train_dataloader):
                 # Skip steps until we reach the resumed step
@@ -877,6 +878,12 @@ def main():
                 batch_pixel_values = batch["pixel_values"]  # [6,3,224,224]
                 batch_input_ids = batch["input_ids"]
                 batch_attention_mask = batch["attention_mask"]
+                
+                train_target = train_target_list[cur_index]
+                if train_target == "generator":
+                    generator.requires_grad_(True)
+                else:
+                    generator.requires_grad_(False)
                 
                 if if_add_noise:
                     # if this is not distrubution training
@@ -931,15 +938,15 @@ def main():
                 
                 # Update optimizer
                 if if_add_noise and if_generator_train:
-                    # which to train
-                    train_target = train_target_list[cur_index]
-                    cur_index = (cur_index + 1) % len(train_target_list)
                     if train_target == "generator":
                         optimizer_generator.step()
                     elif train_target == "clip":
                         optimizer.step()
                 else:
                     optimizer.step()
+                    
+                # update train target 
+                cur_index = (cur_index + 1) % len(train_target_list)
                     
                 # update learning rate
                 # lr_scheduler.step()
