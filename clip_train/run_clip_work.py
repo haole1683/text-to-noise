@@ -1,8 +1,8 @@
-import ptvsd
-print("waiting for attaching")
-ptvsd.enable_attach(address = ('127.0.0.1', 5678))
-ptvsd.wait_for_attach()
-print("attached")
+# import ptvsd
+# print("waiting for attaching")
+# ptvsd.enable_attach(address = ('127.0.0.1', 5678))
+# ptvsd.wait_for_attach()
+# print("attached")
 
 
 import logging
@@ -16,16 +16,13 @@ from tqdm import tqdm
 import torch
 from datasets import load_dataset
 from PIL import Image
-from torchvision.io import ImageReadMode, read_image
-from torchvision.transforms import CenterCrop, ConvertImageDtype, Normalize, Resize, ToTensor
-from torchvision.transforms.functional import InterpolationMode
+from torchvision.io import read_image
+
 import torchvision.transforms as transforms
-import torch.nn as nn
 import accelerate
 import datasets
 import numpy as np
 import torch
-import torch.nn.functional as F
 import torch.utils.checkpoint
 from PIL import Image
 
@@ -46,8 +43,9 @@ from transformers.trainer_pt_utils import get_parameter_names
 from transformers.pytorch_utils import ALL_LAYERNORM_LAYERS
 
 import diffusers
-from diffusers import AutoencoderKL, UNet2DConditionModel
+
 from diffusers.utils import is_wandb_available
+from diffusers.optimization import get_scheduler
 
 from accelerate import Accelerator
 from accelerate.logging import get_logger
@@ -56,6 +54,10 @@ from accelerate.utils import DistributedDataParallelKwargs
 
 if is_wandb_available():
     import wandb
+    
+from utils import Transform, normalize_fn, collate_fn
+from generator import generatorDcGan, generatorDDPM
+
 
 logger = get_logger(__name__, log_level="INFO")
 
@@ -207,7 +209,7 @@ class ExperimentArguments:
     Hyperparameters for the experiment.
     """
     if_clip_pretrained: bool = field(
-        default=True, metadata={"help": "Whether to use the pretrained clip model."}
+        default=False, metadata={"help": "Whether to use the pretrained clip model."}
     )
     if_clip_train: bool = field(
         default=True, metadata={"help": "Whether to train the clip model."}
@@ -219,7 +221,7 @@ class ExperimentArguments:
         default=False, metadata={"help": "Whether to generate the training dataset."}
     )
     if_normalize: bool = field(
-        default=True, metadata={"help": "Whether to normalize the dataset."}
+        default=False, metadata={"help": "Whether to normalize the dataset."}
     )
     if_use_clip_tokenizer: bool = field(
         default=True, metadata={"help": "Whether to use the clip tokenizer."}
@@ -230,119 +232,20 @@ class ExperimentArguments:
     if_trainloader_shuffle: bool = field(
         default=True, metadata={"help": "Whether to shuffle the trainloader."}
     )
+    lr_scheduler: Optional[str] = field(
+        default="linear",
+        metadata={"help": "The type of lr scheduler."},
+        # help=(
+        #     'The scheduler type to use. Choose between ["linear", "cosine", "cosine_with_restarts", "polynomial",'
+        #     ' "constant", "constant_with_warmup"]'
+        # ),
+    )
 
 
 dataset_name_mapping = {
     "image_caption_dataset.py": ("image_path", "caption"),
 }
 
-def normalize_fn(x, mean, std):
-    return Normalize(mean=mean, std=std)(x)
-
-class Transform(torch.nn.Module):
-    def __init__(self, image_size, mean=None, std=None):
-        super().__init__()
-        self.transforms = transforms.Compose([
-            Resize([image_size], interpolation=InterpolationMode.BICUBIC,antialias=None),
-            CenterCrop(image_size),  # CenterCrop is required because Resize doesn't ensure same output size
-            # ConvertImageDtype(torch.float),
-            ToTensor(), 
-        ])
-        if mean is not None and std is not None:
-            self.transforms.transforms.append(Normalize(mean=mean, std=std))
-
-    def forward(self, x) -> torch.Tensor:
-        """`x` should be an instance of `PIL.Image.Image`"""
-        with torch.no_grad():
-            x = self.transforms(x)
-        return x
-
-
-def collate_fn(examples):
-    pixel_values = torch.stack([example["pixel_values"] for example in examples])
-    input_ids = torch.tensor([example["input_ids"] for example in examples], dtype=torch.long)
-    attention_mask = torch.tensor([example["attention_mask"] for example in examples], dtype=torch.long)
-    return {
-        "pixel_values": pixel_values,
-        "input_ids": input_ids,
-        "attention_mask": attention_mask,
-        "return_loss": True,
-    }
-
-
-class Generator(nn.Module):
-    def __init__(self, image_channel=3, image_shape=[224,224], text_embedding_dim=512):
-        super(Generator, self).__init__()
-        self.image_channel = image_channel
-        self.image_shape = image_shape if isinstance(image_shape, list) else [image_shape, image_shape]
-        self.text_embedding_dim = text_embedding_dim
-        
-        self.vae_config = {
-            'sample_size': self.image_shape,  # 512
-            'in_channels': self.image_channel,
-            'out_channels': self.image_channel,
-            'down_block_types': ['DownEncoderBlock2D', 'DownEncoderBlock2D', 'DownEncoderBlock2D', 'DownEncoderBlock2D'],
-            'up_block_types': ['UpDecoderBlock2D', 'UpDecoderBlock2D', 'UpDecoderBlock2D', 'UpDecoderBlock2D'],
-            'block_out_channels': [128, 256, 512, 512],
-            'layers_per_block': 2,
-            'act_fn': 'silu',
-            'latent_channels': 4,
-            'norm_num_groups': 32,
-            'scaling_factor': 0.18215,
-        }
-         
-        self.vae = AutoencoderKL(**self.vae_config)
-        
-        self.unet_config = {
-            "in_channels": self.vae_config["latent_channels"],
-            "out_channels": self.vae_config["latent_channels"],
-            "sample_size": 28,
-            "act_fn": "silu",
-            "attention_head_dim": 8,
-            "block_out_channels": [
-                320,
-                640,
-                1280,
-                1280
-            ],
-            "center_input_sample": False,
-            "cross_attention_dim": self.text_embedding_dim,  
-            "down_block_types": [
-                "CrossAttnDownBlock2D",
-                "CrossAttnDownBlock2D",
-                "CrossAttnDownBlock2D",
-                "DownBlock2D"
-            ],
-            "downsample_padding": 1,
-            "flip_sin_to_cos": True,
-            "freq_shift": 0,
-            "layers_per_block": 2,
-            "mid_block_scale_factor": 1,
-            "norm_eps": 1e-05,
-            "norm_num_groups": 32,
-            "up_block_types": [
-                "UpBlock2D",
-                "CrossAttnUpBlock2D",
-                "CrossAttnUpBlock2D",
-                "CrossAttnUpBlock2D"
-            ]
-        }
-
-        self.unet = UNet2DConditionModel(**self.unet_config)
-        
-        
-    def forward(self, img_pixel_values, encoder_hidden_states):
-        latent = self.vae.encode(img_pixel_values).latent_dist.sample()
-        timesteps = torch.randint(0, 1000, (1,),device=latent.device)
-        timesteps = timesteps.long()  #  6
-        unet_pred = self.unet(latent, timesteps, encoder_hidden_states).sample
-        vae_decoding = self.vae.decoder(unet_pred)
-        return vae_decoding
-    
-    
-    def enable_xformers_memory_efficient_attention(self):
-        self.unet.enable_xformers_memory_efficient_attention()
-        self.vae.enable_xformers_memory_efficient_attention()
 
 def main():
     # print("*"*100)
@@ -391,7 +294,7 @@ def main():
     accelerator_project_config = ProjectConfiguration(total_limit=training_args.save_total_limit)
 
     # reference from https://github.com/huggingface/accelerate/issues/497
-    ddp_scaler = DistributedDataParallelKwargs(bucket_cap_mb=15, find_unused_parameters=False)
+    ddp_scaler = DistributedDataParallelKwargs(bucket_cap_mb=15, find_unused_parameters=True)
     accelerator = Accelerator(
         gradient_accumulation_steps=training_args.gradient_accumulation_steps,
         mixed_precision="no",
@@ -454,21 +357,21 @@ def main():
             use_auth_token=True if model_args.use_auth_token else None,
         )
     
-    if model_args.tokenizer_name:
-        tokenizer = AutoTokenizer.from_pretrained(
-            model_args.tokenizer_name, cache_dir=model_args.cache_dir, use_fast=model_args.use_fast_tokenizer
-        )
-    elif model_args.model_name_or_path:
-        tokenizer = AutoTokenizer.from_pretrained(
-            model_args.model_name_or_path, cache_dir=model_args.cache_dir, use_fast=model_args.use_fast_tokenizer
-        )
-    else:
-        raise ValueError(
-            "You are instantiating a new tokenizer from scratch. This is not supported by this script."
-            "You can do it from another script, save it, and load it from here, using --tokenizer_name."
-        )
+    
     if experiment_args.if_clip_pretrained:
-        pass
+        if model_args.tokenizer_name:
+            tokenizer = AutoTokenizer.from_pretrained(
+                model_args.tokenizer_name, cache_dir=model_args.cache_dir, use_fast=model_args.use_fast_tokenizer
+            )
+        elif model_args.model_name_or_path:
+            tokenizer = AutoTokenizer.from_pretrained(
+                model_args.model_name_or_path, cache_dir=model_args.cache_dir, use_fast=model_args.use_fast_tokenizer
+            )
+        else:
+            raise ValueError(
+                "You are instantiating a new tokenizer from scratch. This is not supported by this script."
+                "You can do it from another script, save it, and load it from here, using --tokenizer_name."
+            )
     else:
         tokenizer = CLIPTokenizer.from_pretrained("openai/clip-vit-base-patch32")
     
@@ -481,6 +384,7 @@ def main():
     )
     
     clip_config = CLIPConfig()
+    clip_config.vision_config.image_size = 64
     clip_pretrained = experiment_args.if_clip_pretrained
     if clip_pretrained:
         clip_model = AutoModel.from_pretrained(
@@ -490,7 +394,6 @@ def main():
             token=True if model_args.use_auth_token else None,
         )
     else:
-        # clip_model = CLIPModel(clip_config)
         clip_model = AutoModel.from_config(clip_config)
         
     def _freeze_params(module):
@@ -498,9 +401,11 @@ def main():
             param.requires_grad = False
 
     if model_args.freeze_vision_model:
+        logging.info("Freezing vision model")
         _freeze_params(clip_model.vision_model)
 
     if model_args.freeze_text_model:
+        logging.info("Freezing text model")
         _freeze_params(clip_model.text_model)
 
     if training_args.seed is not None:
@@ -515,14 +420,7 @@ def main():
             pass
         image_channel = clip_config.vision_config.num_channels
         image_shape = clip_config.vision_config.image_size
-        generator = Generator(image_channel,image_shape,text_embedding_dim)
-        
-    # text_encoder = CLIPTextModel.from_pretrained(
-    #     pretrained_model_name_or_path, subfolder="text_encoder", revision=revision
-    # )
-    # # text_encoder
-    # text_encoder.requires_grad_(False)
-    # weight_dtype = torch.float32
+        generator = generatorDDPM(image_channel, image_shape)
     
     # Preprocessing the datasets.
     # We need to tokenize inputs and targets.
@@ -657,7 +555,6 @@ def main():
     # evaluation dataloader
     eval_dataloader = torch.utils.data.DataLoader(
         eval_dataset,
-        # train_dataset,
         shuffle=True,
         collate_fn=collate_fn,
         batch_size=training_args.per_device_eval_batch_size,
@@ -689,10 +586,7 @@ def main():
         
             # Transform images on the fly as doing it on the whole dataset takes too much time.
             test_dataset.set_transform(transform_images)
-            
-    def normalize_fn(x, mean, std):
-        return transforms.Normalize(mean=mean, std=std)(x)
-    
+
     # Initialize the optimizer
     use_8bit_adam = experiment_args.if_use_8bit_adam
     
@@ -703,7 +597,6 @@ def main():
             raise ImportError(
                 "Please install bitsandbytes to use 8-bit Adam. You can do so by running `pip install bitsandbytes`"
             )
-
         optimizer_cls = bnb.optim.AdamW8bit
     else:
         optimizer_cls = torch.optim.AdamW
@@ -730,10 +623,25 @@ def main():
         "eps": 1e-8,
     }
 
+    generator_lr_scale = 1
     optimizer = optimizer_cls(optimizer_grouped_parameters, **adam_kwargs)
     if experiment_args.if_add_noise and experiment_args.if_generator_train:
+        adam_kwargs["lr"] = training_args.learning_rate * generator_lr_scale
         generator_parameters = generator.parameters()
         optimizer_generator = optimizer_cls(generator_parameters, **adam_kwargs)
+    
+    lr_scheduler = get_scheduler(
+        experiment_args.lr_scheduler,
+        optimizer=optimizer,
+        num_warmup_steps= 500,
+        num_training_steps= training_args.max_steps * training_args.gradient_accumulation_steps,
+    )
+    lr_scheduler_generator = get_scheduler(
+        experiment_args.lr_scheduler,
+        optimizer=optimizer_generator,
+        num_warmup_steps= 500,
+        num_training_steps= training_args.max_steps * training_args.gradient_accumulation_steps,
+    )
     
     # Handle the repository creation
     if accelerator.is_main_process:
@@ -742,20 +650,21 @@ def main():
     
     
     # Accelerator
-    # For optimizer and scheduler
-    optimizer = accelerator.prepare(optimizer)
-    # lr_scheduler = accelerator.prepare(lr_scheduler)
-    if experiment_args.if_add_noise and experiment_args.if_generator_train:
-        optimizer_generator = accelerator.prepare(optimizer_generator)
-    
     # For model
     clip_model = accelerator.prepare(clip_model)
     if experiment_args.if_add_noise:
         generator = accelerator.prepare(generator)
+    # For optimizer and scheduler
+    optimizer = accelerator.prepare(optimizer)
+    lr_scheduler = accelerator.prepare(lr_scheduler)
+
+    if experiment_args.if_add_noise and experiment_args.if_generator_train:
+        optimizer_generator = accelerator.prepare(optimizer_generator)
+        lr_scheduler_generator = accelerator.prepare(lr_scheduler_generator)    
+    
     train_dataloader = accelerator.prepare(train_dataloader)
     eval_dataloader = accelerator.prepare(eval_dataloader)
-    # text_encoder.to(accelerator.device, dtype=weight_dtype)
-    
+
     
     num_update_steps_per_epoch = math.ceil(len(train_dataloader) / training_args.gradient_accumulation_steps)
     if training_args.max_steps is None or training_args.max_steps <= 0:
@@ -851,13 +760,14 @@ def main():
     for epoch in range(first_epoch, training_args.num_train_epochs):
         print("THE DEVICE",accelerator.device)
         if training_args.do_train:
-            logging.info("*"*50)
-            logging.info("Doing Training")
-            logging.info("*"*50)
-                
-            progress_bar.set_description("Training Steps")
+            if accelerator.is_main_process:
+                logging.info("*"*50)
+                logging.info("Doing Training")
+                logging.info("*"*50)
+                progress_bar.set_description("Training Steps")
+            
+            
             train_loss = 0.0
-
             generator_step_M = 1
             clip_step_N = 1
             train_target_list = ["generator"]*generator_step_M + ["clip"]*clip_step_N
@@ -866,15 +776,11 @@ def main():
             clip_model.train()
             if if_generator_train:
                 generator.train()
-                # generator.enable_xformers_memory_efficient_attention()
+            
+            # wait for everyone to be ready before starting to train.
+            # accelerator.wait_for_everyone()
             
             for step, batch in enumerate(train_dataloader):
-                # Skip steps until we reach the resumed step
-                if training_args.resume_from_checkpoint and epoch == first_epoch and step < resume_step:
-                    if step % training_args.gradient_accumulation_steps == 0:
-                        progress_bar.update(1)
-                    continue
-
                 batch_pixel_values = batch["pixel_values"]  # [6,3,224,224]
                 batch_input_ids = batch["input_ids"]
                 batch_attention_mask = batch["attention_mask"]
@@ -893,8 +799,12 @@ def main():
                         text_encoder = clip_model.text_model
                     with torch.no_grad():
                         encoder_hidden_states = text_encoder(batch_input_ids,batch_attention_mask)[0]               
-                    noise = generator(batch_pixel_values, encoder_hidden_states)
 
+                    generator_output = generator(batch_pixel_values, encoder_hidden_states)
+                    image_ = generator_output
+                    noise = image_ - batch_pixel_values
+                    # noise = generator_output
+                    
                     # limit the norm of the noise
                     norm_type = 'l2'
                     epsilon = 16
@@ -907,7 +817,8 @@ def main():
                     image = torch.clamp(image, -1, 1)
                 else:
                     image = batch_pixel_values
-                     
+                image = batch_pixel_values  
+                
                 if if_normalize:
                     image = normalize_fn(image, mean=image_processor.image_mean, std=image_processor.image_std)
                     
@@ -917,7 +828,7 @@ def main():
                     "attention_mask":batch_attention_mask,
                     "return_loss": True
                 }
-                # text_encoder.requires_grad_(True)
+        
                 output = clip_model(**batch_data_input)
                 logits_per_image = output.logits_per_image   # for training , image_logits is the same as logits text
                 logits_per_text = output.logits_per_text
@@ -936,61 +847,66 @@ def main():
                     if if_clip_train:
                         accelerator.clip_grad_norm_(clip_model.parameters(), training_args.max_grad_norm)
                 
-                # Update optimizer
+                # Update optimizer and scheduler
                 if if_add_noise and if_generator_train:
                     if train_target == "generator":
                         optimizer_generator.step()
+                        lr_scheduler_generator.step()
                     elif train_target == "clip":
                         optimizer.step()
+                        lr_scheduler.step()
                 else:
                     optimizer.step()
-                    
+                    lr_scheduler.step()
+                
                 # update train target 
                 cur_index = (cur_index + 1) % len(train_target_list)
                     
-                # update learning rate
-                # lr_scheduler.step()
                 
-                # zero the grad of model
+                # zero the grad of model and optimizer
                 clip_model.zero_grad()
-                if if_add_noise and if_generator_train:
-                    generator.zero_grad()
-                
-                # zero the grad of optimizer
                 optimizer.zero_grad()
                 if if_add_noise and if_generator_train:
+                    generator.zero_grad()
                     optimizer_generator.zero_grad()
+                
+                # update progress bar and save state
+                if accelerator.is_main_process:
+                    # Checks if the accelerator has performed an optimization step behind the scenes
+                    if accelerator.sync_gradients:
+                        progress_bar.update(1)
+                        global_step += 1
+                        accelerator.log({"train_loss": train_loss}, step=global_step)
+                        train_loss = 0.0
 
-                # Checks if the accelerator has performed an optimization step behind the scenes
-                if accelerator.sync_gradients:
-                    progress_bar.update(1)
-                    global_step += 1
-                    accelerator.log({"train_loss": train_loss}, step=global_step)
-                    train_loss = 0.0
-
-                    checkpointing_steps = 1000
-                    if global_step % checkpointing_steps == 0:
-                        logging.info("Epoch : {} ; Step : {} ; Save checkpoint to {}".format(epoch, global_step, training_args.output_dir))
-                        if accelerator.is_main_process:
+                        checkpointing_steps = 5000
+                        if global_step % checkpointing_steps == 0 or global_step == 10:
+                            logging.info("Epoch : {} ; Step : {} ; Save checkpoint to {}".format(epoch, global_step, training_args.output_dir))
                             save_path = os.path.join(training_args.output_dir, f"checkpoint-{global_step}")
                             accelerator.save_state(save_path)
+                            accelerator.save_model(clip_model, os.path.join(save_path, "clip_model"))
+                            if if_add_noise and if_generator_train:
+                                accelerator.save_model(generator, os.path.join(save_path, "generator"))
                             logger.info(f"Saved state to {save_path}")
-                
-                record = {
-                        "epoch": epoch,
-                        "step": step,
-                        "global_step":global_step,
-                        "train_loss": loss.detach().item(),
-                        "lr": optimizer.param_groups[0]["lr"],
-                        }
-                wandb.log(record)  
-                progress_bar.set_postfix(**record)
-
-                if global_step >= training_args.max_steps:
-                    break
+                        
+                    record = {
+                            "epoch": epoch,
+                            "step": step,
+                            "global_step":global_step,
+                            "train_loss": loss.detach().item(),
+                            "avg_train_loss": avg_loss.detach().item(),
+                            "lr": optimizer.param_groups[0]["lr"],
+                            }
+                    wandb.log(record)  
+                    progress_bar.set_postfix(**record)
+                    
+                    if avg_loss.detach().item() < 0.9:
+                        # end the training if the loss is too small        
+                        accelerator.end_training()
+                    if global_step >= training_args.max_steps:
+                        break
         
         # evaluation on the eval dataset
-        # accelerator.wait_for_everyone()
         if training_args.do_eval and accelerator.is_main_process:
             logging.info("*"*50)
             logging.info("Doing Evaluation")
@@ -1036,7 +952,6 @@ def main():
                         }
             wandb.log(eval_record)  
 
-        # accelerator.wait_for_everyone()
     accelerator.end_training()
     
 

@@ -1,0 +1,146 @@
+W&B offline. Running your script from this directory will only write metadata locally. Use wandb disabled to completely turn off W&B.
+1
+1
+1
+1
+1
+1
+1
+1
+08/24/2023 15:27:17 - WARNING - __main__ - Process rank: 0, device: cuda:0, n_gpu: 1distributed training: True, 16-bits training: False
+08/24/2023 15:27:17 - INFO - __main__ - Training/evaluation parameters TrainingArguments(
+_n_gpu=1,
+adafactor=False,
+adam_beta1=0.9,
+adam_beta2=0.999,
+adam_epsilon=1e-08,
+auto_find_batch_size=False,
+bf16=False,
+bf16_full_eval=False,
+data_seed=None,
+dataloader_drop_last=False,
+dataloader_num_workers=0,
+dataloader_pin_memory=True,
+ddp_backend=None,
+ddp_broadcast_buffers=None,
+ddp_bucket_cap_mb=None,
+ddp_find_unused_parameters=None,
+ddp_timeout=1800,
+debug=[],
+deepspeed=None,
+disable_tqdm=False,
+do_eval=True,
+do_predict=False,
+do_train=True,
+eval_accumulation_steps=None,
+eval_delay=0,
+eval_steps=None,
+evaluation_strategy=no,
+fp16=False,
+fp16_backend=auto,
+fp16_full_eval=False,
+fp16_opt_level=O1,
+fsdp=[],
+fsdp_config={'fsdp_min_num_params': 0, 'xla': False, 'xla_fsdp_grad_ckpt': False},
+fsdp_min_num_params=0,
+fsdp_transformer_layer_cls_to_wrap=None,
+full_determinism=False,
+gradient_accumulation_steps=1,
+gradient_checkpointing=False,
+greater_is_better=None,
+group_by_length=False,
+half_precision_backend=auto,
+hub_model_id=None,
+hub_private_repo=False,
+hub_strategy=every_save,
+hub_token=<HUB_TOKEN>,
+ignore_data_skip=False,
+include_inputs_for_metrics=False,
+jit_mode_eval=False,
+label_names=None,
+label_smoothing_factor=0.0,
+learning_rate=0.0001,
+length_column_name=length,
+load_best_model_at_end=False,
+local_rank=0,
+log_level=passive,
+log_level_replica=warning,
+log_on_each_node=True,
+logging_dir=/share/ckpt/songtianwei/runs/Aug24_15-27-16_fvl14,
+logging_first_step=False,
+logging_nan_inf_filter=True,
+logging_steps=500,
+logging_strategy=steps,
+lr_scheduler_type=linear,
+max_grad_norm=1.0,
+max_steps=100000,
+metric_for_best_model=None,
+mp_parameters=,
+no_cuda=False,
+num_train_epochs=20.0,
+optim=adamw_hf,
+optim_args=None,
+output_dir=/share/ckpt/songtianwei,
+overwrite_output_dir=True,
+past_index=-1,
+per_device_eval_batch_size=128,
+per_device_train_batch_size=32,
+prediction_loss_only=False,
+push_to_hub=False,
+push_to_hub_model_id=None,
+push_to_hub_organization=None,
+push_to_hub_token=<PUSH_TO_HUB_TOKEN>,
+ray_scope=last,
+remove_unused_columns=False,
+report_to=['wandb'],
+resume_from_checkpoint=None,
+run_name=/share/ckpt/songtianwei,
+save_on_each_node=False,
+save_safetensors=False,
+save_steps=500,
+save_strategy=steps,
+save_total_limit=None,
+seed=42,
+sharded_ddp=[],
+skip_memory_metrics=True,
+tf32=None,
+torch_compile=False,
+torch_compile_backend=None,
+torch_compile_mode=None,
+torchdynamo=None,
+tpu_metrics_debug=False,
+tpu_num_cores=None,
+use_ipex=False,
+use_legacy_prediction_loop=False,
+use_mps_device=False,
+warmup_ratio=0.0,
+warmup_steps=0,
+weight_decay=0.1,
+xpu_backend=None,
+)
+08/24/2023 15:27:17 - INFO - __main__ - Distributed environment: MULTI_GPU  Backend: nccl
+Num processes: 8
+Process index: 0
+Local process index: 0
+Device: cuda:0
+
+Mixed precision type: no
+
+Repo card metadata block was not found. Setting CardData to empty.
+08/24/2023 15:27:17 - WARNING - huggingface_hub.repocard - Repo card metadata block was not found. Setting CardData to empty.
+Repo card metadata block was not found. Setting CardData to empty.
+08/24/2023 15:27:17 - WARNING - huggingface_hub.repocard - Repo card metadata block was not found. Setting CardData to empty.
+Repo card metadata block was not found. Setting CardData to empty.
+08/24/2023 15:27:17 - WARNING - huggingface_hub.repocard - Repo card metadata block was not found. Setting CardData to empty.
+Repo card metadata block was not found. Setting CardData to empty.
+08/24/2023 15:27:17 - WARNING - huggingface_hub.repocard - Repo card metadata block was not found. Setting CardData to empty.
+Repo card metadata block was not found. Setting CardData to empty.
+08/24/2023 15:27:17 - WARNING - huggingface_hub.repocard - Repo card metadata block was not found. Setting CardData to empty.
+Repo card metadata block was not found. Setting CardData to empty.
+08/24/2023 15:27:17 - WARNING - huggingface_hub.repocard - Repo card metadata block was not found. Setting CardData to empty.
+Repo card metadata block was not found. Setting CardData to empty.
+08/24/2023 15:27:17 - WARNING - huggingface_hub.repocard - Repo card metadata block was not found. Setting CardData to empty.
+Repo card metadata block was not found. Setting CardData to empty.
+08/24/2023 15:27:20 - WARNING - huggingface_hub.repocard - Repo card metadata block was not found. Setting CardData to empty.
+{'force_upcast'} was not found in config. Values will be initialized to default values.
+{'time_cond_proj_dim', 'addition_embed_type', 'num_class_embeds', 'addition_embed_type_num_heads', 'encoder_hid_dim', 'encoder_hid_dim_type', 'timestep_post_act', 'time_embedding_type', 'class_embed_type', 'resnet_skip_time_act', 'resnet_time_scale_shift', 'class_embeddings_concat', 'mid_block_only_cross_attention', 'cross_attention_norm', 'conv_out_kernel', 'mid_block_type', 'upcast_attention', 'num_attention_heads', 'projection_class_embeddings_input_dim', 'dual_cross_attention', 'resnet_out_scale_factor', 'conv_in_kernel', 'use_linear_projection', 'transformer_layers_per_block', 'time_embedding_dim', 'addition_time_embed_dim', 'time_embedding_act_fn', 'only_cross_attention'} was not found in config. Values will be initialized to default values.
